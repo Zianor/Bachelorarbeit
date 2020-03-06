@@ -27,15 +27,19 @@ class BcgData:
         self.data_series = []
         for path in paths:
             mat_dict = loadmat(path)
-            self.data_series.append(
-                DataSeries(
-                    mat_dict['BCG_raw_data'],
-                    mat_dict['q_BCG'],
-                    mat_dict['BBI_BCG'],
-                    mat_dict['BBI_ECG'],
-                    mat_dict['indx'],
-                    self.samplerate)
-            )
+            self.add_file_to_data(mat_dict)
+
+    def add_file_to_data(self, mat_dict):
+        """Adds the content of dict of bcg data to data_series"""
+        self.data_series.append(
+            DataSeries(
+                mat_dict['BCG_raw_data'],
+                mat_dict['q_BCG'],
+                mat_dict['BBI_BCG'],
+                mat_dict['BBI_ECG'],
+                mat_dict['indx'],
+                self.samplerate)
+        )
 
 
 data = BcgData()
