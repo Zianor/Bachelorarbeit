@@ -1,6 +1,5 @@
 from scipy.io import loadmat
 from src.utils import get_project_root
-import matplotlib.pyplot as plt
 import os
 
 
@@ -22,7 +21,8 @@ class BcgData:
     samplerate = 100
 
     def __init__(self):
-        paths = [path for path in os.listdir(os.path.join(get_project_root(), 'data/')) if path.lower().endswith(".mat")]
+        paths = [path for path in os.listdir(os.path.join(get_project_root(), 'data/')) if
+                 path.lower().endswith(".mat")]
         paths = [os.path.join(os.path.join(get_project_root(), 'data/'), path) for path in paths]
         self.data_series = []
         for path in paths:
@@ -38,11 +38,6 @@ class BcgData:
                 mat_dict['BBI_BCG'],
                 mat_dict['BBI_ECG'],
                 mat_dict['indx'],
-                self.samplerate)
+                self.samplerate
+            )
         )
-
-
-data = BcgData()
-for series in data.data_series:
-    plt.plot(series.calculate_bbi_error())
-    plt.show()
