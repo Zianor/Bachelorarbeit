@@ -4,6 +4,28 @@ from scipy.stats import median_absolute_deviation, kurtosis, skew
 from scipy.signal import find_peaks, hilbert, butter, lfilter
 
 
+class DataSet:
+
+    def __init__(self):
+        data = BcgData()
+        self.segment_length = 1000  # in samples
+        self._create_segments(data, self.segment_length)
+        # TODO: split in trainings and test set
+
+    def _create_segments(self, data, segment_length):
+        self.segments = []
+        for series in data.data_series:
+            for i in range(len(series.raw_data))[::segment_length]:
+                segment_data = series.raw_data[i:i+segment_length]
+                informative = DataSet.is_informative()  # label as informative or non informative
+                self.segments.append(segment_data, data.samplerate, informative)
+
+    @staticmethod
+    def is_informative():
+        # TODO: implement, incl. paramaters
+        return False
+
+
 class Segment:
     """A segment of bcg data with its statistical features based on the paper 'Sensor data quality processing for
     vital signs with opportunistic ambient sensing' (https://ieeexplore.ieee.org/document/7591234)"""
