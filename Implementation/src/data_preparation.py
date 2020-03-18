@@ -33,11 +33,11 @@ class BcgData:
         """Adds the content of dict of bcg data to data_series"""
         self.data_series.append(
             DataSeries(
-                mat_dict['BCG_raw_data'],
-                mat_dict['q_BCG'],
-                mat_dict['BBI_BCG'],
-                mat_dict['BBI_ECG'],
-                mat_dict['indx'],
+                mat_dict['BCG_raw_data'][0],
+                mat_dict['q_BCG'][0],
+                mat_dict['BBI_BCG'][0],
+                mat_dict['BBI_ECG'][0],
+                mat_dict['indx'][0],
                 self.samplerate
             )
         )
