@@ -1,17 +1,24 @@
-from src.data_preparation import BcgData
+import csv
+import os
+
 import numpy as np
-from scipy.stats import median_absolute_deviation, kurtosis, skew
 from scipy.signal import find_peaks, hilbert, butter, lfilter
-import matplotlib.pyplot as plt
+from scipy.stats import median_absolute_deviation, kurtosis, skew
+
+from src.data_preparation import BcgData
+from src.utils import get_project_root
 
 
 class DataSet:
 
     def __init__(self):
-        data = BcgData()
+        self.path = os.path.join(get_project_root(), 'data/data.csv')
+        self.data = BcgData()
         self.segment_length = 1000  # in samples
-        self._create_segments(data, self.segment_length)
-        # TODO: split in trainings and test set
+        print("Create segments and calculate features")
+        self._create_segments(self.data, self.segment_length)
+        print("Save segments")
+        self.save_csv()
 
     def _create_segments(self, data, segment_length):
         self.segments = []
@@ -27,6 +34,13 @@ class DataSet:
         # TODO: implement, incl. paramaters
         return False
 
+    def save_csv(self):
+        """Saves all segments as csv"""
+        with open(self.path, 'w') as f:
+            writer = csv.writer(f)
+            for segment in self.segments:
+                writer.writerow(segment.get_feature_array())
+
 
 class Segment:
     """A segment of bcg data with its statistical features based on the paper 'Sensor data quality processing for
@@ -38,23 +52,27 @@ class Segment:
         :param raw_data: raw BCG data
         :param informative: boolean indicating if segment is labeled as informative or not
         """
-        self.bcg = Segment._butter_bandpass_filter(raw_data, 1, 12, samplerate)
-        self.informative = informative
-        self.minimum = np.min(self.bcg)
-        self.maximum = np.max(self.bcg)
-        self.mean = np.mean(self.bcg)
-        self.standard_deviation = np.std(self.bcg)
+        bcg = Segment._butter_bandpass_filter(raw_data, 1, 12, samplerate)
+        self.minimum = np.min(bcg)
+        self.maximum = np.max(bcg)
+        self.mean = np.mean(bcg)
+        self.standard_deviation = np.std(bcg)
         self.range = self.maximum - self.minimum
-        self.iqr = np.subtract(*np.percentile(self.bcg, [75, 25]))
-        self.mad = median_absolute_deviation(self.bcg)
-        self.number_zero_crossings = (np.diff(np.sign(self.bcg)) != 0).sum()
-        self.kurtosis = kurtosis(self.bcg)
-        self.skewness = skew(self.bcg)
-        maxima, _ = find_peaks(self.bcg)
-        self.variance_local_maxima = np.var(self.bcg[maxima])
-        minima, _ = find_peaks(-self.bcg)
-        self.variance_local_minima = np.var(self.bcg[minima])
-        self.mean_signal_envelope = Segment._calc_mean_signal_envelope(self.bcg)
+        self.iqr = np.subtract(*np.percentile(bcg, [75, 25]))
+        self.mad = median_absolute_deviation(bcg)
+        self.number_zero_crossings = (np.diff(np.sign(bcg)) != 0).sum()
+        self.kurtosis = kurtosis(bcg)
+        self.skewness = skew(bcg)
+        maxima, _ = find_peaks(bcg)
+        self.variance_local_maxima = np.var(bcg[maxima])
+        if np.isnan(self.variance_local_maxima):
+            self.variance_local_maxima = 0
+        minima, _ = find_peaks(-bcg)
+        self.variance_local_minima = np.var(bcg[minima])
+        if np.isnan(self.variance_local_minima):
+            self.variance_local_minima = 0
+        self.mean_signal_envelope = Segment._calc_mean_signal_envelope(bcg)
+        self.informative = informative
 
     @staticmethod
     def _calc_mean_signal_envelope(signal):
@@ -82,5 +100,24 @@ class Segment:
         high = highcut / nyq
         b, a = butter(order, [low, high], btype='band')
         return b, a
+
+    def get_feature_array(self):
+        """:return array representation of the segment"""
+        return np.array([self.minimum,
+                         self.maximum,
+                         self.mean,
+                         self.standard_deviation,
+                         self.range,
+                         self.iqr,
+                         self.mad,
+                         self.number_zero_crossings,
+                         self.kurtosis,
+                         self.skewness,
+                         self.variance_local_maxima,
+                         self.variance_local_minima,
+                         self.mean_signal_envelope,
+                         self.informative])
+
+
 
 
