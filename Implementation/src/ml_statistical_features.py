@@ -2,6 +2,7 @@ from src.data_preparation import BcgData
 import numpy as np
 from scipy.stats import median_absolute_deviation, kurtosis, skew
 from scipy.signal import find_peaks, hilbert, butter, lfilter
+import matplotlib.pyplot as plt
 
 
 class DataSet:
@@ -15,10 +16,11 @@ class DataSet:
     def _create_segments(self, data, segment_length):
         self.segments = []
         for series in data.data_series:
-            for i in range(len(series.raw_data))[::segment_length]:
-                segment_data = series.raw_data[i:i+segment_length]
-                informative = DataSet.is_informative()  # label as informative or non informative
-                self.segments.append(segment_data, data.samplerate, informative)
+            for i in range(0, len(series.raw_data), segment_length):
+                if i+segment_length < len(series.raw_data):  # to prevent shorter segments, last shorter one ignored
+                    segment_data = np.array(series.raw_data[i:i+segment_length])
+                    informative = DataSet.is_informative()  # label as informative or non informative
+                    self.segments.append(Segment(segment_data, data.samplerate, informative))
 
     @staticmethod
     def is_informative():
@@ -33,10 +35,10 @@ class Segment:
     def __init__(self, raw_data, samplerate, informative):
         """
         Creates a segment and computes several statistical features
-        :param filtered_data: preprocessed BCG data
+        :param raw_data: raw BCG data
         :param informative: boolean indicating if segment is labeled as informative or not
         """
-        self.bcg = Segment._butter_bandpass_filter(raw_data, 1000, 12000, samplerate)
+        self.bcg = Segment._butter_bandpass_filter(raw_data, 1, 12, samplerate)
         self.informative = informative
         self.minimum = np.min(self.bcg)
         self.maximum = np.max(self.bcg)
@@ -48,8 +50,10 @@ class Segment:
         self.number_zero_crossings = (np.diff(np.sign(self.bcg)) != 0).sum()
         self.kurtosis = kurtosis(self.bcg)
         self.skewness = skew(self.bcg)
-        self.variance_local_maxima = np.var(self.bcg[find_peaks(self.bcg)])
-        self.variance_local_minima = np.var(self.bcg[find_peaks(-self.bcg)])
+        maxima, _ = find_peaks(self.bcg)
+        self.variance_local_maxima = np.var(self.bcg[maxima])
+        minima, _ = find_peaks(-self.bcg)
+        self.variance_local_minima = np.var(self.bcg[minima])
         self.mean_signal_envelope = Segment._calc_mean_signal_envelope(self.bcg)
 
     @staticmethod
@@ -78,4 +82,5 @@ class Segment:
         high = highcut / nyq
         b, a = butter(order, [low, high], btype='band')
         return b, a
+
 
