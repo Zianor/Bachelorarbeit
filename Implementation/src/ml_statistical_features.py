@@ -22,22 +22,22 @@ class DataSet:
         self.data = BcgData()
         self.segment_length = DataSet._seconds_to_frames(10, self.data.samplerate)  # in samples
         print("Create segments and calculate features")
-        self._create_segments(self.data, self.segment_length)
+        self._create_segments()
         print("Save segments")
         self.save_csv()
 
-    def _create_segments(self, data):
+    def _create_segments(self):
         """Creates segments with a given length out of given BCG Data
                 :param data: BCG Data
                 :type data: BcgData
                 """
         self.segments = []
-        for series in data.data_series:
+        for series in self.data.data_series:
             for i in range(0, len(series.raw_data), self.segment_length):
                 if i + self.segment_length < len(series.raw_data):  # prevent shorter segments, last shorter one ignored
                     segment_data = np.array(series.raw_data[i:i + self.segment_length])
                     informative = self.is_informative(series, i, i + self.segment_length)  # label
-                    self.segments.append(Segment(segment_data, data.samplerate, informative))
+                    self.segments.append(Segment(segment_data, self.data.samplerate, informative))
 
     def is_informative(self, series, start, end):
         """
@@ -110,13 +110,15 @@ class Segment:
         self.kurtosis = kurtosis(bcg)
         self.skewness = skew(bcg)
         maxima, _ = find_peaks(bcg)
-        self.variance_local_maxima = np.var(bcg[maxima])
-        if np.isnan(self.variance_local_maxima):
+        if len(maxima) == 0:
             self.variance_local_maxima = 0
+        else:
+            self.variance_local_maxima = np.var(bcg[maxima])
         minima, _ = find_peaks(-bcg)
-        self.variance_local_minima = np.var(bcg[minima])
-        if np.isnan(self.variance_local_minima):
+        if len(minima) == 0:
             self.variance_local_minima = 0
+        else:
+            self.variance_local_minima = np.var(bcg[minima])
         self.mean_signal_envelope = Segment._calc_mean_signal_envelope(bcg)
         self.informative = informative
 
