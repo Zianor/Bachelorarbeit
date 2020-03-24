@@ -10,19 +10,19 @@ from src.utils import get_project_root
 
 
 class DataSet:
-    segment_length = 1000  # in samples
 
     def __init__(self, coverage_threshold, mean_error_threshold):
         self.path = os.path.join(get_project_root(), 'data/data.csv')
         self.coverage_threshold = coverage_threshold
         self.mean_error_threshold = mean_error_threshold
         self.data = BcgData()
+        self.segment_length = DataSet._seconds_to_frames(10, self.data.samplerate)  # in samples
         print("Create segments and calculate features")
         self._create_segments(self.data, self.segment_length)
         print("Save segments")
         self.save_csv()
 
-    def _create_segments(self, data, segment_length):
+    def _create_segments(self, data):
         """Creates segments with a given length out of given BCG Data
                 :param data: BCG Data
                 :type data: BcgData
@@ -31,10 +31,10 @@ class DataSet:
                 """
         self.segments = []
         for series in data.data_series:
-            for i in range(0, len(series.raw_data), segment_length):
-                if i + segment_length < len(series.raw_data):  # to prevent shorter segments, last shorter one ignored
-                    segment_data = np.array(series.raw_data[i:i + segment_length])
-                    informative = self.is_informative(series, i, i + segment_length)  # label
+            for i in range(0, len(series.raw_data), self.segment_length):
+                if i + self.segment_length < len(series.raw_data):  # to prevent shorter segments, last shorter one ignored
+                    segment_data = np.array(series.raw_data[i:i + self.segment_length])
+                    informative = self.is_informative(series, i, i + self.segment_length)  # label
                     self.segments.append(Segment(segment_data, data.samplerate, informative))
 
     def is_informative(self, series, start, end):
@@ -51,7 +51,7 @@ class DataSet:
         :rtype: boolean
         """
         indices = np.where(np.logical_and(start < series.indices, series.indices < end))[0]
-        coverage = 100 / DataSet.segment_length * sum(
+        coverage = 100 / self.segment_length * sum(
             DataSet._seconds_to_frames(bbi, series.samplerate) for bbi in series.bbi_bcg[indices])
         if coverage < self.coverage_threshold:
             return False
@@ -172,7 +172,7 @@ class Segment:
 
 
 if __name__ == "__main__":
-    data_set = DataSet(85, 0.005)
+    data_set = DataSet(80, 0.007)
     count_informative = sum(segment.informative for segment in data_set.segments)
     print("Informative: " + str(count_informative))
     print("Not-informative: " + str(len(data_set.segments)-count_informative))
