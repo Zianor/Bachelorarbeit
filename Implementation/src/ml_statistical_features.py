@@ -10,6 +10,10 @@ from src.utils import get_project_root
 
 
 class DataSet:
+    """
+    A data set contains BCG Data in the form of 10 seconds segments. Furthermore a DataSet writes a .csv file with the
+    statistical feature representation of all segments.
+    """
 
     def __init__(self, coverage_threshold, mean_error_threshold):
         self.path = os.path.join(get_project_root(), 'data/data.csv')
@@ -26,13 +30,11 @@ class DataSet:
         """Creates segments with a given length out of given BCG Data
                 :param data: BCG Data
                 :type data: BcgData
-                :param segment_length: segment length in samples
-                :type segment_length: int
                 """
         self.segments = []
         for series in data.data_series:
             for i in range(0, len(series.raw_data), self.segment_length):
-                if i + self.segment_length < len(series.raw_data):  # to prevent shorter segments, last shorter one ignored
+                if i + self.segment_length < len(series.raw_data):  # prevent shorter segments, last shorter one ignored
                     segment_data = np.array(series.raw_data[i:i + self.segment_length])
                     informative = self.is_informative(series, i, i + self.segment_length)  # label
                     self.segments.append(Segment(segment_data, data.samplerate, informative))
