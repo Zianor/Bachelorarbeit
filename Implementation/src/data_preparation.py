@@ -13,9 +13,6 @@ class DataSeries:
         self.indices = indices
         self.samplerate = samplerate
 
-    def calculate_bbi_error(self):
-        return abs(self.bbi_bcg - self.bbi_ecg)
-
 
 class BcgData:
     samplerate = 100

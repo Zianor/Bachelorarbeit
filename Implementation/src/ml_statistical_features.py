@@ -110,12 +110,12 @@ class Segment:
         self.kurtosis = kurtosis(bcg)
         self.skewness = skew(bcg)
         maxima, _ = find_peaks(bcg)
-        if len(maxima) == 0:
+        if len(maxima) == 0:  # TODO: decide how to deal with, , drop the segments?
             self.variance_local_maxima = 0
         else:
             self.variance_local_maxima = np.var(bcg[maxima])
         minima, _ = find_peaks(-bcg)
-        if len(minima) == 0:
+        if len(minima) == 0:  # TODO: decide how to deal with, drop the segments?
             self.variance_local_minima = 0
         else:
             self.variance_local_minima = np.var(bcg[minima])
