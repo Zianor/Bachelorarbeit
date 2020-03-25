@@ -40,6 +40,11 @@ class MyTestCase(unittest.TestCase):
     def test__type_samplerate(self):
         self.assertEqual(type(self.series.samplerate), int)
 
+    def test__equal_array_length(self):
+        self.assertEqual(len(self.series.sqi), len(self.series.bbi_ecg))
+        self.assertEqual(len(self.series.sqi), len(self.series.bbi_bcg))
+        self.assertEqual(len(self.series.sqi), len(self.series.indices))
+
 
 if __name__ == '__main__':
     unittest.main()
