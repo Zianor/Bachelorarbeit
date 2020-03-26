@@ -27,10 +27,9 @@ class DataSet:
         self.save_csv()
 
     def _create_segments(self):
-        """Creates segments with a given length out of given BCG Data
-                :param data: BCG Data
-                :type data: BcgData
-                """
+        """
+        Creates segments with a given length out of given BCG Data
+        """
         self.segments = []
         for series in self.data.data_series:
             for i in range(0, len(series.raw_data), self.segment_length):
