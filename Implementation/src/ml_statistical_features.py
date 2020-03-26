@@ -1,9 +1,15 @@
 import csv
 import os
+import warnings
 
 import numpy as np
+import pandas as pd
 from scipy.signal import find_peaks, hilbert, butter, lfilter
 from scipy.stats import median_absolute_deviation, kurtosis, skew
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score, confusion_matrix
 
 from src.data_preparation import BcgData
 from src.utils import get_project_root
@@ -15,15 +21,13 @@ class DataSet:
     statistical feature representation of all segments.
     """
 
-    def __init__(self, coverage_threshold, mean_error_threshold):
+    def __init__(self, coverage_threshold=80, mean_error_threshold=0.007):
         self.path = os.path.join(get_project_root(), 'data/data.csv')
         self.coverage_threshold = coverage_threshold
         self.mean_error_threshold = mean_error_threshold
         self.data = BcgData()
         self.segment_length = DataSet._seconds_to_frames(10, self.data.samplerate)  # in samples
-        print("Create segments and calculate features")
         self._create_segments()
-        print("Save segments")
         self.save_csv()
 
     def _create_segments(self):
@@ -67,6 +71,7 @@ class DataSet:
         """
         with open(self.path, 'w') as f:
             writer = csv.writer(f)
+            writer.writerow(Segment.get_feature_name_array())
             for segment in self.segments:
                 writer.writerow(segment.get_feature_array())
 
@@ -154,6 +159,23 @@ class Segment:
         b, a = butter(order, [low, high], btype='band')
         return b, a
 
+    @staticmethod
+    def get_feature_name_array():
+        return np.array(['minimum',
+                         'maximum',
+                         'mean',
+                         'standard deviation',
+                         'range',
+                         'iqr',
+                         'mad',
+                         'number zero crossings',
+                         'kurtosis',
+                         'skewness',
+                         'variance local maxima',
+                         'variance local minima',
+                         'mean signal envelope',
+                         'informative'])
+
     def get_feature_array(self):
         """
         :return: array representation of the segment
@@ -174,8 +196,60 @@ class Segment:
                          self.informative])
 
 
+def load_data():
+    """
+    Loads BCG data features with its target labels
+    :return: BCG data features, target labels
+    """
+    path = os.path.join(get_project_root(), 'data/data.csv')
+    if not os.path.isfile(path):
+        warnings.warn('No csv, data needs to be reproduced. This may take some time')
+        DataSet()
+    df = pd.read_csv(path)
+    features = df.iloc[:, 0:12]
+    target = df.iloc[:, 13]
+    return features, target
+
+
+def support_vector_machine(x, target):
+    """
+    Support vector machine
+    :param x: feature matrix
+    :param target: target vector
+    """
+    # Split dataset in 2/3 training and 1/3 test data
+    x_train, x_test, y_train, y_test = train_test_split(
+        x, target, test_size=0.333, random_state=1, stratify=target)
+
+    print('Labels counts in y:', np.bincount(target))
+    print('Labels counts in y_train:', np.bincount(y_train))
+    print('Labels counts in y_test:', np.bincount(y_test))
+
+    # Standardizing features
+    sc = StandardScaler()
+    sc.fit(x_train)
+    x_train_std = sc.transform(x_train)
+    x_test_std = sc.transform(x_test)
+
+    # train SVM
+    svm = SVC(kernel='rbf', C=1.0, random_state=1)
+    svm.fit(x_train_std, y_train)
+
+    # evaluate
+    y_pred = svm.predict(x_test_std)
+    print('Misclassified examples: %d' % (y_test != y_pred).sum())
+    print('Accuracy: %.3f' % accuracy_score(y_test, y_pred))
+
+    confusion = confusion_matrix(y_test, y_pred)
+    print('Confusion matrix')
+    print(confusion)
+
+
 if __name__ == "__main__":
-    data_set = DataSet(80, 0.007)
-    count_informative = sum(segment.informative for segment in data_set.segments)
-    print("Informative: " + str(count_informative))
-    print("Not-informative: " + str(len(data_set.segments)-count_informative))
+    X, y = load_data()
+
+    support_vector_machine(X, y)
+
+
+
+
