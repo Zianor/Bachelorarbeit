@@ -243,15 +243,16 @@ def load_data():
     return features, target
 
 
-def support_vector_machine(x, target):
+def data_preparation(features, target):
     """
-    Support vector machine
-    :param x: feature matrix
+    Splits data in training and test data and standardizes features
+    :param features: feature matrix
     :param target: target vector
+    :return: x_train_std, x_test_std, y_train, y_test
     """
     # Split dataset in 2/3 training and 1/3 test data
     x_train, x_test, y_train, y_test = train_test_split(
-        x, target, test_size=0.333, random_state=1, stratify=target)
+        features, target, test_size=0.333, random_state=1, stratify=target)
 
     print('Labels counts in y:', np.bincount(target))
     print('Labels counts in y_train:', np.bincount(y_train))
@@ -262,23 +263,41 @@ def support_vector_machine(x, target):
     sc.fit(x_train)
     x_train_std = sc.transform(x_train)
     x_test_std = sc.transform(x_test)
+    return x_train_std, x_test_std, y_train, y_test
+
+
+def evaluate(y_actual, y_pred):
+    """
+    Evaluates predicted labels
+    :param y_actual: actual labels
+    :param y_pred: predicted labels
+    """
+    print('Misclassified examples: %d' % (y_actual != y_pred).sum())
+    print('Accuracy: %.3f' % accuracy_score(y_actual, y_pred))
+
+    confusion = confusion_matrix(y_actual, y_pred)
+    print('Confusion matrix')
+    print(confusion)
+
+
+def support_vector_machine(features, target):
+    """
+    Support vector machine
+    :param features: feature matrix
+    :param target: target vector
+    """
+    x_train_std, x_test_std, y_train, y_test = data_preparation(features, target)
 
     # train SVM
     svm = SVC(kernel='rbf', C=1.0, random_state=1)
     svm.fit(x_train_std, y_train)
 
-    # evaluate
     y_pred = svm.predict(x_test_std)
-    print('Misclassified examples: %d' % (y_test != y_pred).sum())
-    print('Accuracy: %.3f' % accuracy_score(y_test, y_pred))
 
-    confusion = confusion_matrix(y_test, y_pred)
-    print('Confusion matrix')
-    print(confusion)
+    evaluate(y_test, y_pred)
 
 
 if __name__ == "__main__":
-    data_set = DataSet()
     X, y = load_data()
 
     support_vector_machine(X, y)
