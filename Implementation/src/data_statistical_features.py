@@ -1,16 +1,10 @@
 import csv
 import os
-import warnings
 
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 from scipy.signal import find_peaks, hilbert, butter, lfilter
 from scipy.stats import median_absolute_deviation, kurtosis, skew
-from sklearn.metrics import accuracy_score, confusion_matrix
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from sklearn.svm import SVC
 
 from src.data_preparation import BcgData
 from src.utils import get_project_root
@@ -227,77 +221,3 @@ class Segment:
                          self.mean_signal_envelope,
                          self.informative])
 
-
-def load_data():
-    """
-    Loads BCG data features with its target labels
-    :return: BCG data features, target labels
-    """
-    path = os.path.join(get_project_root(), 'data/data.csv')
-    if not os.path.isfile(path):
-        warnings.warn('No csv, data needs to be reproduced. This may take some time')
-        DataSet()
-    df = pd.read_csv(path)
-    features = df.iloc[:, 0:12]
-    target = df.iloc[:, 13]
-    return features, target
-
-
-def data_preparation(features, target):
-    """
-    Splits data in training and test data and standardizes features
-    :param features: feature matrix
-    :param target: target vector
-    :return: x_train_std, x_test_std, y_train, y_test
-    """
-    # Split dataset in 2/3 training and 1/3 test data
-    x_train, x_test, y_train, y_test = train_test_split(
-        features, target, test_size=0.333, random_state=1, stratify=target)
-
-    print('Labels counts in y:', np.bincount(target))
-    print('Labels counts in y_train:', np.bincount(y_train))
-    print('Labels counts in y_test:', np.bincount(y_test))
-
-    # Standardizing features
-    sc = StandardScaler()
-    sc.fit(x_train)
-    x_train_std = sc.transform(x_train)
-    x_test_std = sc.transform(x_test)
-    return x_train_std, x_test_std, y_train, y_test
-
-
-def evaluate(y_actual, y_pred):
-    """
-    Evaluates predicted labels
-    :param y_actual: actual labels
-    :param y_pred: predicted labels
-    """
-    print('Misclassified examples: %d' % (y_actual != y_pred).sum())
-    print('Accuracy: %.3f' % accuracy_score(y_actual, y_pred))
-
-    confusion = confusion_matrix(y_actual, y_pred)
-    print('Confusion matrix')
-    print(confusion)
-
-
-def support_vector_machine(features, target):
-    """
-    Support vector machine
-    :param features: feature matrix
-    :param target: target vector
-    """
-    x_train_std, x_test_std, y_train, y_test = data_preparation(features, target)
-
-    # train SVM
-    svm = SVC(kernel='rbf', C=1.0, random_state=1)
-    svm.fit(x_train_std, y_train)
-
-    y_pred = svm.predict(x_test_std)
-
-    evaluate(y_test, y_pred)
-
-
-if __name__ == "__main__":
-    X, y = load_data()
-
-    support_vector_machine(X, y)
