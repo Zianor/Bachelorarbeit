@@ -2,14 +2,15 @@ import csv
 import os
 import warnings
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from scipy.signal import find_peaks, hilbert, butter, lfilter
 from scipy.stats import median_absolute_deviation, kurtosis, skew
+from sklearn.metrics import accuracy_score, confusion_matrix
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
-from sklearn.metrics import accuracy_score, confusion_matrix
 
 from src.data_preparation import BcgData
 from src.utils import get_project_root
@@ -21,8 +22,9 @@ class DataSet:
     statistical feature representation of all segments.
     """
 
-    def __init__(self, coverage_threshold=80, mean_error_threshold=0.007):
-        self.path = os.path.join(get_project_root(), 'data/data.csv')
+    def __init__(self, coverage_threshold=90, mean_error_threshold=0.015):
+        self.path_csv = os.path.join(get_project_root(), 'data/data.csv')
+        self.path_images = os.path.join(get_project_root(), 'data/images')
         self.coverage_threshold = coverage_threshold
         self.mean_error_threshold = mean_error_threshold
         self.data = BcgData()
@@ -39,8 +41,8 @@ class DataSet:
             for i in range(0, len(series.raw_data), self.segment_length):
                 if i + self.segment_length < len(series.raw_data):  # prevent shorter segments, last shorter one ignored
                     segment_data = np.array(series.raw_data[i:i + self.segment_length])
-                    informative = self.is_informative(series, i, i + self.segment_length)  # label
-                    self.segments.append(Segment(segment_data, self.data.samplerate, informative))
+                    informative, coverage, mean_error = self.is_informative(series, i, i + self.segment_length)  # label
+                    self.segments.append(Segment(segment_data, self.data.samplerate, informative, coverage, mean_error))
 
     def is_informative(self, series, start, end):
         """
@@ -52,28 +54,54 @@ class DataSet:
         :type start: int
         :param end: end index of the segment
         :type end: int
-        :return: if segment is informative
-        :rtype: boolean
+        :return: if segment is informative, coverage, mean_error
+        :rtype: boolean, float, float
         """
         indices = np.where(np.logical_and(start < series.indices, series.indices < end))[0]
         coverage = 100 / self.segment_length * sum(
             DataSet._seconds_to_frames(bbi, series.samplerate) for bbi in series.bbi_bcg[indices])
-        if coverage < self.coverage_threshold:
-            return False
-        mean_error = sum(abs(series.bbi_bcg[i] - series.bbi_ecg[i]) for i in indices) / len(indices)
-        if mean_error > self.mean_error_threshold:
-            return False
-        return True
+        if len(indices) > 0:
+            mean_error = sum(abs(series.bbi_bcg[i] - series.bbi_ecg[i]) for i in indices) / len(indices)
+        else:
+            mean_error = float("inf")
+        if coverage < self.coverage_threshold or mean_error > self.mean_error_threshold:
+            return False, coverage, mean_error
+        return True, coverage, mean_error
 
     def save_csv(self):
         """
         Saves all segments as csv
         """
-        with open(self.path, 'w') as f:
+        with open(self.path_csv, 'w') as f:
             writer = csv.writer(f)
             writer.writerow(Segment.get_feature_name_array())
             for segment in self.segments:
                 writer.writerow(segment.get_feature_array())
+
+    def save_images(self, count=1000):
+        """
+        Saves segments as images
+        :param count: number of images saved
+        """
+        if not os.path.exists(self.path_images):
+            os.makedirs(self.path_images)
+        count_informative = 0
+        count_non_informative = 0
+        for segment in self.segments:
+            if count_non_informative + count_informative > count:
+                break
+            if segment.informative:
+                count_informative += 1
+                plt.plot(segment.bcg)
+                plt.title("Coverage " + str(segment.coverage) + ", Mean Error " + str(segment.mean_error))
+                plt.savefig(os.path.join(self.path_images, 'informative' + str(count_informative)))
+                plt.clf()
+            else:
+                count_non_informative += 1
+                plt.plot(segment.bcg)
+                plt.title("Coverage " + str(segment.coverage) + ", Mean Error " + str(segment.mean_error))
+                plt.savefig(os.path.join(self.path_images, 'non-informative' + str(count_non_informative)))
+                plt.clf()
 
     @staticmethod
     def _seconds_to_frames(duration_seconds, frequency):
@@ -96,34 +124,38 @@ class Segment:
     vital signs with opportunistic ambient sensing' (https://ieeexplore.ieee.org/document/7591234)
     """
 
-    def __init__(self, raw_data, samplerate, informative):
+    def __init__(self, raw_data, samplerate, informative, coverage, mean_error):
         """
         Creates a segment and computes several statistical features
         :param raw_data: raw BCG data
         :param informative: boolean indicating if segment is labeled as informative or not
+        :param coverage:
+        :param mean_error: mean BBI error to reference
         """
-        bcg = Segment._butter_bandpass_filter(raw_data, 1, 12, samplerate)
-        self.minimum = np.min(bcg)
-        self.maximum = np.max(bcg)
-        self.mean = np.mean(bcg)
-        self.standard_deviation = np.std(bcg)
+        self.bcg = Segment._butter_bandpass_filter(raw_data, 1, 12, samplerate)
+        self.coverage = coverage
+        self.mean_error = mean_error
+        self.minimum = np.min(self.bcg)
+        self.maximum = np.max(self.bcg)
+        self.mean = np.mean(self.bcg)
+        self.standard_deviation = np.std(self.bcg)
         self.range = self.maximum - self.minimum
-        self.iqr = np.subtract(*np.percentile(bcg, [75, 25]))
-        self.mad = median_absolute_deviation(bcg)
-        self.number_zero_crossings = (np.diff(np.sign(bcg)) != 0).sum()
-        self.kurtosis = kurtosis(bcg)
-        self.skewness = skew(bcg)
-        maxima, _ = find_peaks(bcg)
+        self.iqr = np.subtract(*np.percentile(self.bcg, [75, 25]))
+        self.mad = median_absolute_deviation(self.bcg)
+        self.number_zero_crossings = (np.diff(np.sign(self.bcg)) != 0).sum()
+        self.kurtosis = kurtosis(self.bcg)
+        self.skewness = skew(self.bcg)
+        maxima, _ = find_peaks(self.bcg)
         if len(maxima) == 0:  # TODO: decide how to deal with, , drop the segments?
             self.variance_local_maxima = 0
         else:
-            self.variance_local_maxima = np.var(bcg[maxima])
-        minima, _ = find_peaks(-bcg)
+            self.variance_local_maxima = np.var(self.bcg[maxima])
+        minima, _ = find_peaks(-self.bcg)
         if len(minima) == 0:  # TODO: decide how to deal with, drop the segments?
             self.variance_local_minima = 0
         else:
-            self.variance_local_minima = np.var(bcg[minima])
-        self.mean_signal_envelope = Segment._calc_mean_signal_envelope(bcg)
+            self.variance_local_minima = np.var(self.bcg[minima])
+        self.mean_signal_envelope = Segment._calc_mean_signal_envelope(self.bcg)
         self.informative = informative
 
     @staticmethod
@@ -246,10 +278,7 @@ def support_vector_machine(x, target):
 
 
 if __name__ == "__main__":
+    data_set = DataSet()
     X, y = load_data()
 
     support_vector_machine(X, y)
-
-
-
-
