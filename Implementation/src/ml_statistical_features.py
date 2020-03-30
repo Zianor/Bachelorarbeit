@@ -35,22 +35,23 @@ def data_preparation(features, target):
     Splits data in training and test data and standardizes features
     :param features: feature matrix
     :param target: target vector
-    :return: x_train_std, x_test_std, y_train, y_test
+    :return: string_representation, x_train_std, x_test_std, y_train, y_test
     """
     # Split dataset in 2/3 training and 1/3 test data
     x_train, x_test, y_train, y_test = train_test_split(
         features, target, test_size=0.333, random_state=1, stratify=target)
 
-    print('Labels counts in y:', np.bincount(target))
-    print('Labels counts in y_train:', np.bincount(y_train))
-    print('Labels counts in y_test:', np.bincount(y_test))
+    string_representation = ['Labels counts in y:', str(np.bincount(
+        target)), os.linesep, 'Labels counts in y_train:', str(np.bincount(
+        y_train)), os.linesep, 'Labels counts in y_test:', str(np.bincount(y_test))]
+    string_representation = ''.join(string_representation)
 
     # Standardizing features
     sc = StandardScaler()
     sc.fit(x_train)
     x_train_std = sc.transform(x_train)
     x_test_std = sc.transform(x_test)
-    return x_train_std, x_test_std, y_train, y_test
+    return string_representation, x_train_std, x_test_std, y_train, y_test
 
 
 def evaluate(y_actual, y_pred):
@@ -73,7 +74,7 @@ def support_vector_machine(features, target):
     :param features: feature matrix
     :param target: target vector
     """
-    x_train_std, x_test_std, y_train, y_test = data_preparation(features, target)
+    _, x_train_std, x_test_std, y_train, y_test = data_preparation(features, target)
 
     # train SVM
     svm = SVC(kernel='rbf', C=1.0, random_state=1)
@@ -92,7 +93,7 @@ def support_vector_machine_cross_validation(features, target, k=10):
     :param target: target vector
     :param k: number of folds
     """
-    x_train_std, x_test_std, y_train, y_test = data_preparation(features, target)
+    _, x_train_std, x_test_std, y_train, y_test = data_preparation(features, target)
 
     # train SVM
     svm = SVC(kernel='rbf', C=1.0, random_state=1)
@@ -116,7 +117,7 @@ def linear_discriminant_analysis(features, target):
     :param features: feature matrix
     :param target: target vector
     """
-    x_train_std, x_test_std, y_train, y_test = data_preparation(features, target)
+    _, x_train_std, x_test_std, y_train, y_test = data_preparation(features, target)
 
     # train LDA
     lda = LinearDiscriminantAnalysis()  # no further information given
@@ -135,7 +136,7 @@ def linear_discriminant_analysis_cross_validation(features, target, k=10):
     :param target: target vector
     :param k: number of folds
     """
-    x_train_std, x_test_std, y_train, y_test = data_preparation(features, target)
+    _, x_train_std, x_test_std, y_train, y_test = data_preparation(features, target)
 
     # train LDA
     lda = LinearDiscriminantAnalysis()  # no further information given
