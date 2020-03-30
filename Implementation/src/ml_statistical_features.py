@@ -5,6 +5,7 @@ import sys
 import pandas as pd
 import numpy as np
 from sklearn import model_selection
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.metrics import accuracy_score, confusion_matrix
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
@@ -97,7 +98,9 @@ def support_vector_machine_cross_validation(features, target, k=10):
     svm = SVC(kernel='rbf', C=1.0, random_state=1)
     k_fold = model_selection.KFold(n_splits=k)
     y_train = y_train.to_numpy()
-    results_k_fold = [svm.fit(x_train_std[train_index], y_train[train_index]).score(x_train_std[test_index], y_train[test_index]) for train_index, test_index in k_fold.split(x_train_std, y_train)]
+    results_k_fold = [
+        svm.fit(x_train_std[train_index], y_train[train_index]).score(x_train_std[test_index], y_train[test_index]) for
+        train_index, test_index in k_fold.split(x_train_std, y_train)]
 
     print("Support Vector Machine (cross validation)")
     print("Accuracy in cross validation: %.3f" % (np.mean(results_k_fold) * 100.0))
@@ -107,9 +110,54 @@ def support_vector_machine_cross_validation(features, target, k=10):
     evaluate(y_test, y_pred)
 
 
+def linear_discriminant_analysis(features, target):
+    """
+    Linear Discriminant Analysis
+    :param features: feature matrix
+    :param target: target vector
+    """
+    x_train_std, x_test_std, y_train, y_test = data_preparation(features, target)
+
+    # train LDA
+    lda = LinearDiscriminantAnalysis()  # no further information given
+    lda.fit(x_train_std, y_train)
+
+    y_pred = lda.predict(x_test_std)
+
+    print("Linear Discriminant Analysis")
+    evaluate(y_test, y_pred)
+
+
+def linear_discriminant_analysis_cross_validation(features, target, k=10):
+    """
+    Linear Discriminant Analysis with k-fold cross validation
+    :param features: feature matrix
+    :param target: target vector
+    :param k: number of folds
+    """
+    x_train_std, x_test_std, y_train, y_test = data_preparation(features, target)
+
+    # train LDA
+    lda = LinearDiscriminantAnalysis()  # no further information given
+    k_fold = model_selection.KFold(n_splits=k)
+    y_train = y_train.to_numpy()
+    results_k_fold = [
+        lda.fit(x_train_std[train_index], y_train[train_index]).score(x_train_std[test_index], y_train[test_index]) for
+        train_index, test_index in k_fold.split(x_train_std, y_train)]
+
+    print("Linear Discriminant Analysis (cross validation)")
+    print("Accuracy in cross validation: %.3f" % (np.mean(results_k_fold) * 100.0))
+
+    y_pred = lda.predict(x_test_std)
+
+    evaluate(y_test, y_pred)
+
+
 if __name__ == "__main__":
     X, y = load_data()
 
-    support_vector_machine(X, y)
-    support_vector_machine_cross_validation(X, y)
+    # support_vector_machine(X, y)
+    # support_vector_machine_cross_validation(X, y)
+    linear_discriminant_analysis(X, y)
+    linear_discriminant_analysis_cross_validation(X, y)
     sys.exit(0)
