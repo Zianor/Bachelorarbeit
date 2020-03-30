@@ -10,6 +10,7 @@ from sklearn.metrics import accuracy_score, confusion_matrix
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
+from sklearn.tree import DecisionTreeClassifier
 
 from data_statistical_features import DataSet
 from utils import get_project_root
@@ -160,6 +161,53 @@ def linear_discriminant_analysis_cross_validation(features, target, k=10):
     return ''.join(string_representation)
 
 
+def decision_tree(features, target):
+    """
+    Decision tree
+    :param features: feature matrix
+    :param target: target vector
+    :return: string representation of results
+    """
+    _, x_train_std, x_test_std, y_train, y_test = data_preparation(features, target)
+
+    # train DT
+    dt = DecisionTreeClassifier()  # no further information given
+    dt.fit(x_train_std, y_train)
+
+    y_pred = dt.predict(x_test_std)
+
+    string_representation = ["Decision tree", os.linesep, str(evaluate(y_test, y_pred))]
+
+    return ''.join(string_representation)
+
+
+def decision_tree_cross_validation(features, target, k=10):
+    """
+    Decision tree with k-fold cross validation
+    :param features: feature matrix
+    :param target: target vector
+    :param k: number of folds
+    :return: string representation of results
+    """
+    _, x_train_std, x_test_std, y_train, y_test = data_preparation(features, target)
+
+    # train DT
+    dt = DecisionTreeClassifier()  # no further information given
+    k_fold = model_selection.KFold(n_splits=k)
+    y_train = y_train.to_numpy()
+    results_k_fold = [
+        dt.fit(x_train_std[train_index], y_train[train_index]).score(x_train_std[test_index], y_train[test_index]) for
+        train_index, test_index in k_fold.split(x_train_std, y_train)]
+
+    y_pred = dt.predict(x_test_std)
+
+    string_representation = ["Decision (cross validation)", os.linesep,
+                             "Accuracy in cross validation: %.3f" % (np.mean(results_k_fold) * 100.0), os.linesep,
+                             str(evaluate(y_test, y_pred))]
+
+    return ''.join(string_representation)
+
+
 if __name__ == "__main__":
     X, y = load_data()
     data_string, _, _, _, _ = data_preparation(X, y)
@@ -168,4 +216,6 @@ if __name__ == "__main__":
     # print(support_vector_machine_cross_validation(X, y))
     # print(linear_discriminant_analysis(X, y))
     # print(linear_discriminant_analysis_cross_validation(X, y))
+    print(decision_tree(X, y))
+    print(decision_tree_cross_validation(X, y))
     sys.exit(0)
