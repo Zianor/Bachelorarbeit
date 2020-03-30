@@ -60,12 +60,10 @@ def evaluate(y_actual, y_pred):
     :param y_actual: actual labels
     :param y_pred: predicted labels
     """
-    print("Misclassified examples: %d" % (y_actual != y_pred).sum())
-    print("Accuracy: %.3f" % accuracy_score(y_actual, y_pred))
-
-    confusion = confusion_matrix(y_actual, y_pred)
-    print("Confusion matrix")
-    print(confusion)
+    string_representation = ["Misclassified examples: %d" % (y_actual != y_pred).sum(), os.linesep,
+                             "Accuracy: %.3f" % accuracy_score(y_actual, y_pred), os.linesep,
+                             "Confusion matrix", os.linesep, str(confusion_matrix(y_actual, y_pred))]
+    return ''.join(string_representation)
 
 
 def support_vector_machine(features, target):
@@ -83,7 +81,7 @@ def support_vector_machine(features, target):
     y_pred = svm.predict(x_test_std)
 
     print("Support Vector machine")
-    evaluate(y_test, y_pred)
+    print(evaluate(y_test, y_pred))
 
 
 def support_vector_machine_cross_validation(features, target, k=10):
@@ -108,7 +106,7 @@ def support_vector_machine_cross_validation(features, target, k=10):
 
     y_pred = svm.predict(x_test_std)
 
-    evaluate(y_test, y_pred)
+    print(evaluate(y_test, y_pred))
 
 
 def linear_discriminant_analysis(features, target):
@@ -126,7 +124,7 @@ def linear_discriminant_analysis(features, target):
     y_pred = lda.predict(x_test_std)
 
     print("Linear Discriminant Analysis")
-    evaluate(y_test, y_pred)
+    print(evaluate(y_test, y_pred))
 
 
 def linear_discriminant_analysis_cross_validation(features, target, k=10):
@@ -151,7 +149,7 @@ def linear_discriminant_analysis_cross_validation(features, target, k=10):
 
     y_pred = lda.predict(x_test_std)
 
-    evaluate(y_test, y_pred)
+    print(evaluate(y_test, y_pred))
 
 
 if __name__ == "__main__":
@@ -160,5 +158,5 @@ if __name__ == "__main__":
     # support_vector_machine(X, y)
     # support_vector_machine_cross_validation(X, y)
     linear_discriminant_analysis(X, y)
-    linear_discriminant_analysis_cross_validation(X, y)
+    # linear_discriminant_analysis_cross_validation(X, y)
     sys.exit(0)
