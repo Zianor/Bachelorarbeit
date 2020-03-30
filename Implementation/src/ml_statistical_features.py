@@ -71,6 +71,7 @@ def support_vector_machine(features, target):
     Support vector machine
     :param features: feature matrix
     :param target: target vector
+    :return: string representation of results
     """
     _, x_train_std, x_test_std, y_train, y_test = data_preparation(features, target)
 
@@ -80,8 +81,9 @@ def support_vector_machine(features, target):
 
     y_pred = svm.predict(x_test_std)
 
-    print("Support Vector machine")
-    print(evaluate(y_test, y_pred))
+    string_representation = ["Support Vector machine", os.linesep, str(evaluate(y_test, y_pred))]
+
+    return ''.join(string_representation)
 
 
 def support_vector_machine_cross_validation(features, target, k=10):
@@ -90,6 +92,7 @@ def support_vector_machine_cross_validation(features, target, k=10):
     :param features: feature matrix
     :param target: target vector
     :param k: number of folds
+    :return: string representation of results
     """
     _, x_train_std, x_test_std, y_train, y_test = data_preparation(features, target)
 
@@ -101,12 +104,13 @@ def support_vector_machine_cross_validation(features, target, k=10):
         svm.fit(x_train_std[train_index], y_train[train_index]).score(x_train_std[test_index], y_train[test_index]) for
         train_index, test_index in k_fold.split(x_train_std, y_train)]
 
-    print("Support Vector Machine (cross validation)")
-    print("Accuracy in cross validation: %.3f" % (np.mean(results_k_fold) * 100.0))
-
     y_pred = svm.predict(x_test_std)
 
-    print(evaluate(y_test, y_pred))
+    string_representation = ["Support Vector Machine (cross validation)", os.linesep,
+                             "Accuracy in cross validation: %.3f" % (np.mean(results_k_fold) * 100.0), os.linesep,
+                             str(evaluate(y_test, y_pred))]
+
+    return ''.join(string_representation)
 
 
 def linear_discriminant_analysis(features, target):
@@ -114,6 +118,7 @@ def linear_discriminant_analysis(features, target):
     Linear Discriminant Analysis
     :param features: feature matrix
     :param target: target vector
+    :return: string representation of results
     """
     _, x_train_std, x_test_std, y_train, y_test = data_preparation(features, target)
 
@@ -123,8 +128,9 @@ def linear_discriminant_analysis(features, target):
 
     y_pred = lda.predict(x_test_std)
 
-    print("Linear Discriminant Analysis")
-    print(evaluate(y_test, y_pred))
+    string_representation = ["Linear Discriminant Analysis", os.linesep, str(evaluate(y_test, y_pred))]
+
+    return ''.join(string_representation)
 
 
 def linear_discriminant_analysis_cross_validation(features, target, k=10):
@@ -133,6 +139,7 @@ def linear_discriminant_analysis_cross_validation(features, target, k=10):
     :param features: feature matrix
     :param target: target vector
     :param k: number of folds
+    :return: string representation of results
     """
     _, x_train_std, x_test_std, y_train, y_test = data_preparation(features, target)
 
@@ -144,19 +151,21 @@ def linear_discriminant_analysis_cross_validation(features, target, k=10):
         lda.fit(x_train_std[train_index], y_train[train_index]).score(x_train_std[test_index], y_train[test_index]) for
         train_index, test_index in k_fold.split(x_train_std, y_train)]
 
-    print("Linear Discriminant Analysis (cross validation)")
-    print("Accuracy in cross validation: %.3f" % (np.mean(results_k_fold) * 100.0))
-
     y_pred = lda.predict(x_test_std)
 
-    print(evaluate(y_test, y_pred))
+    string_representation = ["Linear Discriminant Analysis (cross validation)", os.linesep,
+                             "Accuracy in cross validation: %.3f" % (np.mean(results_k_fold) * 100.0), os.linesep,
+                             str(evaluate(y_test, y_pred))]
+
+    return ''.join(string_representation)
 
 
 if __name__ == "__main__":
     X, y = load_data()
-
-    # support_vector_machine(X, y)
-    # support_vector_machine_cross_validation(X, y)
-    linear_discriminant_analysis(X, y)
-    # linear_discriminant_analysis_cross_validation(X, y)
+    data_string, _, _, _, _ = data_preparation(X, y)
+    print(data_string)
+    # print(support_vector_machine(X, y))
+    # print(support_vector_machine_cross_validation(X, y))
+    # print(linear_discriminant_analysis(X, y))
+    # print(linear_discriminant_analysis_cross_validation(X, y))
     sys.exit(0)
