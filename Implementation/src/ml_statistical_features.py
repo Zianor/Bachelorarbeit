@@ -9,6 +9,7 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, confusion_matrix
 from sklearn.model_selection import train_test_split
+from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
@@ -75,15 +76,11 @@ def support_vector_machine(features, target):
     :param target: target vector
     :return: string representation of results
     """
-    _, x_train_std, x_test_std, y_train, y_test = data_preparation(features, target)
-
-    # train SVM
     svm = SVC(kernel='rbf', C=1.0, random_state=1)
-    svm.fit(x_train_std, y_train)
 
-    y_pred = svm.predict(x_test_std)
+    evaluation = classifier(svm, features, target)
 
-    string_representation = ["Support Vector machine", os.linesep, str(evaluate(y_test, y_pred))]
+    string_representation = ["Support Vector machine", os.linesep, evaluation]
 
     return ''.join(string_representation)
 
@@ -117,15 +114,11 @@ def linear_discriminant_analysis(features, target):
     :param target: target vector
     :return: string representation of results
     """
-    _, x_train_std, x_test_std, y_train, y_test = data_preparation(features, target)
-
-    # train LDA
     lda = LinearDiscriminantAnalysis()  # no further information given
-    lda.fit(x_train_std, y_train)
 
-    y_pred = lda.predict(x_test_std)
+    evaluation = classifier(lda, features, target)
 
-    string_representation = ["Linear Discriminant Analysis", os.linesep, str(evaluate(y_test, y_pred))]
+    string_representation = ["Linear Discriminant Analysis", os.linesep, evaluation]
 
     return ''.join(string_representation)
 
@@ -159,15 +152,11 @@ def decision_tree(features, target):
     :param target: target vector
     :return: string representation of results
     """
-    _, x_train_std, x_test_std, y_train, y_test = data_preparation(features, target)
-
-    # train DT
     dt = DecisionTreeClassifier()  # no further information given
-    dt.fit(x_train_std, y_train)
 
-    y_pred = dt.predict(x_test_std)
+    evaluation = classifier(dt, features, target)
 
-    string_representation = ["Decision tree", os.linesep, str(evaluate(y_test, y_pred))]
+    string_representation = ["Decision tree", os.linesep, evaluation]
 
     return ''.join(string_representation)
 
@@ -202,15 +191,11 @@ def random_forest(features, target, n_trees=50):
     :param n_trees: The number of trees in the forest
     :return: string representation of results
     """
-    _, x_train_std, x_test_std, y_train, y_test = data_preparation(features, target)
-
-    # train RF
     rf = RandomForestClassifier(n_estimators=n_trees)  # no further information given
-    rf.fit(x_train_std, y_train)
 
-    y_pred = rf.predict(x_test_std)
+    evaluation = classifier(rf, features, target)
 
-    string_representation = ["Random Forest", os.linesep, str(evaluate(y_test, y_pred))]
+    string_representation = ["Random Forest", os.linesep, evaluation]
 
     return ''.join(string_representation)
 
@@ -236,9 +221,46 @@ def random_forest_cross_validation(features, target, n_trees=50, k=10):
     return ''.join(string_representation)
 
 
+def multilayer_perceptron(features, target, hidden_nodes=50):
+    """
+    Multilayer Perceptron
+    :param features: feature matrix
+    :param target: target vector
+    :param hidden_nodes: The number of neurons in the hidden layer
+    :return: string representation of results
+    """
+    mlp = MLPClassifier(hidden_layer_sizes=hidden_nodes)
+
+    evaluation = classifier(mlp, features, target)
+
+    string_representation = ["Multilayer Perceptron", os.linesep, evaluation]
+
+    return ''.join(string_representation)
+
+
+def multilayer_perceptron_cross_validation(features, target, hidden_nodes=50, k=10):
+    """
+    Multilayer Perceptron with k-fold cross validation
+    :param features: feature matrix
+    :param target: target vector
+    :param hidden_nodes: The number of neurons in the hidden layer
+    :param k: number of folds
+    :return: string representation of results
+    """
+    mlp = MLPClassifier(hidden_layer_sizes=hidden_nodes)
+
+    evaluation, results_k_fold = classifier_cross_validation(mlp, features, target, k)
+
+    string_representation = ["Random Forest (cross validation)", os.linesep,
+                             "Accuracy in cross validation: %.3f" % (np.mean(results_k_fold) * 100.0), os.linesep,
+                             evaluation]
+
+    return ''.join(string_representation)
+
+
 def classifier_cross_validation(clf, features, target, k=10):
     """
-    Trains a classifier with k fold cross validation
+    Trains and tests a classifier with k fold cross validation
     :param clf: The classifier to be trained
     :param features: feature matrix
     :param target: target vector
@@ -261,16 +283,37 @@ def classifier_cross_validation(clf, features, target, k=10):
     return evaluation, results_k_fold
 
 
+def classifier(clf, features, target):
+    """
+    Trains and tests a classifier
+    :param clf: The classifier to be trained
+    :param features: feature matrix
+    :param target: target vector
+    :return: evaluation
+    :rtype: String
+    """
+    _, x_train_std, x_test_std, y_train, y_test = data_preparation(features, target)
+
+    # train
+    clf.fit(x_train_std, y_train)
+
+    y_pred = clf.predict(x_test_std)
+
+    return evaluate(y_test, y_pred)
+
+
 if __name__ == "__main__":
     X, y = load_data()
     data_string, _, _, _, _ = data_preparation(X, y)
     print(data_string)
     # print(support_vector_machine(X, y))
-    print(support_vector_machine_cross_validation(X, y))
+    # print(support_vector_machine_cross_validation(X, y))
     # print(linear_discriminant_analysis(X, y))
-    print(linear_discriminant_analysis_cross_validation(X, y))
+    # print(linear_discriminant_analysis_cross_validation(X, y))
     # print(decision_tree(X, y))
-    print(decision_tree_cross_validation(X, y))
+    # print(decision_tree_cross_validation(X, y))
     # print(random_forest(X, y))
-    print(random_forest_cross_validation(X, y))
+    # print(random_forest_cross_validation(X, y))
+    # print(multilayer_perceptron(X, y))
+    print(multilayer_perceptron_cross_validation(X, y))
     sys.exit(0)
