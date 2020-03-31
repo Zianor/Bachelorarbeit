@@ -100,17 +100,12 @@ def support_vector_machine_cross_validation(features, target, k=10):
 
     # train SVM
     svm = SVC(kernel='rbf', C=1.0, random_state=1)
-    k_fold = model_selection.KFold(n_splits=k)
-    y_train = y_train.to_numpy()
-    results_k_fold = [
-        svm.fit(x_train_std[train_index], y_train[train_index]).score(x_train_std[test_index], y_train[test_index]) for
-        train_index, test_index in k_fold.split(x_train_std, y_train)]
 
-    y_pred = svm.predict(x_test_std)
+    evaluation, results_k_fold = classifier_cross_validation(svm, features, target, k)
 
     string_representation = ["Support Vector Machine (cross validation)", os.linesep,
                              "Accuracy in cross validation: %.3f" % (np.mean(results_k_fold) * 100.0), os.linesep,
-                             str(evaluate(y_test, y_pred))]
+                             evaluation]
 
     return ''.join(string_representation)
 
@@ -147,17 +142,12 @@ def linear_discriminant_analysis_cross_validation(features, target, k=10):
 
     # train LDA
     lda = LinearDiscriminantAnalysis()  # no further information given
-    k_fold = model_selection.KFold(n_splits=k)
-    y_train = y_train.to_numpy()
-    results_k_fold = [
-        lda.fit(x_train_std[train_index], y_train[train_index]).score(x_train_std[test_index], y_train[test_index]) for
-        train_index, test_index in k_fold.split(x_train_std, y_train)]
 
-    y_pred = lda.predict(x_test_std)
+    evaluation, results_k_fold = classifier_cross_validation(lda, features, target, k)
 
     string_representation = ["Linear Discriminant Analysis (cross validation)", os.linesep,
                              "Accuracy in cross validation: %.3f" % (np.mean(results_k_fold) * 100.0), os.linesep,
-                             str(evaluate(y_test, y_pred))]
+                             evaluation]
 
     return ''.join(string_representation)
 
@@ -194,17 +184,12 @@ def decision_tree_cross_validation(features, target, k=10):
 
     # train DT
     dt = DecisionTreeClassifier()  # no further information given
-    k_fold = model_selection.KFold(n_splits=k)
-    y_train = y_train.to_numpy()
-    results_k_fold = [
-        dt.fit(x_train_std[train_index], y_train[train_index]).score(x_train_std[test_index], y_train[test_index]) for
-        train_index, test_index in k_fold.split(x_train_std, y_train)]
 
-    y_pred = dt.predict(x_test_std)
+    evaluation, results_k_fold = classifier_cross_validation(dt, features, target, k)
 
     string_representation = ["Decision Tree (cross validation)", os.linesep,
                              "Accuracy in cross validation: %.3f" % (np.mean(results_k_fold) * 100.0), os.linesep,
-                             str(evaluate(y_test, y_pred))]
+                             evaluation]
 
     return ''.join(string_representation)
 
@@ -239,23 +224,41 @@ def random_forest_cross_validation(features, target, n_trees=50, k=10):
     :param k: number of folds
     :return: string representation of results
     """
-    _, x_train_std, x_test_std, y_train, y_test = data_preparation(features, target)
-
     # train RF
     rf = RandomForestClassifier(n_estimators=n_trees)  # no further information given
-    k_fold = model_selection.KFold(n_splits=k)
-    y_train = y_train.to_numpy()
-    results_k_fold = [
-        rf.fit(x_train_std[train_index], y_train[train_index]).score(x_train_std[test_index], y_train[test_index]) for
-        train_index, test_index in k_fold.split(x_train_std, y_train)]
 
-    y_pred = rf.predict(x_test_std)
+    evaluation, results_k_fold = classifier_cross_validation(rf, features, target, k)
 
     string_representation = ["Random Forest (cross validation)", os.linesep,
                              "Accuracy in cross validation: %.3f" % (np.mean(results_k_fold) * 100.0), os.linesep,
-                             str(evaluate(y_test, y_pred))]
+                             evaluation]
 
     return ''.join(string_representation)
+
+
+def classifier_cross_validation(clf, features, target, k=10):
+    """
+    Trains a classifier with k fold cross validation
+    :param clf: The classifier to be trained
+    :param features: feature matrix
+    :param target: target vector
+    :param k: number of folds
+    :return: evaluation, results_k_fold
+    :rtype: (String, array)
+    """
+    _, x_train_std, x_test_std, y_train, y_test = data_preparation(features, target)
+
+    k_fold = model_selection.KFold(n_splits=k)
+    y_train = y_train.to_numpy()
+    results_k_fold = [
+        clf.fit(x_train_std[train_index], y_train[train_index]).score(x_train_std[test_index], y_train[test_index]) for
+        train_index, test_index in k_fold.split(x_train_std, y_train)]
+
+    y_pred = clf.predict(x_test_std)
+
+    evaluation = evaluate(y_test, y_pred)
+
+    return evaluation, results_k_fold
 
 
 if __name__ == "__main__":
@@ -263,11 +266,11 @@ if __name__ == "__main__":
     data_string, _, _, _, _ = data_preparation(X, y)
     print(data_string)
     # print(support_vector_machine(X, y))
-    # print(support_vector_machine_cross_validation(X, y))
+    print(support_vector_machine_cross_validation(X, y))
     # print(linear_discriminant_analysis(X, y))
-    # print(linear_discriminant_analysis_cross_validation(X, y))
+    print(linear_discriminant_analysis_cross_validation(X, y))
     # print(decision_tree(X, y))
-    # print(decision_tree_cross_validation(X, y))
-    print(random_forest(X, y))
+    print(decision_tree_cross_validation(X, y))
+    # print(random_forest(X, y))
     print(random_forest_cross_validation(X, y))
     sys.exit(0)
