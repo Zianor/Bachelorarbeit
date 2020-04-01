@@ -57,6 +57,23 @@ def data_preparation(features, target):
     return string_representation, x_train_std, x_test_std, y_train, y_test
 
 
+def evaluate_model(y_actual_train, y_pred_train, y_actual_test, y_pred_test):
+    """
+    Evaluates model performance
+    :param y_actual_train: Actual labels from training set
+    :param y_pred_train: Predicted labels from training set
+    :param y_actual_test: Actual labels from test set
+    :param y_pred_test: Predicted labels from test set
+    :return:
+    """
+    string_representation = ["Training set", os.linesep,
+                             evaluate(y_actual_train, y_pred_train), os.linesep,
+                             "Test set", os.linesep,
+                             evaluate(y_actual_test, y_pred_test)
+                             ]
+    return ''.join(string_representation)
+
+
 def evaluate(y_actual, y_pred):
     """
     Evaluates predicted labels
@@ -241,7 +258,7 @@ def multilayer_perceptron_cross_validation(features, target, hidden_nodes=50, k=
 
     evaluation, results_k_fold = classifier_cross_validation(mlp, features, target, k)
 
-    string_representation = ["Random Forest (cross validation)", os.linesep,
+    string_representation = ["Multilayer Perceptron (cross validation)", os.linesep,
                              "Accuracy in cross validation: %.3f" % (np.mean(results_k_fold) * 100.0), os.linesep,
                              evaluation]
 
@@ -266,9 +283,10 @@ def classifier_cross_validation(clf, features, target, k=10):
         clf.fit(x_train_std[train_index], y_train[train_index]).score(x_train_std[test_index], y_train[test_index]) for
         train_index, test_index in k_fold.split(x_train_std, y_train)]
 
-    y_pred = clf.predict(x_test_std)
+    y_pred_train = clf.predict(x_train_std)
+    y_pred_test = clf.predict(x_test_std)
 
-    evaluation = evaluate(y_test, y_pred)
+    evaluation = evaluate_model(y_train, y_pred_train, y_test, y_pred_test)
 
     return evaluation, results_k_fold
 
@@ -287,23 +305,24 @@ def classifier(clf, features, target):
     # train
     clf.fit(x_train_std, y_train)
 
-    y_pred = clf.predict(x_test_std)
+    y_pred_train = clf.predict(x_train_std)
+    y_pred_test = clf.predict(x_test_std)
 
-    return evaluate(y_test, y_pred)
+    return evaluate_model(y_train, y_pred_train, y_test, y_pred_test)
 
 
 if __name__ == "__main__":
     X, y = load_data()
     data_string, _, _, _, _ = data_preparation(X, y)
     print(data_string)
-    # print(support_vector_machine(X, y))
-    # print(support_vector_machine_cross_validation(X, y))
-    # print(linear_discriminant_analysis(X, y))
-    # print(linear_discriminant_analysis_cross_validation(X, y))
-    # print(decision_tree(X, y))
-    # print(decision_tree_cross_validation(X, y))
-    # print(random_forest(X, y))
-    # print(random_forest_cross_validation(X, y))
-    # print(multilayer_perceptron(X, y))
+    print(support_vector_machine(X, y))
+    print(support_vector_machine_cross_validation(X, y))
+    print(linear_discriminant_analysis(X, y))
+    print(linear_discriminant_analysis_cross_validation(X, y))
+    print(decision_tree(X, y))
+    print(decision_tree_cross_validation(X, y))
+    print(random_forest(X, y))
+    print(random_forest_cross_validation(X, y))
+    print(multilayer_perceptron(X, y))
     print(multilayer_perceptron_cross_validation(X, y))
     sys.exit(0)
