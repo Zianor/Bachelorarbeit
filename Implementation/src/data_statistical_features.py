@@ -21,22 +21,22 @@ class DataSet:
         self.path_images = os.path.join(get_project_root(), 'data/images')
         self.coverage_threshold = coverage_threshold
         self.mean_error_threshold = mean_error_threshold
-        self.data = BcgData()
-        self.segment_length = DataSet._seconds_to_frames(10, self.data.samplerate)  # in samples
-        self._create_segments()
+        data = BcgData()
+        self.segment_length = DataSet._seconds_to_frames(10, data.samplerate)  # in samples
+        self._create_segments(data)
         self.save_csv()
 
-    def _create_segments(self):
+    def _create_segments(self, bcg_data):
         """
         Creates segments with a given length out of given BCG Data
         """
         self.segments = []
-        for series in self.data.data_series:
+        for series in bcg_data.data_series:
             for i in range(0, len(series.raw_data), self.segment_length):
                 if i + self.segment_length < len(series.raw_data):  # prevent shorter segments, last shorter one ignored
                     segment_data = np.array(series.raw_data[i:i + self.segment_length])
                     informative, coverage, mean_error = self.is_informative(series, i, i + self.segment_length)  # label
-                    self.segments.append(Segment(segment_data, self.data.samplerate, informative, coverage, mean_error))
+                    self.segments.append(Segment(segment_data, bcg_data.samplerate, informative, coverage, mean_error))
 
     def is_informative(self, series, start, end):
         """
