@@ -93,9 +93,6 @@ def support_vector_machine_cross_validation(features, target, k=10):
     :param k: number of folds
     :return: string representation of results
     """
-    _, x_train_std, x_test_std, y_train, y_test = data_preparation(features, target)
-
-    # train SVM
     svm = SVC(kernel='rbf', C=1.0, random_state=1)
 
     evaluation, results_k_fold = classifier_cross_validation(svm, features, target, k)
@@ -131,9 +128,6 @@ def linear_discriminant_analysis_cross_validation(features, target, k=10):
     :param k: number of folds
     :return: string representation of results
     """
-    _, x_train_std, x_test_std, y_train, y_test = data_preparation(features, target)
-
-    # train LDA
     lda = LinearDiscriminantAnalysis()  # no further information given
 
     evaluation, results_k_fold = classifier_cross_validation(lda, features, target, k)
@@ -169,9 +163,6 @@ def decision_tree_cross_validation(features, target, k=10):
     :param k: number of folds
     :return: string representation of results
     """
-    _, x_train_std, x_test_std, y_train, y_test = data_preparation(features, target)
-
-    # train DT
     dt = DecisionTreeClassifier()  # no further information given
 
     evaluation, results_k_fold = classifier_cross_validation(dt, features, target, k)
@@ -209,7 +200,6 @@ def random_forest_cross_validation(features, target, n_trees=50, k=10):
     :param k: number of folds
     :return: string representation of results
     """
-    # train RF
     rf = RandomForestClassifier(n_estimators=n_trees)  # no further information given
 
     evaluation, results_k_fold = classifier_cross_validation(rf, features, target, k)
