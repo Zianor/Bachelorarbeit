@@ -4,7 +4,7 @@ import sys
 
 import pandas as pd
 import numpy as np
-from sklearn import model_selection
+from sklearn import model_selection, clone
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, confusion_matrix
@@ -102,20 +102,20 @@ def support_vector_machine(features, target):
     return ''.join(string_representation)
 
 
-def support_vector_machine_cross_validation(features, target, k=10):
+def support_vector_machine_cross_validation(features, target, k=10, test_reverse=False):
     """
     Support vector machine with k-fold cross validation
     :param features: feature matrix
     :param target: target vector
     :param k: number of folds
+    :param test_reverse: Uses test set for training and training set for test
     :return: string representation of results
     """
     svm = SVC(kernel='rbf', C=1.0, random_state=1)
 
-    evaluation, results_k_fold = classifier_cross_validation(svm, features, target, k)
+    evaluation = classifier_cross_validation(svm, features, target, k, test_reverse)
 
     string_representation = ["Support Vector Machine (cross validation)", os.linesep,
-                             "Accuracy in cross validation: %.3f" % (np.mean(results_k_fold) * 100.0), os.linesep,
                              evaluation]
 
     return ''.join(string_representation)
@@ -137,20 +137,20 @@ def linear_discriminant_analysis(features, target):
     return ''.join(string_representation)
 
 
-def linear_discriminant_analysis_cross_validation(features, target, k=10):
+def linear_discriminant_analysis_cross_validation(features, target, k=10, test_reverse=False):
     """
     Linear Discriminant Analysis with k-fold cross validation
     :param features: feature matrix
     :param target: target vector
     :param k: number of folds
+    :param test_reverse: Uses test set for training and training set for test
     :return: string representation of results
     """
     lda = LinearDiscriminantAnalysis()  # no further information given
 
-    evaluation, results_k_fold = classifier_cross_validation(lda, features, target, k)
+    evaluation = classifier_cross_validation(lda, features, target, k, test_reverse)
 
     string_representation = ["Linear Discriminant Analysis (cross validation)", os.linesep,
-                             "Accuracy in cross validation: %.3f" % (np.mean(results_k_fold) * 100.0), os.linesep,
                              evaluation]
 
     return ''.join(string_representation)
@@ -172,20 +172,20 @@ def decision_tree(features, target):
     return ''.join(string_representation)
 
 
-def decision_tree_cross_validation(features, target, k=10):
+def decision_tree_cross_validation(features, target, k=10, test_reverse=False):
     """
     Decision tree with k-fold cross validation
     :param features: feature matrix
     :param target: target vector
     :param k: number of folds
+    :param test_reverse: Uses test set for training and training set for test
     :return: string representation of results
     """
     dt = DecisionTreeClassifier()  # no further information given
 
-    evaluation, results_k_fold = classifier_cross_validation(dt, features, target, k)
+    evaluation = classifier_cross_validation(dt, features, target, k, test_reverse)
 
     string_representation = ["Decision Tree (cross validation)", os.linesep,
-                             "Accuracy in cross validation: %.3f" % (np.mean(results_k_fold) * 100.0), os.linesep,
                              evaluation]
 
     return ''.join(string_representation)
@@ -208,21 +208,22 @@ def random_forest(features, target, n_trees=50):
     return ''.join(string_representation)
 
 
-def random_forest_cross_validation(features, target, n_trees=50, k=10):
+def random_forest_cross_validation(features, target, n_trees=50, k=10, test_reverse=False):
     """
     Random Forest with k-fold cross validation
     :param features: feature matrix
     :param target: target vector
     :param n_trees: The number of trees in the forest
     :param k: number of folds
+    :param test_reverse: Uses test set for training and training set for test
     :return: string representation of results
     """
     rf = RandomForestClassifier(n_estimators=n_trees)  # no further information given
 
-    evaluation, results_k_fold = classifier_cross_validation(rf, features, target, k)
+    print(k)
+    evaluation = classifier_cross_validation(rf, features, target, k, test_reverse)
 
     string_representation = ["Random Forest (cross validation)", os.linesep,
-                             "Accuracy in cross validation: %.3f" % (np.mean(results_k_fold) * 100.0), os.linesep,
                              evaluation]
 
     return ''.join(string_representation)
@@ -245,37 +246,45 @@ def multilayer_perceptron(features, target, hidden_nodes=50):
     return ''.join(string_representation)
 
 
-def multilayer_perceptron_cross_validation(features, target, hidden_nodes=50, k=10):
+def multilayer_perceptron_cross_validation(features, target, hidden_nodes=50, k=10, test_reverse=False):
     """
     Multilayer Perceptron with k-fold cross validation
     :param features: feature matrix
     :param target: target vector
     :param hidden_nodes: The number of neurons in the hidden layer
     :param k: number of folds
+    :param test_reverse: Uses test set for training and training set for test
     :return: string representation of results
     """
     mlp = MLPClassifier(hidden_layer_sizes=hidden_nodes)
 
-    evaluation, results_k_fold = classifier_cross_validation(mlp, features, target, k)
+    evaluation = classifier_cross_validation(mlp, features, target, k, test_reverse)
 
     string_representation = ["Multilayer Perceptron (cross validation)", os.linesep,
-                             "Accuracy in cross validation: %.3f" % (np.mean(results_k_fold) * 100.0), os.linesep,
                              evaluation]
 
     return ''.join(string_representation)
 
 
-def classifier_cross_validation(clf, features, target, k=10):
+def classifier_cross_validation(clf, features, target, k=10, test_reverse=False):
     """
     Trains and tests a classifier with k fold cross validation
     :param clf: The classifier to be trained
     :param features: feature matrix
     :param target: target vector
     :param k: number of folds
+    :param test_reverse: Uses test set for training and training set for test
     :return: evaluation, results_k_fold
     :rtype: (String, array)
     """
     _, x_train_std, x_test_std, y_train, y_test = data_preparation(features, target)
+
+    evaluation = []
+
+    if test_reverse:
+        x_test_std, x_train_std, y_test, y_train = x_train_std, x_test_std, y_train, y_test
+        evaluation.append("Reversed")
+        evaluation.append(os.linesep)
 
     k_fold = model_selection.KFold(n_splits=k)
     y_train = y_train.to_numpy()
@@ -286,9 +295,11 @@ def classifier_cross_validation(clf, features, target, k=10):
     y_pred_train = clf.predict(x_train_std)
     y_pred_test = clf.predict(x_test_std)
 
-    evaluation = evaluate_model(y_train, y_pred_train, y_test, y_pred_test)
+    evaluation.append("Accuracy in cross validation: %.3f" % (np.mean(results_k_fold) * 100.0))
+    evaluation.append(os.linesep)
+    evaluation.append(evaluate_model(y_train, y_pred_train, y_test, y_pred_test))
 
-    return evaluation, results_k_fold
+    return ''.join(evaluation)
 
 
 def classifier(clf, features, target):
@@ -311,18 +322,50 @@ def classifier(clf, features, target):
     return evaluate_model(y_train, y_pred_train, y_test, y_pred_test)
 
 
+def evaluate_all():
+    """
+    Trains and tests all implemented models
+    :return: evaluation
+    :rtype: String
+    """
+    x, y = load_data()
+    data_string, _, _, _, _ = data_preparation(x, y)
+    string_representation = [data_string, os.linesep,
+                             support_vector_machine(x, y),
+                             support_vector_machine_cross_validation(x, y), os.linesep,
+                             linear_discriminant_analysis(x, y), os.linesep,
+                             linear_discriminant_analysis_cross_validation(x, y), os.linesep,
+                             decision_tree(x, y), os.linesep,
+                             decision_tree_cross_validation(x, y), os.linesep,
+                             random_forest(x, y), os.linesep,
+                             random_forest_cross_validation(x, y), os.linesep,
+                             multilayer_perceptron(x, y), os.linesep,
+                             multilayer_perceptron_cross_validation(x, y), os.linesep]
+    return ''.join(string_representation)
+
+
+def evaluate_paper():
+    """
+    Evaluates all models according to the paper "https://ieeexplore.ieee.org/document/7591234"
+    :return: evaluation
+    :rtype: String
+    """
+    x, y = load_data()
+    data_string, _, _, _, _ = data_preparation(x, y)
+    string_representation = [data_string, os.linesep,
+                             support_vector_machine_cross_validation(x, y), os.linesep,
+                             support_vector_machine_cross_validation(x, y, k=10, test_reverse=True), os.linesep,
+                             linear_discriminant_analysis_cross_validation(x, y), os.linesep,
+                             linear_discriminant_analysis_cross_validation(x, y, k=10, test_reverse=True), os.linesep,
+                             decision_tree_cross_validation(x, y), os.linesep,
+                             decision_tree_cross_validation(x, y, k=10, test_reverse=True), os.linesep,
+                             random_forest_cross_validation(x, y), os.linesep,
+                             random_forest_cross_validation(x, y, k=10, test_reverse=True), os.linesep,
+                             multilayer_perceptron_cross_validation(x, y), os.linesep,
+                             multilayer_perceptron_cross_validation(x, y, k=10, test_reverse=True), os.linesep]
+    return ''.join(string_representation)
+
+
 if __name__ == "__main__":
-    X, y = load_data()
-    data_string, _, _, _, _ = data_preparation(X, y)
-    print(data_string)
-    print(support_vector_machine(X, y))
-    print(support_vector_machine_cross_validation(X, y))
-    print(linear_discriminant_analysis(X, y))
-    print(linear_discriminant_analysis_cross_validation(X, y))
-    print(decision_tree(X, y))
-    print(decision_tree_cross_validation(X, y))
-    print(random_forest(X, y))
-    print(random_forest_cross_validation(X, y))
-    print(multilayer_perceptron(X, y))
-    print(multilayer_perceptron_cross_validation(X, y))
+    print(evaluate_paper())
     sys.exit(0)
