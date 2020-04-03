@@ -4,11 +4,12 @@ import sys
 
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 from sklearn import model_selection, clone
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, confusion_matrix
-from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, confusion_matrix, plot_roc_curve
+from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
@@ -44,9 +45,9 @@ def data_preparation(features, target):
     x_train, x_test, y_train, y_test = train_test_split(
         features, target, test_size=0.333, random_state=1, stratify=target)
 
-    string_representation = ['Labels counts in y:', str(np.bincount(
-        target)), os.linesep, 'Labels counts in y_train:', str(np.bincount(
-        y_train)), os.linesep, 'Labels counts in y_test:', str(np.bincount(y_test))]
+    string_representation = ['Labels counts in y:', str(np.bincount(target)), os.linesep, 'Labels counts in y_train:',
+                             str(np.bincount(y_train)), os.linesep, 'Labels counts in y_test:',
+                             str(np.bincount(y_test))]
     string_representation = ''.join(string_representation)
 
     # Standardizing features
@@ -64,13 +65,15 @@ def evaluate_model(y_actual_train, y_pred_train, y_actual_test, y_pred_test):
     :param y_pred_train: Predicted labels from training set
     :param y_actual_test: Actual labels from test set
     :param y_pred_test: Predicted labels from test set
-    :return:
+    :return: evaluation of the model
+    :rtype: String
     """
     string_representation = ["Training set", os.linesep,
                              evaluate(y_actual_train, y_pred_train), os.linesep,
                              "Test set", os.linesep,
                              evaluate(y_actual_test, y_pred_test)
                              ]
+
     return ''.join(string_representation)
 
 
@@ -86,16 +89,17 @@ def evaluate(y_actual, y_pred):
     return ''.join(string_representation)
 
 
-def support_vector_machine(features, target):
+def support_vector_machine(features, target, plot_roc=False):
     """
     Support vector machine
     :param features: feature matrix
     :param target: target vector
+    :param plot_roc: if True ROC curve will be plotted
     :return: string representation of results
     """
     svm = SVC(kernel='rbf', C=1.0, random_state=1)
 
-    evaluation = classifier(svm, features, target)
+    evaluation = classifier(svm, features, target, plot_roc)
 
     string_representation = ["Support Vector machine", os.linesep, evaluation]
 
@@ -121,16 +125,17 @@ def support_vector_machine_cross_validation(features, target, k=10, test_reverse
     return ''.join(string_representation)
 
 
-def linear_discriminant_analysis(features, target):
+def linear_discriminant_analysis(features, target, plot_roc=False):
     """
     Linear Discriminant Analysis
     :param features: feature matrix
     :param target: target vector
+    :param plot_roc: if True ROC curve will be plotted
     :return: string representation of results
     """
     lda = LinearDiscriminantAnalysis()  # no further information given
 
-    evaluation = classifier(lda, features, target)
+    evaluation = classifier(lda, features, target, plot_roc)
 
     string_representation = ["Linear Discriminant Analysis", os.linesep, evaluation]
 
@@ -144,6 +149,7 @@ def linear_discriminant_analysis_cross_validation(features, target, k=10, test_r
     :param target: target vector
     :param k: number of folds
     :param test_reverse: Uses test set for training and training set for test
+    :param plot_roc: if True ROC curve will be plotted
     :return: string representation of results
     """
     lda = LinearDiscriminantAnalysis()  # no further information given
@@ -156,16 +162,17 @@ def linear_discriminant_analysis_cross_validation(features, target, k=10, test_r
     return ''.join(string_representation)
 
 
-def decision_tree(features, target):
+def decision_tree(features, target, plot_roc=False):
     """
     Decision tree
     :param features: feature matrix
     :param target: target vector
+    :param plot_roc: if True ROC curve will be plotted
     :return: string representation of results
     """
     dt = DecisionTreeClassifier()  # no further information given
 
-    evaluation = classifier(dt, features, target)
+    evaluation = classifier(dt, features, target, plot_roc)
 
     string_representation = ["Decision tree", os.linesep, evaluation]
 
@@ -191,17 +198,18 @@ def decision_tree_cross_validation(features, target, k=10, test_reverse=False):
     return ''.join(string_representation)
 
 
-def random_forest(features, target, n_trees=50):
+def random_forest(features, target, n_trees=50, plot_roc=False):
     """
     Random forest
     :param features: feature matrix
     :param target: target vector
     :param n_trees: The number of trees in the forest
+    :param plot_roc: if True ROC curve will be plotted
     :return: string representation of results
     """
     rf = RandomForestClassifier(n_estimators=n_trees)  # no further information given
 
-    evaluation = classifier(rf, features, target)
+    evaluation = classifier(rf, features, target, plot_roc)
 
     string_representation = ["Random Forest", os.linesep, evaluation]
 
@@ -220,7 +228,6 @@ def random_forest_cross_validation(features, target, n_trees=50, k=10, test_reve
     """
     rf = RandomForestClassifier(n_estimators=n_trees)  # no further information given
 
-    print(k)
     evaluation = classifier_cross_validation(rf, features, target, k, test_reverse)
 
     string_representation = ["Random Forest (cross validation)", os.linesep,
@@ -229,17 +236,18 @@ def random_forest_cross_validation(features, target, n_trees=50, k=10, test_reve
     return ''.join(string_representation)
 
 
-def multilayer_perceptron(features, target, hidden_nodes=50):
+def multilayer_perceptron(features, target, hidden_nodes=50, plot_roc=False):
     """
     Multilayer Perceptron
     :param features: feature matrix
     :param target: target vector
     :param hidden_nodes: The number of neurons in the hidden layer
+    :param plot_roc: if True ROC curve will be plotted
     :return: string representation of results
     """
     mlp = MLPClassifier(hidden_layer_sizes=hidden_nodes)
 
-    evaluation = classifier(mlp, features, target)
+    evaluation = classifier(mlp, features, target, plot_roc)
 
     string_representation = ["Multilayer Perceptron", os.linesep, evaluation]
 
@@ -286,28 +294,22 @@ def classifier_cross_validation(clf, features, target, k=10, test_reverse=False)
         evaluation.append("Reversed")
         evaluation.append(os.linesep)
 
-    k_fold = model_selection.KFold(n_splits=k)
+    k_fold = model_selection.KFold(n_splits=k, shuffle=True, random_state=1)
     y_train = y_train.to_numpy()
-    results_k_fold = [
-        clf.fit(x_train_std[train_index], y_train[train_index]).score(x_train_std[test_index], y_train[test_index]) for
-        train_index, test_index in k_fold.split(x_train_std, y_train)]
-
-    y_pred_train = clf.predict(x_train_std)
-    y_pred_test = clf.predict(x_test_std)
+    results_k_fold = cross_val_score(clf, x_train_std, y_train, cv=k_fold)
 
     evaluation.append("Accuracy in cross validation: %.3f" % (np.mean(results_k_fold) * 100.0))
-    evaluation.append(os.linesep)
-    evaluation.append(evaluate_model(y_train, y_pred_train, y_test, y_pred_test))
 
     return ''.join(evaluation)
 
 
-def classifier(clf, features, target):
+def classifier(clf, features, target, plot_roc=False):
     """
     Trains and tests a classifier
     :param clf: The classifier to be trained
     :param features: feature matrix
     :param target: target vector
+    :param plot_roc: if True ROC curve will be plotted
     :return: evaluation
     :rtype: String
     """
@@ -319,10 +321,14 @@ def classifier(clf, features, target):
     y_pred_train = clf.predict(x_train_std)
     y_pred_test = clf.predict(x_test_std)
 
+    if plot_roc:
+        roc_display = plot_roc_curve(clf, x_test_std, y_test)
+        plt.show()
+
     return evaluate_model(y_train, y_pred_train, y_test, y_pred_test)
 
 
-def evaluate_all():
+def evaluate_all(plot_roc=False):
     """
     Trains and tests all implemented models
     :return: evaluation
@@ -331,16 +337,16 @@ def evaluate_all():
     x, y = load_data()
     data_string, _, _, _, _ = data_preparation(x, y)
     string_representation = [data_string, os.linesep,
-                             support_vector_machine(x, y),
-                             support_vector_machine_cross_validation(x, y), os.linesep,
-                             linear_discriminant_analysis(x, y), os.linesep,
-                             linear_discriminant_analysis_cross_validation(x, y), os.linesep,
-                             decision_tree(x, y), os.linesep,
-                             decision_tree_cross_validation(x, y), os.linesep,
-                             random_forest(x, y), os.linesep,
-                             random_forest_cross_validation(x, y), os.linesep,
-                             multilayer_perceptron(x, y), os.linesep,
-                             multilayer_perceptron_cross_validation(x, y), os.linesep]
+                             support_vector_machine(x, y, plot_roc=plot_roc),
+                             support_vector_machine_cross_validation(x, y, plot_roc=plot_roc), os.linesep,
+                             linear_discriminant_analysis(x, y, plot_roc=plot_roc), os.linesep,
+                             linear_discriminant_analysis_cross_validation(x, y, plot_roc=plot_roc), os.linesep,
+                             decision_tree(x, y, plot_roc=plot_roc), os.linesep,
+                             decision_tree_cross_validation(x, y, plot_roc=plot_roc), os.linesep,
+                             random_forest(x, y, plot_roc=plot_roc), os.linesep,
+                             random_forest_cross_validation(x, y, plot_roc=plot_roc), os.linesep,
+                             multilayer_perceptron(x, y, plot_roc=plot_roc), os.linesep,
+                             multilayer_perceptron_cross_validation(x, y, plot_roc=plot_roc), os.linesep]
     return ''.join(string_representation)
 
 
