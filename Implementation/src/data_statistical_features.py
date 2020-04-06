@@ -17,7 +17,7 @@ class DataSet:
     """
 
     def __init__(self, coverage_threshold=90, mean_error_threshold=0.015):
-        self.path_csv = os.path.join(get_project_root(), 'data/data.csv')
+        self.path_csv = os.path.join(get_project_root(), 'data/data_statistical_features.csv')
         self.path_images = os.path.join(get_project_root(), 'data/images')
         self.coverage_threshold = coverage_threshold
         self.mean_error_threshold = mean_error_threshold

@@ -24,7 +24,7 @@ def load_data():
     Loads BCG data features with its target labels
     :return: BCG data features, target labels
     """
-    path = os.path.join(get_project_root(), 'data/data.csv')
+    path = os.path.join(get_project_root(), 'data/data_statistical_features.csv')
     if not os.path.isfile(path):
         warnings.warn('No csv, data needs to be reproduced. This may take some time')
         DataSet()
@@ -459,6 +459,5 @@ def evaluate_paper_statistical_features():
 
 
 if __name__ == "__main__":
-    print(evaluate_all())
-    x, y = load_data()
+    evaluate_all(True)
     sys.exit(0)
