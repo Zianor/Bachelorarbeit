@@ -34,11 +34,12 @@ def load_data():
     return features, target
 
 
-def data_preparation(features, target):
+def data_preparation(features, target, reverse=False):
     """
     Splits data in training and test data and standardizes features
     :param features: feature matrix
     :param target: target vector
+    :param reverse: Uses test set for training and training set for test
     :return: string_representation, x_train_std, x_test_std, y_train, y_test
     """
     # Split dataset in 2/3 training and 1/3 test data
@@ -49,6 +50,9 @@ def data_preparation(features, target):
                              str(np.bincount(y_train)), os.linesep, 'Labels counts in y_test:',
                              str(np.bincount(y_test))]
     string_representation = ''.join(string_representation)
+
+    if reverse:
+        x_test, x_train, y_test, y_train = x_train, x_test, y_train, y_test
 
     # Standardizing features
     sc = StandardScaler()
@@ -89,214 +93,254 @@ def evaluate(y_actual, y_pred):
     return ''.join(string_representation)
 
 
-def support_vector_machine(features, target, test_reverse=False, plot_roc=False):
+def support_vector_machine(features, target, reverse=False, plot_roc=False):
     """
     Support vector machine
     :param features: feature matrix
     :param target: target vector
-    :param test_reverse: Uses test set for training and training set for test
+    :param reverse: Uses test set for training and training set for test
     :param plot_roc: if True ROC curve will be plotted
     :return: string representation of results
     """
     svm = SVC(kernel='rbf', C=1.0, random_state=1)
 
-    evaluation = classifier(svm, features, target, test_reverse=test_reverse, plot_roc=plot_roc)
+    evaluation = classifier(svm, features, target, reverse=reverse, plot_roc=plot_roc)
 
-    string_representation = ["Support Vector machine", os.linesep, evaluation]
+    if reverse:
+        string_representation = ["Support Vector Machine - Reversed", os.linesep,
+                                 evaluation]
+    else:
+        string_representation = ["Support Vector Machine", os.linesep,
+                                 evaluation]
 
     return ''.join(string_representation)
 
 
-def support_vector_machine_cross_validation(features, target, k=10, test_reverse=False):
+def support_vector_machine_cross_validation(features, target, k=10, reverse=False):
     """
     Support vector machine with k-fold cross validation
     :param features: feature matrix
     :param target: target vector
     :param k: number of folds
-    :param test_reverse: Uses test set for training and training set for test
+    :param reverse: Uses test set for training and training set for test
     :return: string representation of results
     """
     svm = SVC(kernel='rbf', C=1.0, random_state=1)
 
-    evaluation = classifier_cross_validation(svm, features, target, k, test_reverse)
+    evaluation = classifier_cross_validation(svm, features, target, k, reverse)
 
-    string_representation = ["Support Vector Machine (cross validation)", os.linesep,
-                             evaluation]
+    if reverse:
+        string_representation = ["Support Vector Machine (cross validation) - Reversed", os.linesep,
+                                 evaluation]
+    else:
+        string_representation = ["Support Vector Machine (cross validation)", os.linesep,
+                                 evaluation]
 
     return ''.join(string_representation)
 
 
-def linear_discriminant_analysis(features, target, test_reverse=False, plot_roc=False):
+def linear_discriminant_analysis(features, target, reverse=False, plot_roc=False):
     """
     Linear Discriminant Analysis
     :param features: feature matrix
     :param target: target vector
-    :param test_reverse: Uses test set for training and training set for test
+    :param reverse: Uses test set for training and training set for test
     :param plot_roc: if True ROC curve will be plotted
     :return: string representation of results
     """
     lda = LinearDiscriminantAnalysis()  # no further information given
 
-    evaluation = classifier(lda, features, target, test_reverse=test_reverse, plot_roc=plot_roc)
+    evaluation = classifier(lda, features, target, reverse=reverse, plot_roc=plot_roc)
 
-    string_representation = ["Linear Discriminant Analysis", os.linesep, evaluation]
+    if reverse:
+        string_representation = ["Linear Discriminant Analysis - Reversed", os.linesep,
+                                 evaluation]
+    else:
+        string_representation = ["Linear Discriminant Analysis", os.linesep,
+                                 evaluation]
 
     return ''.join(string_representation)
 
 
-def linear_discriminant_analysis_cross_validation(features, target, k=10, test_reverse=False):
+def linear_discriminant_analysis_cross_validation(features, target, k=10, reverse=False):
     """
     Linear Discriminant Analysis with k-fold cross validation
     :param features: feature matrix
     :param target: target vector
     :param k: number of folds
-    :param test_reverse: Uses test set for training and training set for test
+    :param reverse: Uses test set for training and training set for test
     :return: string representation of results
     """
     lda = LinearDiscriminantAnalysis()  # no further information given
 
-    evaluation = classifier_cross_validation(lda, features, target, k, test_reverse)
+    evaluation = classifier_cross_validation(lda, features, target, k, reverse)
 
-    string_representation = ["Linear Discriminant Analysis (cross validation)", os.linesep,
-                             evaluation]
+    if reverse:
+        string_representation = ["Linear Discriminant Analysis (cross validation) - Reversed", os.linesep,
+                                 evaluation]
+    else:
+        string_representation = ["Linear Discriminant Analysis (cross validation)", os.linesep,
+                                 evaluation]
 
     return ''.join(string_representation)
 
 
-def decision_tree(features, target, test_reverse=False, plot_roc=False):
+def decision_tree(features, target, reverse=False, plot_roc=False):
     """
     Decision tree
     :param features: feature matrix
     :param target: target vector
-    :param test_reverse: Uses test set for training and training set for test
+    :param reverse: Uses test set for training and training set for test
     :param plot_roc: if True ROC curve will be plotted
     :return: string representation of results
     """
     dt = DecisionTreeClassifier()  # no further information given
 
-    evaluation = classifier(dt, features, target, test_reverse=test_reverse, plot_roc=plot_roc)
+    evaluation = classifier(dt, features, target, reverse=reverse, plot_roc=plot_roc)
 
-    string_representation = ["Decision tree", os.linesep, evaluation]
+    if reverse:
+        string_representation = ["Decision Tree - Reversed", os.linesep,
+                                 evaluation]
+    else:
+        string_representation = ["Decision Tree", os.linesep,
+                                 evaluation]
 
     return ''.join(string_representation)
 
 
-def decision_tree_cross_validation(features, target, k=10, test_reverse=False):
+def decision_tree_cross_validation(features, target, k=10, reverse=False):
     """
     Decision tree with k-fold cross validation
     :param features: feature matrix
     :param target: target vector
     :param k: number of folds
-    :param test_reverse: Uses test set for training and training set for test
+    :param reverse: Uses test set for training and training set for test
     :return: string representation of results
     """
     dt = DecisionTreeClassifier()  # no further information given
 
-    evaluation = classifier_cross_validation(dt, features, target, k, test_reverse)
+    evaluation = classifier_cross_validation(dt, features, target, k, reverse)
 
-    string_representation = ["Decision Tree (cross validation)", os.linesep,
-                             evaluation]
+    if reverse:
+        string_representation = ["Decision Tree (cross validation) - Reversed", os.linesep,
+                                 evaluation]
+    else:
+        string_representation = ["Decision Tree (cross validation)", os.linesep,
+                                 evaluation]
 
     return ''.join(string_representation)
 
 
-def random_forest(features, target, n_trees=50, test_reverse=False, plot_roc=False):
+def random_forest(features, target, n_trees=50, reverse=False, plot_roc=False):
     """
     Random forest
     :param features: feature matrix
     :param target: target vector
     :param n_trees: The number of trees in the forest
-    :param test_reverse: Uses test set for training and training set for test
+    :param reverse: Uses test set for training and training set for test
     :param plot_roc: if True ROC curve will be plotted
     :return: string representation of results
     """
     rf = RandomForestClassifier(n_estimators=n_trees)  # no further information given
 
-    evaluation = classifier(rf, features, target, test_reverse=test_reverse, plot_roc=plot_roc)
+    evaluation = classifier(rf, features, target, reverse=reverse, plot_roc=plot_roc)
 
-    string_representation = ["Random Forest", os.linesep, evaluation]
+    if reverse:
+        string_representation = ["Random Forest - Reversed", os.linesep,
+                                 evaluation]
+    else:
+        string_representation = ["Random Forest", os.linesep,
+                                 evaluation]
 
     return ''.join(string_representation)
 
 
-def random_forest_cross_validation(features, target, n_trees=50, k=10, test_reverse=False):
+def random_forest_cross_validation(features, target, n_trees=50, k=10, reverse=False):
     """
     Random Forest with k-fold cross validation
     :param features: feature matrix
     :param target: target vector
     :param n_trees: The number of trees in the forest
     :param k: number of folds
-    :param test_reverse: Uses test set for training and training set for test
+    :param reverse: Uses test set for training and training set for test
     :return: string representation of results
     """
     rf = RandomForestClassifier(n_estimators=n_trees)  # no further information given
 
-    evaluation = classifier_cross_validation(rf, features, target, k, test_reverse)
+    evaluation = classifier_cross_validation(rf, features, target, k, reverse)
 
-    string_representation = ["Random Forest (cross validation)", os.linesep,
-                             evaluation]
+    if reverse:
+        string_representation = ["Random Forest (cross validation) - Reversed", os.linesep,
+                                 evaluation]
+    else:
+        string_representation = ["Random Forest (cross validation)", os.linesep,
+                                 evaluation]
 
     return ''.join(string_representation)
 
 
-def multilayer_perceptron(features, target, hidden_nodes=50, test_reverse=False, plot_roc=False):
+def multilayer_perceptron(features, target, hidden_nodes=50, reverse=False, plot_roc=False):
     """
     Multilayer Perceptron
     :param features: feature matrix
     :param target: target vector
     :param hidden_nodes: The number of neurons in the hidden layer
-    :param test_reverse: Uses test set for training and training set for test
+    :param reverse: Uses test set for training and training set for test
     :param plot_roc: if True ROC curve will be plotted
     :return: string representation of results
     """
     mlp = MLPClassifier(hidden_layer_sizes=hidden_nodes)
 
-    evaluation = classifier(mlp, features, target, test_reverse=test_reverse, plot_roc=plot_roc)
+    evaluation = classifier(mlp, features, target, reverse=reverse, plot_roc=plot_roc)
 
-    string_representation = ["Multilayer Perceptron", os.linesep, evaluation]
+    if reverse:
+        string_representation = ["Multilayer Perceptron - Reversed", os.linesep,
+                                 evaluation]
+    else:
+        string_representation = ["Multilayer Perceptron", os.linesep,
+                                 evaluation]
 
     return ''.join(string_representation)
 
 
-def multilayer_perceptron_cross_validation(features, target, hidden_nodes=50, k=10, test_reverse=False):
+def multilayer_perceptron_cross_validation(features, target, hidden_nodes=50, k=10, reverse=False):
     """
     Multilayer Perceptron with k-fold cross validation
     :param features: feature matrix
     :param target: target vector
     :param hidden_nodes: The number of neurons in the hidden layer
     :param k: number of folds
-    :param test_reverse: Uses test set for training and training set for test
+    :param reverse: Uses test set for training and training set for test
     :return: string representation of results
     """
     mlp = MLPClassifier(hidden_layer_sizes=hidden_nodes)
 
-    evaluation = classifier_cross_validation(mlp, features, target, k, test_reverse)
+    evaluation = classifier_cross_validation(mlp, features, target, k, reverse)
 
-    string_representation = ["Multilayer Perceptron (cross validation)", os.linesep,
-                             evaluation]
+    if reverse:
+        string_representation = ["Multilayer Perceptron (cross validation) - Reversed", os.linesep,
+                                 evaluation]
+    else:
+        string_representation = ["Multilayer Perceptron (cross validation)", os.linesep,
+                                 evaluation]
 
     return ''.join(string_representation)
 
 
-def classifier_cross_validation(clf, features, target, k=10, test_reverse=False):
+def classifier_cross_validation(clf, features, target, k=10, reverse=False):
     """
     Trains and tests a classifier with k fold cross validation
     :param clf: The classifier to be trained
     :param features: feature matrix
     :param target: target vector
     :param k: number of folds
-    :param test_reverse: Uses test set for training and training set for test
+    :param reverse: Uses test set for training and training set for test
     :return: evaluation, results_k_fold
     :rtype: (String, array)
     """
-    _, x_train_std, x_test_std, y_train, y_test = data_preparation(features, target)
+    _, x_train_std, x_test_std, y_train, y_test = data_preparation(features, target, reverse=reverse)
 
     evaluation = []
-
-    if test_reverse:
-        x_test_std, x_train_std, y_test, y_train = x_train_std, x_test_std, y_train, y_test
-        evaluation.append("Reversed")
-        evaluation.append(os.linesep)
 
     k_fold = model_selection.KFold(n_splits=k, shuffle=True, random_state=1)
     y_train = y_train.to_numpy()
@@ -307,25 +351,20 @@ def classifier_cross_validation(clf, features, target, k=10, test_reverse=False)
     return ''.join(evaluation)
 
 
-def classifier(clf, features, target, test_reverse=False, plot_roc=False):
+def classifier(clf, features, target, reverse=False, plot_roc=False):
     """
     Trains and tests a classifier
     :param clf: The classifier to be trained
     :param features: feature matrix
     :param target: target vector
-    :param test_reverse: Uses test set for training and training set for test
+    :param reverse: Uses test set for training and training set for test
     :param plot_roc: if True ROC curve will be plotted
     :return: evaluation
     :rtype: String
     """
-    _, x_train_std, x_test_std, y_train, y_test = data_preparation(features, target)
+    _, x_train_std, x_test_std, y_train, y_test = data_preparation(features, target, reverse=reverse)
 
     evaluation = []
-
-    if test_reverse:
-        x_test_std, x_train_std, y_test, y_train = x_train_std, x_test_std, y_train, y_test
-        evaluation.append("Reversed")
-        evaluation.append(os.linesep)
 
     # train
     clf.fit(x_train_std, y_train)
@@ -352,15 +391,15 @@ def evaluate_all(plot_roc=False):
     data_string, _, _, _, _ = data_preparation(x, y)
     string_representation = [data_string, os.linesep,
                              support_vector_machine(x, y, plot_roc=plot_roc),
-                             support_vector_machine_cross_validation(x, y, plot_roc=plot_roc), os.linesep,
+                             support_vector_machine_cross_validation(x, y), os.linesep,
                              linear_discriminant_analysis(x, y, plot_roc=plot_roc), os.linesep,
-                             linear_discriminant_analysis_cross_validation(x, y, plot_roc=plot_roc), os.linesep,
+                             linear_discriminant_analysis_cross_validation(x, y), os.linesep,
                              decision_tree(x, y, plot_roc=plot_roc), os.linesep,
-                             decision_tree_cross_validation(x, y, plot_roc=plot_roc), os.linesep,
+                             decision_tree_cross_validation(x, y), os.linesep,
                              random_forest(x, y, plot_roc=plot_roc), os.linesep,
-                             random_forest_cross_validation(x, y, plot_roc=plot_roc), os.linesep,
+                             random_forest_cross_validation(x, y), os.linesep,
                              multilayer_perceptron(x, y, plot_roc=plot_roc), os.linesep,
-                             multilayer_perceptron_cross_validation(x, y, plot_roc=plot_roc), os.linesep]
+                             multilayer_perceptron_cross_validation(x, y), os.linesep]
     return ''.join(string_representation)
 
 
@@ -374,18 +413,20 @@ def evaluate_paper():
     data_string, _, _, _, _ = data_preparation(x, y)
     string_representation = [data_string, os.linesep,
                              support_vector_machine_cross_validation(x, y), os.linesep,
-                             support_vector_machine_cross_validation(x, y, k=10, test_reverse=True), os.linesep,
+                             support_vector_machine_cross_validation(x, y, k=10, reverse=True), os.linesep,
                              linear_discriminant_analysis_cross_validation(x, y), os.linesep,
-                             linear_discriminant_analysis_cross_validation(x, y, k=10, test_reverse=True), os.linesep,
+                             linear_discriminant_analysis_cross_validation(x, y, k=10, reverse=True), os.linesep,
                              decision_tree_cross_validation(x, y), os.linesep,
-                             decision_tree_cross_validation(x, y, k=10, test_reverse=True), os.linesep,
+                             decision_tree_cross_validation(x, y, k=10, reverse=True), os.linesep,
                              random_forest_cross_validation(x, y), os.linesep,
-                             random_forest_cross_validation(x, y, k=10, test_reverse=True), os.linesep,
+                             random_forest_cross_validation(x, y, k=10, reverse=True), os.linesep,
                              multilayer_perceptron_cross_validation(x, y), os.linesep,
-                             multilayer_perceptron_cross_validation(x, y, k=10, test_reverse=True), os.linesep]
+                             multilayer_perceptron_cross_validation(x, y, k=10, reverse=True), os.linesep]
     return ''.join(string_representation)
 
 
 if __name__ == "__main__":
-    print(evaluate_paper())
+    x, y = load_data()
+    print(support_vector_machine(x, y, reverse=True))
+    # print(evaluate_paper())
     sys.exit(0)
