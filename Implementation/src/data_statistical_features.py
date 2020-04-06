@@ -200,7 +200,9 @@ class Segment:
                          'variance local maxima',
                          'variance local minima',
                          'mean signal envelope',
-                         'informative'])
+                         'informative',
+                         'mean error',
+                         'coverage'])
 
     def get_feature_array(self):
         """
@@ -219,5 +221,7 @@ class Segment:
                          self.variance_local_maxima,
                          self.variance_local_minima,
                          self.mean_signal_envelope,
-                         self.informative])
+                         self.informative,
+                         self.mean_error,
+                         self.coverage])
 

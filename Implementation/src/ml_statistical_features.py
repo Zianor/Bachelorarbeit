@@ -31,7 +31,9 @@ def load_data():
     df = pd.read_csv(path)
     features = df.iloc[:, 0:13]
     target = df.iloc[:, 13]
-    return features, target
+    mean_error = df.iloc[:, 14]
+    coverage = df.iloc[:, 15]
+    return features, target, mean_error, coverage
 
 
 def data_preparation(features, target, reverse=False, partial=True):
@@ -82,8 +84,16 @@ def evaluate_model(y_actual_train, y_pred_train, y_actual_test, y_pred_test):
     string_representation = ["Training set", os.linesep,
                              evaluate(y_actual_train, y_pred_train), os.linesep,
                              "Test set", os.linesep,
-                             evaluate(y_actual_test, y_pred_test)
+                             evaluate(y_actual_test, y_pred_test), os.linesep
                              ]
+
+    _, _, mean_error, coverage = load_data()
+
+    avg_mean_error = calc_avg_mean_error(mean_error, y_pred_test, y_actual_test)
+    string_representation.extend(["Average mean error: ", str(avg_mean_error), os.linesep])
+
+    coverage = calc_coverage(coverage, y_pred_test, y_actual_test)
+    string_representation.extend(["Coverage: ", str(coverage), os.linesep])
 
     return ''.join(string_representation)
 
@@ -402,9 +412,8 @@ def evaluate_all(plot_roc=False):
     :return: evaluation
     :rtype: String
     """
-    x, y = load_data()
-    data_string, _, _, _, _ = data_preparation(x, y)
-    string_representation = [data_string, os.linesep, os.linesep,
+    x, y, mean_error, coverage = load_data()
+    string_representation = [get_data_metrics(x, y, mean_error, coverage), os.linesep, os.linesep,
                              support_vector_machine(x, y, plot_roc=plot_roc), os.linesep, os.linesep,
                              support_vector_machine_cross_validation(x, y), os.linesep, os.linesep,
                              linear_discriminant_analysis(x, y, plot_roc=plot_roc), os.linesep, os.linesep,
@@ -424,9 +433,8 @@ def evaluate_paper_statistical_features():
     :return: evaluation
     :rtype: String
     """
-    x, y = load_data()
-    data_string, _, _, _, _ = data_preparation(x, y)
-    string_representation = [data_string, os.linesep,
+    x, y, mean_error, coverage = load_data()
+    string_representation = [get_data_metrics(x, y, mean_error, coverage), os.linesep,
                              "Cross Validation", os.linesep, os.linesep,
                              support_vector_machine_cross_validation(x, y, partial=True), os.linesep, os.linesep,
                              support_vector_machine_cross_validation(x, y, k=10, partial=True, reverse=True),
@@ -458,6 +466,78 @@ def evaluate_paper_statistical_features():
     return ''.join(string_representation)
 
 
+def get_data_metrics(features, target, mean_error, coverage):
+    """
+    Returns a description of the given data, incl. mean bbi error, coverage and training and test group
+    :param features: feature matrix
+    :param target: target vector
+    :param mean_error: mean bbi error for each segment
+    :type: pandas.Series
+    :param coverage: coverage for each segment
+    :type: pandas.Series
+    :return: data description
+    :rtype: String
+    """
+    data_description, _, _, y_train, y_test = data_preparation(features, target)
+
+    string_representation = [data_description]
+
+    string_representation.extend(
+        ["Mean bbi error on all data: ", str(calc_avg_mean_error(mean_error, target)), os.linesep])
+    string_representation.extend(["Coverage on all data: ", str(calc_coverage(coverage, target)), os.linesep])
+
+    string_representation.extend(
+        ["Mean bbi error on training set: ", str(calc_avg_mean_error(mean_error, y_train)), os.linesep])
+    string_representation.extend(["Coverage on training set: ", str(calc_coverage(coverage, y_train)), os.linesep])
+
+    string_representation.extend(
+        ["Mean bbi error on test set: ", str(calc_avg_mean_error(mean_error, y_test)), os.linesep])
+    string_representation.extend(["Coverage on test set: ", str(calc_coverage(coverage, y_test)), os.linesep])
+
+    return ''.join(string_representation)
+
+
+def calc_avg_mean_error(mean_error, predicted, actual=None):
+    """
+    Calculates mean bbi error of all segments predicted as informative
+    :param mean_error: Array containing each segments mean bbi error
+    :param predicted: Predicted labels for all segments
+    :param actual: If predicted is not of type pandas.core.series.Series, Series of actual labels needed for mapping
+    :return: average mean bbi error, None if mapping was not possible
+    """
+    if not isinstance(predicted, pd.Series):
+        if actual is None:
+            warnings.warn(
+                'Predicted Labels not of type pandas.core.series.Series but no Series actual for mapping given')
+            return None
+        actual.update = predicted
+        predicted = actual
+    mean_error = mean_error[predicted.index]
+    avg_mean_error = np.mean(mean_error[predicted.values == 1])
+    return avg_mean_error
+
+
+def calc_coverage(coverage, predicted, actual=None):
+    """
+    Calculates coverage over all segments
+    :param coverage: Array containing each segments mean bbi error
+    :param predicted: Predicted labels for all segments
+    :param actual: If predicted is not of type pandas.core.series.Series, Series of actual labels needed for mapping
+    :return: coverage, None if mapping was not possible
+    """
+    if not isinstance(predicted, pd.Series):
+        if actual is None:
+            warnings.warn(
+                'Predicted Labels not of type pandas.core.series.Series but no Series actual for mapping given')
+            return None
+        actual.update = predicted
+        predicted = actual
+    coverage = coverage[predicted.index]
+    coverage_sum = np.sum(coverage[predicted.values == 1])  # coverage over all informative segments
+    coverage = coverage_sum / len(coverage)
+    return coverage
+
+
 if __name__ == "__main__":
-    evaluate_all(True)
+    print(evaluate_all(True))
     sys.exit(0)
