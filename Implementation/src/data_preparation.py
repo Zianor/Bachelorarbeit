@@ -1,5 +1,6 @@
 from scipy.io import loadmat
 from src.utils import get_project_root
+import numpy as np
 import os
 
 
@@ -12,6 +13,7 @@ class DataSeries:
         self.bbi_ecg = bbi_ecg
         self.indices = indices
         self.samplerate = samplerate
+        self.length = len(raw_data) / samplerate  # in seconds
 
 
 class BcgData:
@@ -40,3 +42,10 @@ class BcgData:
                 self.samplerate
             )
         )
+
+    def get_total_time(self):
+        """
+        :return: total recorded time in hours
+        """
+        time = np.array([series.length for series in self.data_series]).sum()
+        return time/60/60
