@@ -258,10 +258,12 @@ def classifier(clf, parameters, features, target, reverse=False, plot_roc=False)
 
     k_fold = model_selection.KFold(n_splits=10, shuffle=True, random_state=1)
 
-    grid_search = GridSearchCV(estimator=clf, param_grid=parameters, cv=k_fold)
+    grid_search = GridSearchCV(estimator=clf, param_grid=parameters, cv=k_fold, n_jobs=10)  # TODO: evtl. anpassen
     grid_search.fit(x_train_std, y_train)
-    print(grid_search.get_params())
-    evaluation = []
+
+    evaluation = [os.linesep, "Best Score ", str(grid_search.best_score_), os.linesep,
+                  "Best Params", str(grid_search.best_estimator_), os.linesep,
+                  "Grid ", os.linesep, pd.DataFrame(grid_search.cv_results_).to_string(), os.linesep]
 
     y_pred = grid_search.predict(x_test_std)
 
@@ -293,24 +295,20 @@ def evaluate_all(plot_roc=False):
 
 def evaluate_paper_statistical_features():
     """
-    Evaluates all models according to the paper "https://ieeexplore.ieee.org/document/7591234"
-    :return: evaluation
-    :rtype: String
+    Evaluates all models according to the paper "https://ieeexplore.ieee.org/document/7591234 and prints results"
     """
     x, y, mean_error, coverage = load_data()
-    string_representation = [get_data_metrics(x, y, mean_error, coverage), os.linesep,
-                             support_vector_machine(x, y), os.linesep, os.linesep,
-                             linear_discriminant_analysis(x, y), os.linesep, os.linesep,
-                             decision_tree(x, y), os.linesep, os.linesep,
-                             random_forest(x, y), os.linesep, os.linesep,
-                             multilayer_perceptron(x, y), os.linesep, os.linesep,
-                             support_vector_machine(x, y, reverse=True), os.linesep, os.linesep,
-                             linear_discriminant_analysis(x, y, reverse=True), os.linesep, os.linesep,
-                             decision_tree(x, y, reverse=True), os.linesep, os.linesep,
-                             random_forest(x, y, reverse=True), os.linesep, os.linesep,
-                             multilayer_perceptron(x, y, reverse=True)
-                             ]
-    return ''.join(string_representation)
+    print(get_data_metrics(x, y, mean_error, coverage), os.linesep)
+    print(support_vector_machine(x, y), os.linesep, os.linesep)
+    print(linear_discriminant_analysis(x, y), os.linesep, os.linesep)
+    print(decision_tree(x, y), os.linesep, os.linesep)
+    print(random_forest(x, y), os.linesep, os.linesep)
+    print(multilayer_perceptron(x, y), os.linesep, os.linesep)
+    print(support_vector_machine(x, y, reverse=True), os.linesep, os.linesep)
+    print(linear_discriminant_analysis(x, y, reverse=True), os.linesep, os.linesep)
+    print(decision_tree(x, y, reverse=True), os.linesep, os.linesep)
+    print(random_forest(x, y, reverse=True), os.linesep, os.linesep)
+    print(multilayer_perceptron(x, y, reverse=True))
 
 
 def get_data_metrics(features, target, mean_error, coverage):
@@ -327,7 +325,7 @@ def get_data_metrics(features, target, mean_error, coverage):
     """
     data_description, _, _, y_train, y_test = data_preparation(features, target)
 
-    string_representation = [data_description]
+    string_representation = [data_description, os.linesep]
 
     string_representation.extend(
         ["Mean bbi error on all data: ", str(calc_avg_mean_error(mean_error, target)), os.linesep])
@@ -387,5 +385,5 @@ def calc_coverage(coverage, predicted, actual=None):
 
 if __name__ == "__main__":
     # print(evaluate_all(True))
-    print(evaluate_paper_statistical_features())
+    evaluate_paper_statistical_features()
     sys.exit(0)
