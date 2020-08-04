@@ -35,13 +35,13 @@ def brueser_csv(fs, use_existing=True):
              path.lower().endswith(".mat")]
 
     for path in paths:
-        if(use_existing):
-            number = path.lower().split("_")[-1]
-            number = number.replace("mat", "")
+        if use_existing:
             path = os.path.join(os.path.join(get_project_root(), 'data/'), path)
 
             data = loadmat(path)['BCG_raw_data'][0]
 
+            number = path.lower().split("_")[-1]
+            number = number.replace("mat", "")
             filename = 'brueser' + str(number) + 'csv'
             path_csv = os.path.join(data_path, filename)
 
