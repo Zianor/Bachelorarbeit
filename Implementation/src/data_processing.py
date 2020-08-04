@@ -2,23 +2,30 @@ import csv
 
 import numpy as np
 import scipy
+from pyedflib import highlevel
+
 import brueser
 import os
 from utils import get_project_root
 from scipy.io import loadmat
 from scipy import signal
+from ecgdetectors import Detectors
+import pandas as pd
 
 
-def get_brueser_hr(unique_peaks, medians, segment_length, segment_count, samplerate):
+def get_brueser_hr(unique_peaks, medians, segment_length, segment_count, sample_rate):
+    unique_peaks = unique_peaks.to_numpy()
+    last_peak = unique_peaks[-1]
+    segment_count = last_peak//segment_length
     hr = np.zeros(segment_count)
 
-    for i, _ in enumerate(hr):
+    for i in range(segment_count):
         start = i*segment_length
         end = (i+1)*segment_length
-        indices = np.argwhere(np.logical_and(start < unique_peaks, unique_peaks < end))[0]
-        hr[i] = np.mean(medians[indices])
+        indices = np.where(np.logical_and(start <= unique_peaks, unique_peaks < end))
+        hr[i] = np.mean(medians.to_numpy()[indices])
 
-    hr = 60 * hr / samplerate  # convert to bpm
+    hr = [60 / (curr / sample_rate) for curr in hr]  # TODO: use broadcasting # convert to bpm
     return hr
 
 
