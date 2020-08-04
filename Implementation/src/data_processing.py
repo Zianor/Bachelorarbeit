@@ -19,7 +19,7 @@ def get_brueser_hr(unique_peaks, medians, segment_length, segment_count, sample_
     segment_count = last_peak//segment_length
     hr = np.zeros(segment_count)
 
-    for i in range(segment_count):
+    for i, _ in enumerate(hr):
         start = i*segment_length
         end = (i+1)*segment_length
         indices = np.where(np.logical_and(start <= unique_peaks, unique_peaks < end))
