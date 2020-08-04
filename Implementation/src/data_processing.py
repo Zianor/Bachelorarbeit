@@ -13,7 +13,7 @@ from ecgdetectors import Detectors
 import pandas as pd
 
 
-def get_brueser_hr(unique_peaks, medians, segment_length, segment_count, sample_rate):
+def get_brueser_hr(unique_peaks, medians, segment_length, sample_rate):
     unique_peaks = unique_peaks.to_numpy()
     last_peak = unique_peaks[-1]
     segment_count = last_peak//segment_length
