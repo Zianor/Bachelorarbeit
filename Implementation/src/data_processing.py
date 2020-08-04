@@ -45,7 +45,7 @@ def brueser_csv(fs, use_existing=True):
             filename = 'brueser' + str(number) + 'csv'
             path_csv = os.path.join(data_path, filename)
 
-            if not os.path.isfile(path_csv):
+            if not use_existing or not os.path.isfile(path_csv):
                 win = np.arange(0.3 * fs, 2 * fs + 1, dtype=np.int32)
                 result, est_len, quality_arr = brueser.interval_probabilities(data, win, estimate_lengths=True)
                 peaks, _ = scipy.signal.find_peaks(data, distance=win[0])
@@ -91,7 +91,7 @@ def ecg_csv(use_existing=True):
         filename = 'rpeaks' + str(number) + 'csv'
         path_csv = os.path.join(data_path, filename)
 
-        if use_existing and not os.path.isfile(path_csv):
+        if not use_existing or not os.path.isfile(path_csv):
             signals, signal_headers, header = highlevel.read_edf(path)
             detectors = Detectors(signal_headers[0]['sample_rate'])
             for signal_header in signal_headers:
