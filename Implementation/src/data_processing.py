@@ -95,8 +95,8 @@ def ecg_csv(use_existing=True):
             signals, signal_headers, header = highlevel.read_edf(path)
             detectors = Detectors(signal_headers[0]['sample_rate'])
             r_peaks = {}
-            for i, signal in enumerate(signals):
+            for i, s in enumerate(signals):
                 if signal_headers[i]['transducer'] == 'ECG electrode':
-                    r_peaks[signal_headers[i]['label']] = detectors.pan_tompkins_detector(signal)
+                    r_peaks[signal_headers[i]['label']] = detectors.pan_tompkins_detector(s)
             r_peaks_data = pd.DataFrame(dict([(k, pd.Series(v)) for k, v in r_peaks.items()]))
             r_peaks_data.to_csv(path_csv)
