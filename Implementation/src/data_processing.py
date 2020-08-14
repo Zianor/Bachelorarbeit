@@ -100,3 +100,30 @@ def ecg_csv(use_existing=True):
                     r_peaks[signal_headers[i]['label']] = detectors.pan_tompkins_detector(s)
             r_peaks_data = pd.DataFrame(dict([(k, pd.Series(v)) for k, v in r_peaks.items()]))
             r_peaks_data.to_csv(path_csv)
+
+
+def serialize_ecg_hrs():
+    ecg_csv()
+    brueser_csv(100)
+    data_path = os.path.join(get_project_root(), 'data/ecg/')
+    paths = [path for path in os.listdir(data_path) if path.lower().endswith(".csv")]
+    ecg_hrs = {}
+    for path in paths:
+        path = os.path.join(os.path.join(get_project_root(), 'data/ecg/'), path)
+        data = pd.read_csv(path)
+        ecg_hrs[path] = get_ecg_hr(data.to_numpy(), 10 * 1000, 1000)
+    ecg_data = pd.DataFrame(dict([(k, pd.Series(v)) for k, v in ecg_hrs.items()]))
+    ecg_data.to_csv(os.path.join(get_project_root(), 'data/ecg/ecg_hrs.csv'))
+
+
+def serialize_bcg_hrs():
+    data_path = os.path.join(get_project_root(), 'data/')
+    paths = [path for path in os.listdir(data_path) if
+             path.lower().endswith(".csv") and path.lower().startswith('brueser')]
+    bcg_hrs = {}
+    for path in paths:
+        path = os.path.join(os.path.join(get_project_root(), 'data/'), path)
+        data = pd.read_csv(path)
+        bcg_hrs[path] = get_brueser_hr(data['unique_peaks'], data['medians'], 10 * 100, 100)
+    bcg_data = pd.DataFrame(dict([(k, pd.Series(v)) for k, v in bcg_hrs.items()]))
+    bcg_data.to_csv(os.path.join(get_project_root(), 'data/bcg_hrs.csv'))
