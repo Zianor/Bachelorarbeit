@@ -69,16 +69,21 @@ def get_ecg_hr(r_peaks, segment_length, sample_rate, lower_threshold=30, upper_t
     for i, _ in enumerate(hr):
         start = i * segment_length
         end = (i + 1) * segment_length
-        curr_hr = []
-        for r_peaks_single in r_peaks.transpose():
-            indices = np.argwhere(np.logical_and(start <= r_peaks_single, r_peaks_single < end))
-            hr_guess = len(indices) / segment_length * sample_rate * 60
-            if lower_threshold < hr_guess < upper_threshold:
-                curr_hr.append(hr_guess)
-        if curr_hr:
-            hr[i] = np.mean(curr_hr)
-        else:
-            hr[i] = 0
+        hr[i] = get_ecg_segment_hr(start, end, r_peaks, sample_rate, lower_threshold, upper_threshold)
+    return hr
+
+
+def get_ecg_segment_hr(start, end, r_peaks, sample_rate, lower_threshold=30, upper_threshold=200):
+    curr_hr = []
+    for r_peaks_single in r_peaks.transpose():
+        indices = np.argwhere(np.logical_and(start <= r_peaks_single, r_peaks_single < end))
+        hr_guess = len(indices) / (end - start) * sample_rate * 60
+        if lower_threshold < hr_guess < upper_threshold:
+            curr_hr.append(hr_guess)
+    if curr_hr:
+        hr = np.mean(curr_hr)
+    else:
+        hr = 0
     return hr
 
 
