@@ -1,27 +1,27 @@
 import csv
+import os
 
 import numpy as np
+import pandas as pd
 import scipy
+from ecgdetectors import Detectors
 from pyedflib import highlevel
+from scipy import signal
+from scipy.io import loadmat
 
 import brueser
-import os
 from utils import get_project_root
-from scipy.io import loadmat
-from scipy import signal
-from ecgdetectors import Detectors
-import pandas as pd
 
 
 def get_brueser_hr(unique_peaks, medians, segment_length, sample_rate):
     unique_peaks = unique_peaks.to_numpy()
     last_peak = unique_peaks[-1]
-    segment_count = last_peak//segment_length
+    segment_count = last_peak // segment_length
     hr = np.zeros(segment_count)
 
     for i, _ in enumerate(hr):
-        start = i*segment_length
-        end = (i+1)*segment_length
+        start = i * segment_length
+        end = (i + 1) * segment_length
         indices = np.where(np.logical_and(start <= unique_peaks, unique_peaks < end))
         hr[i] = np.mean(medians.to_numpy()[indices])
 
@@ -49,8 +49,8 @@ def brueser_csv(fs, use_existing=True):
                 win = np.arange(0.3 * fs, 2 * fs + 1, dtype=np.int32)
                 result, est_len, quality_arr = brueser.interval_probabilities(data, win, estimate_lengths=True)
                 peaks, _ = scipy.signal.find_peaks(data, distance=win[0])
-                unique_peaks, medians, qualities = brueser.rr_intervals_from_est_len(est_len, peaks, data, quality_arr, win[0])
-                # alle 3 serialisieren
+                unique_peaks, medians, qualities = brueser.rr_intervals_from_est_len(est_len, peaks, data, quality_arr,
+                                                                                     win[0])
 
                 with open(path_csv, 'w') as f:
                     writer = csv.writer(f)
