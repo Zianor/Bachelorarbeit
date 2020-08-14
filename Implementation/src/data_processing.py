@@ -60,8 +60,8 @@ def brueser_csv(fs, use_existing=True):
 
 
 def get_ecg_hr(r_peaks, segment_length, sample_rate, lower_threshold=30, upper_threshold=200):
-    last_peak = np.max(r_peaks)
-    segment_count = last_peak // segment_length
+    last_peak = np.nanmax(r_peaks[-1, :])
+    segment_count = int(last_peak // segment_length)
     hr = np.zeros(segment_count)
     for i, _ in enumerate(hr):
         start = i * segment_length
