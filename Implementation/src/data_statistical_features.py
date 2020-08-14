@@ -36,7 +36,7 @@ class DataSet:
                 if i + self.segment_length < len(series.raw_data):  # prevent shorter segments, last shorter one ignored
                     segment_data = np.array(series.raw_data[i:i + self.segment_length])
                     informative, coverage, mean_error = self.is_informative(series, i, i + self.segment_length)  # label
-                    self.segments.append(Segment(segment_data, bcg_data.samplerate, informative, coverage, mean_error))
+                    self.segments.append(Segment(segment_data, bcg_data.sample_rate, informative, coverage, mean_error))
 
     def is_informative(self, series, start, end):
         """
@@ -53,7 +53,7 @@ class DataSet:
         """
         indices = np.where(np.logical_and(start < series.indices, series.indices < end))[0]
         coverage = 100 / self.segment_length * sum(
-            DataSet._seconds_to_frames(bbi, series.samplerate) for bbi in series.bbi_bcg[indices])
+            DataSet._seconds_to_frames(bbi, series.sample_rate) for bbi in series.bbi_bcg[indices])
         if len(indices) > 0:
             mean_error = sum(abs(series.bbi_bcg[i] - series.bbi_ecg[i]) for i in indices) / len(indices)
         else:

@@ -6,18 +6,18 @@ import os
 
 class DataSeries:
 
-    def __init__(self, raw_data, sqi, bbi_bcg, bbi_ecg, indices, samplerate):
+    def __init__(self, raw_data, sqi, bbi_bcg, bbi_ecg, indices, sample_rate):
         self.raw_data = raw_data
         self.sqi = sqi
         self.bbi_bcg = bbi_bcg
         self.bbi_ecg = bbi_ecg
         self.indices = indices
-        self.samplerate = samplerate
-        self.length = len(raw_data) / samplerate  # in seconds
+        self.sample_rate = sample_rate
+        self.length = len(raw_data) / sample_rate  # in seconds
 
 
 class BcgData:
-    samplerate = 100
+    sample_rate = 100
 
     def __init__(self):
         paths = [path for path in os.listdir(os.path.join(get_project_root(), 'data/')) if
@@ -39,7 +39,7 @@ class BcgData:
                 mat_dict['BBI_BCG'][:, 0],
                 mat_dict['BBI_ECG'][:, 0],
                 mat_dict['indx'][:, 0],
-                self.samplerate
+                self.sample_rate
             )
         )
 
