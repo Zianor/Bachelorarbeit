@@ -94,32 +94,9 @@ def ecg_csv(use_existing=True):
         if not use_existing or not os.path.isfile(path_csv):
             signals, signal_headers, header = highlevel.read_edf(path)
             detectors = Detectors(signal_headers[0]['sample_rate'])
-            for signal_header in signal_headers:
-                print(signal_header)
-            r_peaks = []
+            r_peaks = {}
             for i, signal in enumerate(signals):
                 if signal_headers[i]['transducer'] == 'ECG electrode':
-                    r_peaks.append(detectors.pan_tompkins_detector(signal))
-            with open(path_csv, 'w') as f:
-                writer = csv.writer(f)
-                for channel in r_peaks:
-                    writer.writerow(channel)
-
-
-# ecg_csv()
-# brueser_csv(100)
-# data_path = os.path.join(get_project_root(), 'data/ecg/')
-# paths = [path for path in os.listdir(data_path) if path.lower().endswith(".csv")]
-# for path in paths:
-#     path = os.path.join(os.path.join(get_project_root(), 'data/ecg/'), path)
-#     data = pd.read_csv(path)
-#     print(os.linesep, path, os.linesep)
-#     print(get_ecg_hr(data.to_numpy(), 10*1000, 1000, 1000))
-#
-# data_path = os.path.join(get_project_root(), 'data/')
-# paths = [path for path in os.listdir(data_path) if path.lower().endswith(".csv") and path.lower().startswith('brueser')]
-# for path in paths:
-#     path = os.path.join(os.path.join(get_project_root(), 'data/'), path)
-#     data = pd.read_csv(path)
-#     print(os.linesep, path, os.linesep)
-#     print(get_brueser_hr(data['unique_peaks'], data['medians'], 10*100, 1000, 100))
+                    r_peaks[signal_headers[i]['label']] = detectors.pan_tompkins_detector(signal)
+            r_peaks_data = pd.DataFrame(dict([(k, pd.Series(v)) for k, v in r_peaks.items()]))
+            r_peaks_data.to_csv(path_csv)
