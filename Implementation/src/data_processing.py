@@ -22,10 +22,13 @@ def get_brueser_hr(unique_peaks, medians, segment_length, sample_rate):
     for i, _ in enumerate(hr):
         start = i * segment_length
         end = (i + 1) * segment_length
-        indices = np.where(np.logical_and(start <= unique_peaks, unique_peaks < end))
-        hr[i] = np.mean(medians.to_numpy()[indices])
+        hr[i] = get_brueser_segment_hr(start, end, unique_peaks, medians, sample_rate)
+    return hr
 
-    hr = [60 / (curr / sample_rate) for curr in hr]  # TODO: use broadcasting # convert to bpm
+
+def get_brueser_segment_hr(start, end, unique_peaks, medians, sample_rate):
+    indices = np.where(np.logical_and(start <= unique_peaks, unique_peaks < end))
+    hr = 60 / (np.mean(medians.to_numpy()[indices]) / sample_rate)
     return hr
 
 
