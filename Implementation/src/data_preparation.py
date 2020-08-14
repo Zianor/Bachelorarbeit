@@ -1,5 +1,6 @@
 from scipy.io import loadmat
 from src.utils import get_project_root
+import numpy as np
 import os
 
 
@@ -12,9 +13,7 @@ class DataSeries:
         self.bbi_ecg = bbi_ecg
         self.indices = indices
         self.samplerate = samplerate
-
-    def calculate_bbi_error(self):
-        return abs(self.bbi_bcg - self.bbi_ecg)
+        self.length = len(raw_data) / samplerate  # in seconds
 
 
 class BcgData:
@@ -30,14 +29,23 @@ class BcgData:
             self.add_file_to_data(mat_dict)
 
     def add_file_to_data(self, mat_dict):
-        """Adds the content of dict of bcg data to data_series"""
+        """
+        Adds the content of dict of bcg data to data_series
+        """
         self.data_series.append(
             DataSeries(
-                mat_dict['BCG_raw_data'],
-                mat_dict['q_BCG'],
-                mat_dict['BBI_BCG'],
-                mat_dict['BBI_ECG'],
-                mat_dict['indx'],
+                mat_dict['BCG_raw_data'][0],
+                mat_dict['q_BCG'][:, 0],
+                mat_dict['BBI_BCG'][:, 0],
+                mat_dict['BBI_ECG'][:, 0],
+                mat_dict['indx'][:, 0],
                 self.samplerate
             )
         )
+
+    def get_total_time(self):
+        """
+        :return: total recorded time in hours
+        """
+        time = np.array([series.length for series in self.data_series]).sum()
+        return time/60/60
