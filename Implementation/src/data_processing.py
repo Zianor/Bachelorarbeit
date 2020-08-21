@@ -87,31 +87,54 @@ def get_ecg_segment_hr(start, end, r_peaks, sample_rate, lower_threshold=30, upp
     return hr
 
 
-def ecg_csv(use_existing=True):
+def ecg_csv_all(use_existing=True):
+    data_path = os.path.join(get_project_root(), 'data/ecg/')
+    paths = [path for path in os.listdir(data_path) if path.lower().endswith(".edf")]
+    for path in paths:
+        path = os.path.join(os.path.join(get_project_root(), 'data/ecg/'), path)
+        ecg_csv(data_path=data_path, path=path, use_existing=use_existing)
+
+
+def ecg_csv(data_path, path, use_existing=True):
+    ecg_id = path.lower().split("_")[-1].replace(".edf", "")
+    filename = 'rpeaks' + str(ecg_id) + '.csv'
+    path_csv = os.path.join(data_path, filename)
+
+    length = None
+    sample_rate = None
+
+    if not use_existing or not os.path.isfile(path_csv):
+        signals, signal_headers, header = highlevel.read_edf(path)
+        r_peaks = {}
+        for i, s in enumerate(signals):
+            if signal_headers[i]['transducer'] == 'ECG electrode':
+                sample_rate = signal_headers[i]['sample_rate']
+                length = len(s)
+                detectors = Detectors(sample_rate)
+                r_peaks[signal_headers[i]['label']] = detectors.pan_tompkins_detector(s)
+        r_peaks_data = pd.DataFrame(dict([(k, pd.Series(v)) for k, v in r_peaks.items()]))
+        r_peaks_data.to_csv(path_csv)
+    else:
+        r_peaks_data = pd.read_csv(path_csv)
+
+    if (not sample_rate) or (not length):
+        for i, s in enumerate(signals):
+            signals, signal_headers, header = highlevel.read_edf(path)
+            if signal_headers[i]['transducer'] == 'ECG electrode':
+                sample_rate = signal_headers[i]['sample_rate']
+                length = len(s)
+                break
+
+    return r_peaks_data, ecg_id, sample_rate, length
+
+
+def serialize_ecg_hrs():
     data_path = os.path.join(get_project_root(), 'data/ecg/')
     paths = [path for path in os.listdir(data_path) if
              path.lower().endswith(".edf")]
     for path in paths:
         path = os.path.join(os.path.join(get_project_root(), 'data/ecg/'), path)
-
-        number = path.lower().split("_")[-1]
-        number = number.replace("edf", "")
-        filename = 'rpeaks' + str(number) + 'csv'
-        path_csv = os.path.join(data_path, filename)
-
-        if not use_existing or not os.path.isfile(path_csv):
-            signals, signal_headers, header = highlevel.read_edf(path)
-            detectors = Detectors(signal_headers[0]['sample_rate'])
-            r_peaks = {}
-            for i, s in enumerate(signals):
-                if signal_headers[i]['transducer'] == 'ECG electrode':
-                    r_peaks[signal_headers[i]['label']] = detectors.pan_tompkins_detector(s)
-            r_peaks_data = pd.DataFrame(dict([(k, pd.Series(v)) for k, v in r_peaks.items()]))
-            r_peaks_data.to_csv(path_csv)
-
-
-def serialize_ecg_hrs():
-    ecg_csv()
+        ecg_csv(data_path=data_path, path=path)
     brueser_csv(100)
     data_path = os.path.join(get_project_root(), 'data/ecg/')
     paths = [path for path in os.listdir(data_path) if path.lower().endswith(".csv")]
@@ -135,3 +158,6 @@ def serialize_bcg_hrs():
         bcg_hrs[path] = get_brueser_hr(data['unique_peaks'], data['medians'], 10 * 100, 100)
     bcg_data = pd.DataFrame(dict([(k, pd.Series(v)) for k, v in bcg_hrs.items()]))
     bcg_data.to_csv(os.path.join(get_project_root(), 'data/bcg_hrs.csv'))
+
+
+ecg_csv()
