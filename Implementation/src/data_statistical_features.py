@@ -6,7 +6,7 @@ import numpy as np
 from scipy.signal import find_peaks, hilbert, butter, lfilter
 from scipy.stats import median_absolute_deviation, kurtosis, skew
 
-from src.data_preparation import BcgData
+from src.data_preparation import Data
 from src.utils import get_project_root
 
 
@@ -16,27 +16,33 @@ class DataSet:
     statistical feature representation of all segments.
     """
 
-    def __init__(self, coverage_threshold=90, mean_error_threshold=0.015):
-        self.path_csv = os.path.join(get_project_root(), 'data/data_statistical_features.csv')
+    def __init__(self, segment_length=10, overlap_amount=0.9, coverage_threshold=90, mean_error_threshold=0.015):
+        filename = 'data/data_statistical_features_l' + str(segment_length) + '_o' + str(overlap_amount) + '.csv'
+        self.path_csv = os.path.join(get_project_root(), filename)
         self.path_images = os.path.join(get_project_root(), 'data/images')
         self.coverage_threshold = coverage_threshold
         self.mean_error_threshold = mean_error_threshold
-        data = BcgData()
-        self.segment_length = DataSet._seconds_to_frames(10, data.samplerate)  # in samples
+        data = Data()
+        self.segment_length = DataSet._seconds_to_frames(segment_length, data.sample_rate)  # in samples
+        self.segment_distance = DataSet._seconds_to_frames(segment_length - segment_length*overlap_amount,
+                                                           data.sample_rate)
         self._create_segments(data)
         self.save_csv()
 
-    def _create_segments(self, bcg_data):
+    def _create_segments(self, data):
         """
         Creates segments with a given length out of given BCG Data
         """
         self.segments = []
-        for series in bcg_data.data_series:
-            for i in range(0, len(series.raw_data), self.segment_length):
-                if i + self.segment_length < len(series.raw_data):  # prevent shorter segments, last shorter one ignored
-                    segment_data = np.array(series.raw_data[i:i + self.segment_length])
-                    informative, coverage, mean_error = self.is_informative(series, i, i + self.segment_length)  # label
-                    self.segments.append(Segment(segment_data, bcg_data.sample_rate, informative, coverage, mean_error))
+        for data_series in data.data_series.values():
+            for bcg_data in data_series.bcg_series.values():
+                # TODO: wie passiert der Übergang/sync bei der gesplitteten Aufnahme? friemel ich die händisch aneinander?
+                for i in range(0, len(bcg_data.raw_data), self.segment_distance):
+                    if i + self.segment_length < len(bcg_data.raw_data):  # prevent shorter segments, last shorter one ignored
+                        segment_data = np.array(bcg_data.raw_data[i:i + self.segment_length])
+                        informative, coverage, mean_error = self.is_informative(bcg_data, i, i + self.segment_length)  # label
+                        self.segments.append(Segment(data_series.patient_id, segment_data, bcg_data.sample_rate,
+                                                     informative, coverage, mean_error))
 
     def is_informative(self, series, start, end):
         """
@@ -118,7 +124,7 @@ class Segment:
     vital signs with opportunistic ambient sensing' (https://ieeexplore.ieee.org/document/7591234)
     """
 
-    def __init__(self, raw_data, samplerate, informative, coverage, mean_error):
+    def __init__(self, patient_id, raw_data, samplerate, informative, coverage, mean_error):
         """
         Creates a segment and computes several statistical features
         :param raw_data: raw BCG data
@@ -127,6 +133,7 @@ class Segment:
         :param mean_error: mean BBI error to reference
         """
         self.bcg = Segment._butter_bandpass_filter(raw_data, 1, 12, samplerate)
+        self.patient_id = patient_id
         self.coverage = coverage
         self.mean_error = mean_error
         self.minimum = np.min(self.bcg)
@@ -202,7 +209,8 @@ class Segment:
                          'mean signal envelope',
                          'informative',
                          'mean error',
-                         'coverage'])
+                         'coverage',
+                         'patient_id'])
 
     def get_feature_array(self):
         """
@@ -223,5 +231,5 @@ class Segment:
                          self.mean_signal_envelope,
                          self.informative,
                          self.mean_error,
-                         self.coverage])
-
+                         self.coverage,
+                         self.patient_id])
