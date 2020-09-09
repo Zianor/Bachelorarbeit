@@ -132,8 +132,8 @@ def ecg_csv(data_path, path, use_existing=True):
         r_peaks_data = pd.read_csv(path_csv)
 
     if (not sample_rate) or (not length):
+        signals, signal_headers, header = highlevel.read_edf(path)
         for i, s in enumerate(signals):
-            signals, signal_headers, header = highlevel.read_edf(path)
             if signal_headers[i]['transducer'] == 'ECG electrode':
                 sample_rate = signal_headers[i]['sample_rate']
                 length = len(s)
