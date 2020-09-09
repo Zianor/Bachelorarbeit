@@ -32,7 +32,7 @@ def get_brueser_segment_hr(start, end, unique_peaks, medians, sample_rate):
     return hr
 
 
-def brueser_csv(fs, use_existing=True):
+def brueser_csv_all(fs, use_existing=True):
     data_path = os.path.join(get_project_root(), 'data/')
     paths = [path for path in os.listdir(data_path) if
              path.lower().endswith(".mat")]
@@ -40,26 +40,40 @@ def brueser_csv(fs, use_existing=True):
     for path in paths:
         if use_existing:
             path = os.path.join(os.path.join(get_project_root(), 'data/'), path)
+            brueser_csv(fs=fs, data_path=data_path, path=path, use_existing=use_existing)
 
-            data = loadmat(path)['BCG_raw_data'][0]
 
-            number = path.lower().split("_")[-1]
-            number = number.replace("mat", "")
-            filename = 'brueser' + str(number) + 'csv'
-            path_csv = os.path.join(data_path, filename)
+def brueser_csv(fs, data_path, path, use_existing=True):
+    """
+    :return: Dataframe of unique_peaks, medians and qualities, where medians is the estimated length
+    :rtype: pandas.Dataframe
+    """
+    data = loadmat(path)['BCG_raw_data'][0]
+    number = path.lower().split("_")[-1]
+    number = number.replace("mat", "")
+    filename = 'brueser' + str(number) + 'csv'
+    path_csv = os.path.join(data_path, filename)
 
-            if not use_existing or not os.path.isfile(path_csv):
-                win = np.arange(0.3 * fs, 2 * fs + 1, dtype=np.int32)
-                result, est_len, quality_arr = brueser.interval_probabilities(data, win, estimate_lengths=True)
-                peaks, _ = scipy.signal.find_peaks(data, distance=win[0])
-                unique_peaks, medians, qualities = brueser.rr_intervals_from_est_len(est_len, peaks, data, quality_arr,
-                                                                                     win[0])
+    if not use_existing or not os.path.isfile(path_csv):
+        win = np.arange(0.3 * fs, 2 * fs + 1, dtype=np.int32)
+        result, est_len, quality_arr = brueser.interval_probabilities(data, win, estimate_lengths=True)
+        peaks, _ = scipy.signal.find_peaks(data, distance=win[0])
+        unique_peaks, medians, qualities = brueser.rr_intervals_from_est_len(est_len, peaks, data, quality_arr,
+                                                                             win[0])
+        with open(path_csv, 'w') as f:
+            writer = csv.writer(f)
+            writer.writerow(["unique_peaks", "medians", "qualities"])
+            for i, peak in enumerate(unique_peaks):
+                writer.writerow([peak, medians[i], qualities[i]])
 
-                with open(path_csv, 'w') as f:
-                    writer = csv.writer(f)
-                    writer.writerow(["unique_peaks", "medians", "qualities"])
-                    for i, peak in enumerate(unique_peaks):
-                        writer.writerow([peak, medians[i], qualities[i]])
+    return pd.read_csv(path_csv)
+
+
+def get_brueser(fs, brueser_id, use_existing=True):
+    data_path = os.path.join(get_project_root(), 'data/')
+    filename = 'ML_data_patient_' + brueser_id + '.mat'
+    path = os.path.join(data_path, filename)
+    return brueser_csv(fs=fs, data_path=data_path, path=path, use_existing=use_existing)
 
 
 def get_ecg_hr(r_peaks, segment_length, sample_rate, lower_threshold=30, upper_threshold=200):
@@ -135,7 +149,7 @@ def serialize_ecg_hrs():
     for path in paths:
         path = os.path.join(os.path.join(get_project_root(), 'data/ecg/'), path)
         ecg_csv(data_path=data_path, path=path)
-    brueser_csv(100)
+    brueser_csv_all(100)
     data_path = os.path.join(get_project_root(), 'data/ecg/')
     paths = [path for path in os.listdir(data_path) if path.lower().endswith(".csv")]
     ecg_hrs = {}
@@ -158,6 +172,3 @@ def serialize_bcg_hrs():
         bcg_hrs[path] = get_brueser_hr(data['unique_peaks'], data['medians'], 10 * 100, 100)
     bcg_data = pd.DataFrame(dict([(k, pd.Series(v)) for k, v in bcg_hrs.items()]))
     bcg_data.to_csv(os.path.join(get_project_root(), 'data/bcg_hrs.csv'))
-
-
-ecg_csv()
