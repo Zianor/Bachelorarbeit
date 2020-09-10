@@ -31,10 +31,10 @@ def load_data(segment_length=10, overlap_amount=0.9):
         DataSet()
     df = pd.read_csv(path)
     features = df.iloc[:, 0:13]
-    target = df.iloc[:, 13]
-    mean_error = df.iloc[:, 14]
-    coverage = df.iloc[:, 15]
-    patient_id = df.iloc[:, 16]  # TODO: do sth with it
+    target = df['informative']
+    mean_error = df['mean error']
+    coverage = df['coverage']
+    patient_id = df['patient_id']  # TODO: do sth with it
     return features, target, mean_error, coverage, patient_id
 
 
