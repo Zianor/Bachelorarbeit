@@ -38,6 +38,19 @@ def load_data(segment_length=10, overlap_amount=0.9):
     return features, target, mean_error, coverage, patient_id
 
 
+def load_data_as_dataframe(segment_length=10, overlap_amount=0.9):
+    """
+    Loads BCG data as Dataframe
+    :return: Dataframe
+    """
+    filename = 'data/data_statistical_features_l' + str(segment_length) + '_o' + str(overlap_amount) + '.csv'
+    path = os.path.join(get_project_root(), filename)
+    if not os.path.isfile(path):
+        warnings.warn('No csv, data needs to be reproduced. This may take some time')
+        DataSet()
+    return pd.read_csv(path)
+
+
 def data_preparation(features, target, reverse=False, partial=True):
     """
     Splits data in training and test data and standardizes features
