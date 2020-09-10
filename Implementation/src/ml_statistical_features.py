@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from sklearn import model_selection, clone
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, confusion_matrix, plot_roc_curve
+from sklearn.metrics import accuracy_score, confusion_matrix, plot_roc_curve, classification_report
 from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV
 from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import StandardScaler
@@ -84,7 +84,8 @@ def evaluate_model(y_actual, y_pred):
     string_representation = ["Results", os.linesep,
                              "Misclassified examples: %d" % (y_actual != y_pred).sum(), os.linesep,
                              "Accuracy: %.3f" % accuracy_score(y_actual, y_pred), os.linesep,
-                             "Confusion matrix", os.linesep, str(confusion_matrix(y_actual, y_pred)), os.linesep
+                             "Confusion matrix", os.linesep, str(confusion_matrix(y_actual, y_pred)), os.linesep,
+                             "Classification report", os.linesep, str(classification_report(y_actual, y_pred, target_names=['non-informative', 'informative']))
                              ]
 
     _, _, mean_error, coverage, _ = load_data()
