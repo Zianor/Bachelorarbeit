@@ -19,12 +19,13 @@ from data_statistical_features import DataSet
 from utils import get_project_root
 
 
-def load_data():
+def load_data(segment_length=10, overlap_amount=0.9):
     """
     Loads BCG data features with its target labels
     :return: BCG data features, target labels
     """
-    path = os.path.join(get_project_root(), 'data/data_statistical_features.csv')
+    filename = 'data/data_statistical_features_l' + str(segment_length) + '_o' + str(overlap_amount) + '.csv'
+    path = os.path.join(get_project_root(), filename)
     if not os.path.isfile(path):
         warnings.warn('No csv, data needs to be reproduced. This may take some time')
         DataSet()
@@ -33,7 +34,8 @@ def load_data():
     target = df.iloc[:, 13]
     mean_error = df.iloc[:, 14]
     coverage = df.iloc[:, 15]
-    return features, target, mean_error, coverage
+    patient_id = df.iloc[:, 16]  # TODO: do sth with it
+    return features, target, mean_error, coverage, patient_id
 
 
 def data_preparation(features, target, reverse=False, partial=True):
@@ -85,7 +87,7 @@ def evaluate_model(y_actual, y_pred):
                              "Confusion matrix", os.linesep, str(confusion_matrix(y_actual, y_pred)), os.linesep
                              ]
 
-    _, _, mean_error, coverage = load_data()
+    _, _, mean_error, coverage, _ = load_data()
 
     avg_mean_error = calc_avg_mean_error(mean_error, y_pred, y_actual)
     string_representation.extend(["Average mean error: ", str(avg_mean_error), os.linesep])
@@ -297,7 +299,7 @@ def evaluate_paper_statistical_features():
     """
     Evaluates all models according to the paper "https://ieeexplore.ieee.org/document/7591234 and prints results"
     """
-    x, y, mean_error, coverage = load_data()
+    x, y, mean_error, coverage, patient_id = load_data()
     print(get_data_metrics(x, y, mean_error, coverage), os.linesep)
     print(support_vector_machine(x, y), os.linesep, os.linesep)
     print(linear_discriminant_analysis(x, y), os.linesep, os.linesep)
