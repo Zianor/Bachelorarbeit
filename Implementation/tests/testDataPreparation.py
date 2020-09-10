@@ -1,16 +1,16 @@
 import unittest
 import numpy as np
-from data_preparation import BcgData, DataSeries
+from data_preparation import DataSet, BCGSeries
 
 
 class MyTestCase(unittest.TestCase):
     def setUp(self) -> None:
-        self.data = BcgData()
-        self.series = self.data.data_series[0]
+        self.data = DataSet()
+        self.series = self.data.bcg_series[0]
 
     def test__type_series(self):
-        for series in self.data.data_series:
-            self.assertEqual(type(series), DataSeries)
+        for series in self.data.bcg_series:
+            self.assertEqual(type(series), BCGSeries)
 
     def test__type_raw_data(self):
         self.assertEqual(type(self.series.raw_data), np.ndarray)
@@ -38,7 +38,7 @@ class MyTestCase(unittest.TestCase):
         self.assertGreater(len(self.series.indices), 1)
 
     def test__type_samplerate(self):
-        self.assertEqual(type(self.series.samplerate), int)
+        self.assertEqual(type(self.series.sample_rate), int)
 
     def test__equal_array_length(self):
         self.assertEqual(len(self.series.sqi), len(self.series.bbi_ecg))
