@@ -33,13 +33,15 @@ def get_brueser_segment_hr(start, end, unique_peaks, medians, sample_rate):
 
 
 def brueser_csv_all(fs, use_existing=True):
-    data_path = os.path.join(get_project_root(), 'data/')
+    data_path = os.path.join(get_project_root(), 'data/bcg/ml_data')
     paths = [path for path in os.listdir(data_path) if
              path.lower().endswith(".mat")]
 
+    data_path = os.path.join(get_project_root(), 'data/bcg/brueser')  # TODO: do sinnvoll
+
     for path in paths:
         if use_existing:
-            path = os.path.join(os.path.join(get_project_root(), 'data/'), path)
+            path = os.path.join(os.path.join(get_project_root(), 'data/bcg_ml_data'), path)
             brueser_csv(fs=fs, data_path=data_path, path=path, use_existing=use_existing)
 
 
@@ -70,9 +72,10 @@ def brueser_csv(fs, data_path, path, use_existing=True):
 
 
 def get_brueser(fs, brueser_id, use_existing=True):
-    data_path = os.path.join(get_project_root(), 'data/')
+    data_path = os.path.join(get_project_root(), 'data/bcg/ml_data')
     filename = 'ML_data_patient_' + brueser_id + '.mat'
     path = os.path.join(data_path, filename)
+    data_path = os.path.join(get_project_root(), '/data/bcg/brueser')
     return brueser_csv(fs=fs, data_path=data_path, path=path, use_existing=use_existing)
 
 
@@ -162,13 +165,13 @@ def serialize_ecg_hrs():
 
 
 def serialize_bcg_hrs():
-    data_path = os.path.join(get_project_root(), 'data/')
+    data_path = os.path.join(get_project_root(), 'data/bcg/brueser')
     paths = [path for path in os.listdir(data_path) if
              path.lower().endswith(".csv") and path.lower().startswith('brueser')]
     bcg_hrs = {}
     for path in paths:
-        path = os.path.join(os.path.join(get_project_root(), 'data/'), path)
+        path = os.path.join(os.path.join(get_project_root(), 'data/bcg/brueser'), path)
         data = pd.read_csv(path)
         bcg_hrs[path] = get_brueser_hr(data['unique_peaks'], data['medians'], 10 * 100, 100)
     bcg_data = pd.DataFrame(dict([(k, pd.Series(v)) for k, v in bcg_hrs.items()]))
-    bcg_data.to_csv(os.path.join(get_project_root(), 'data/bcg_hrs.csv'))
+    bcg_data.to_csv(os.path.join(get_project_root(), 'data/bcg/bcg_hrs.csv'))

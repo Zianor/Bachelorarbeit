@@ -83,9 +83,9 @@ class Data:
         """Loads all bcg data
         :return: array of found bcg_series
         """
-        paths = [path for path in os.listdir(os.path.join(get_project_root(), 'data/')) if
+        paths = [path for path in os.listdir(os.path.join(get_project_root(), 'data/bcg/ml_data')) if
                  path.lower().endswith(".mat")]
-        paths = [os.path.join(os.path.join(get_project_root(), 'data/'), path) for path in paths]
+        paths = [os.path.join(os.path.join(get_project_root(), 'data/bcg/ml_data'), path) for path in paths]
         bcg_series = []
         for path in paths:
             mat_dict = loadmat(path)
