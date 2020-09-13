@@ -1,0 +1,5 @@
+{
+  "criterion": "entropy",
+  "splitter": "best",
+  "class_weight": null
+}
