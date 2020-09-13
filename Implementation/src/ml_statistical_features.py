@@ -308,10 +308,10 @@ def reconstruct_models_paper(grid_search: bool):
     x, y, mean_error, coverage, patient_id = load_data(segment_length=10, overlap_amount=0)
 
     for path, function in zip(paths, functions):
-        est, params = function()
+        clf, params = function()
         if not grid_search:
             params = None
-        eval_classifier_paper(x, y, clf=est, grid_folder_name=path, grid_params=params)
+        eval_classifier_paper(x, y, clf=clf, grid_folder_name=path, grid_params=params)
 
 
 if __name__ == "__main__":
