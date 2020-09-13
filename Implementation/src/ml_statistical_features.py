@@ -301,5 +301,18 @@ def eval_classifier_paper(features, target, clf, grid_folder_name, grid_params=N
     return grid_search.best_estimator_, mean_score_g1, g2_predicted, g2_actual, mean_score_g2, g1_predicted, g1_actual
 
 
+def reconstruct_models_paper(grid_search: bool):
+    paths = ['SVC_0717', 'LDA_0717', 'DT_0717', 'RF_0717', 'MLP_0717']
+    functions = (get_svm_grid_params, get_lda_grid_params, get_dt_grid_params, get_rf_grid_params, get_mlp_grid_params)
+
+    x, y, mean_error, coverage, patient_id = load_data(segment_length=10, overlap_amount=0)
+
+    for path, function in zip(paths, functions):
+        est, params = function()
+        if not grid_search:
+            params = None
+        eval_classifier_paper(x, y, clf=est, grid_folder_name=path, grid_params=params)
+
+
 if __name__ == "__main__":
     pass
