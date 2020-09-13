@@ -77,7 +77,7 @@ def evaluate_model(y_actual, y_pred):
     return ''.join(string_representation)
 
 
-def get_support_vector_machine_grid_params():
+def get_svm_grid_params():
     """Support vector machine
     :return: base estimator and dict of parameters for grid search
     """
@@ -91,7 +91,7 @@ def get_support_vector_machine_grid_params():
     return svm, parameters
 
 
-def get_linear_discriminant_analysis_grid_params():
+def get_lda_grid_params():
     """Linear Discriminant Analysis
     :return: base estimator and dict of parameters for grid search
     """
@@ -104,7 +104,7 @@ def get_linear_discriminant_analysis_grid_params():
     return lda, parameters
 
 
-def get_decision_tree_grid_params():
+def get_dt_grid_params():
     """
     Decision tree
     :return: base estimator and dict of parameters for grid search
@@ -120,7 +120,7 @@ def get_decision_tree_grid_params():
     return dt, parameters
 
 
-def get_random_forest_grid_params():
+def get_rf_grid_params():
     """
     Random forest
     :return: base estimator and dict of parameters for grid search
@@ -136,7 +136,7 @@ def get_random_forest_grid_params():
     return rf, parameters
 
 
-def get_multilayer_perceptron_grid_params():
+def get_mlp_grid_params():
     """
     Multilayer Perceptron
     :return: base estimator and dict of parameters for grid search
