@@ -7,3 +7,4 @@ numba~=0.50.1
 pyEDFlib~=0.1.18
 sklearn~=0.0
 jsonplus~=0.8.0
+py-ecg-detectors~=1.0.2
