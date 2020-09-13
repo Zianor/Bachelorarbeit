@@ -1,15 +1,14 @@
+import jsonplus as json
 import os
+import pickle
 import warnings
-import sys
 
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-from sklearn import model_selection, clone
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, confusion_matrix, plot_roc_curve
-from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV, KFold
 from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
@@ -19,56 +18,36 @@ from data_statistical_features import DataSet
 from utils import get_project_root
 
 
-def load_data():
+def load_data(segment_length=10, overlap_amount=0.9):
     """
     Loads BCG data features with its target labels
     :return: BCG data features, target labels
     """
-    path = os.path.join(get_project_root(), 'data/data_statistical_features.csv')
+    filename = 'data/data_statistical_features_l' + str(segment_length) + '_o' + str(overlap_amount) + '.csv'
+    path = os.path.join(get_project_root(), filename)
     if not os.path.isfile(path):
         warnings.warn('No csv, data needs to be reproduced. This may take some time')
         DataSet()
     df = pd.read_csv(path)
     features = df.iloc[:, 0:13]
-    target = df.iloc[:, 13]
-    mean_error = df.iloc[:, 14]
-    coverage = df.iloc[:, 15]
-    return features, target, mean_error, coverage
+    target = df['informative']
+    mean_error = df['mean error']
+    coverage = df['coverage']
+    patient_id = df['patient_id']  # TODO: do sth with it
+    return features, target, mean_error, coverage, patient_id
 
 
-def data_preparation(features, target, reverse=False, partial=True):
+def load_data_as_dataframe(segment_length=10, overlap_amount=0.9):
     """
-    Splits data in training and test data and standardizes features
-    :param features: feature matrix
-    :param target: target vector
-    :param reverse: Uses test set for training and training set for test
-    :param partial: If true cross validation is performed on only one partial set
-    :return: string_representation, x_train_std, x_test_std, y_train, y_test
+    Loads BCG data as Dataframe
+    :return: Dataframe
     """
-    # Split dataset in 2/3 training and 1/3 test data
-    x_train, x_test, y_train, y_test = train_test_split(
-        features, target, test_size=0.333, random_state=1, stratify=target)
-
-    string_representation = ['Labels counts in y:', str(np.bincount(target)), os.linesep, 'Labels counts in y_train:',
-                             str(np.bincount(y_train)), os.linesep, 'Labels counts in y_test:',
-                             str(np.bincount(y_test))]
-    string_representation = ''.join(string_representation)
-
-    if reverse:
-        x_test, x_train, y_test, y_train = x_train, x_test, y_train, y_test
-
-    # Standardizing features
-    sc = StandardScaler()
-    sc.fit(x_train)
-    if partial:
-        x_train_std = sc.transform(x_train)
-        x_test_std = sc.transform(x_test)
-    else:
-        x_train_std = sc.transform(features)
-        x_test_std = None
-        y_train = target
-        y_test = None
-    return string_representation, x_train_std, x_test_std, y_train, y_test
+    filename = 'data/data_statistical_features_l' + str(segment_length) + '_o' + str(overlap_amount) + '.csv'
+    path = os.path.join(get_project_root(), filename)
+    if not os.path.isfile(path):
+        warnings.warn('No csv, data needs to be reproduced. This may take some time')
+        DataSet()
+    return pd.read_csv(path)
 
 
 def evaluate_model(y_actual, y_pred):
@@ -82,10 +61,12 @@ def evaluate_model(y_actual, y_pred):
     string_representation = ["Results", os.linesep,
                              "Misclassified examples: %d" % (y_actual != y_pred).sum(), os.linesep,
                              "Accuracy: %.3f" % accuracy_score(y_actual, y_pred), os.linesep,
-                             "Confusion matrix", os.linesep, str(confusion_matrix(y_actual, y_pred)), os.linesep
-                             ]
+                             "Confusion matrix", os.linesep, str(confusion_matrix(y_actual, y_pred)), os.linesep,
+                             "Classification report", os.linesep,
+                             str(classification_report(y_actual, y_pred, target_names=['non-informative',
+                                                                                       'informative']))]
 
-    _, _, mean_error, coverage = load_data()
+    _, _, mean_error, coverage, _ = load_data()
 
     avg_mean_error = calc_avg_mean_error(mean_error, y_pred, y_actual)
     string_representation.extend(["Average mean error: ", str(avg_mean_error), os.linesep])
@@ -96,14 +77,9 @@ def evaluate_model(y_actual, y_pred):
     return ''.join(string_representation)
 
 
-def support_vector_machine(features, target, reverse=False, plot_roc=False):
-    """
-    Support vector machine
-    :param features: feature matrix
-    :param target: target vector
-    :param reverse: Uses test set for training and training set for test
-    :param plot_roc: if True ROC curve will be plotted
-    :return: string representation of results
+def get_svm_grid_params():
+    """Support vector machine
+    :return: base estimator and dict of parameters for grid search
     """
     parameters = {
         'kernel': ('linear', 'rbf', 'poly', 'sigmoid'),
@@ -112,26 +88,12 @@ def support_vector_machine(features, target, reverse=False, plot_roc=False):
     }
     svm = SVC(random_state=1)
 
-    evaluation = classifier(svm, parameters, features, target, reverse=reverse, plot_roc=plot_roc)
-
-    if reverse:
-        string_representation = ["Support Vector Machine - Reversed", os.linesep,
-                                 evaluation]
-    else:
-        string_representation = ["Support Vector Machine", os.linesep,
-                                 evaluation]
-
-    return ''.join(string_representation)
+    return svm, parameters
 
 
-def linear_discriminant_analysis(features, target, reverse=False, plot_roc=False):
-    """
-    Linear Discriminant Analysis
-    :param features: feature matrix
-    :param target: target vector
-    :param reverse: Uses test set for training and training set for test
-    :param plot_roc: if True ROC curve will be plotted
-    :return: string representation of results
+def get_lda_grid_params():
+    """Linear Discriminant Analysis
+    :return: base estimator and dict of parameters for grid search
     """
     lda = LinearDiscriminantAnalysis()
 
@@ -139,26 +101,13 @@ def linear_discriminant_analysis(features, target, reverse=False, plot_roc=False
         'solver': ('svd', 'lsqr', 'eigen')
     }
 
-    evaluation = classifier(lda, parameters, features, target, reverse=reverse, plot_roc=plot_roc)
-
-    if reverse:
-        string_representation = ["Linear Discriminant Analysis - Reversed", os.linesep,
-                                 evaluation]
-    else:
-        string_representation = ["Linear Discriminant Analysis", os.linesep,
-                                 evaluation]
-
-    return ''.join(string_representation)
+    return lda, parameters
 
 
-def decision_tree(features, target, reverse=False, plot_roc=False):
+def get_dt_grid_params():
     """
     Decision tree
-    :param features: feature matrix
-    :param target: target vector
-    :param reverse: Uses test set for training and training set for test
-    :param plot_roc: if True ROC curve will be plotted
-    :return: string representation of results
+    :return: base estimator and dict of parameters for grid search
     """
     dt = DecisionTreeClassifier(random_state=1)
 
@@ -168,26 +117,13 @@ def decision_tree(features, target, reverse=False, plot_roc=False):
         'class_weight': (None, 'balanced')
     }
 
-    evaluation = classifier(dt, parameters, features, target, reverse=reverse, plot_roc=plot_roc)
-
-    if reverse:
-        string_representation = ["Decision Tree - Reversed", os.linesep,
-                                 evaluation]
-    else:
-        string_representation = ["Decision Tree", os.linesep,
-                                 evaluation]
-
-    return ''.join(string_representation)
+    return dt, parameters
 
 
-def random_forest(features, target, reverse=False, plot_roc=False):
+def get_rf_grid_params():
     """
     Random forest
-    :param features: feature matrix
-    :param target: target vector
-    :param reverse: Uses test set for training and training set for test
-    :param plot_roc: if True ROC curve will be plotted
-    :return: string representation of results
+    :return: base estimator and dict of parameters for grid search
     """
     rf = RandomForestClassifier(random_state=1)
 
@@ -197,26 +133,13 @@ def random_forest(features, target, reverse=False, plot_roc=False):
         'class_weight': ("balanced", None)
     }
 
-    evaluation = classifier(rf, parameters, features, target, reverse=reverse, plot_roc=plot_roc)
-
-    if reverse:
-        string_representation = ["Random Forest - Reversed", os.linesep,
-                                 evaluation]
-    else:
-        string_representation = ["Random Forest", os.linesep,
-                                 evaluation]
-
-    return ''.join(string_representation)
+    return rf, parameters
 
 
-def multilayer_perceptron(features, target, reverse=False, plot_roc=False):
+def get_mlp_grid_params():
     """
     Multilayer Perceptron
-    :param features: feature matrix
-    :param target: target vector
-    :param reverse: Uses test set for training and training set for test
-    :param plot_roc: if True ROC curve will be plotted
-    :return: string representation of results
+    :return: base estimator and dict of parameters for grid search
     """
     mlp = MLPClassifier()
 
@@ -228,118 +151,7 @@ def multilayer_perceptron(features, target, reverse=False, plot_roc=False):
         'learning_rate_init': [0.0001]
     }
 
-    evaluation = classifier(mlp, parameters, features, target, reverse=reverse, plot_roc=plot_roc)
-
-    if reverse:
-        string_representation = ["Multilayer Perceptron - Reversed", os.linesep,
-                                 evaluation]
-    else:
-        string_representation = ["Multilayer Perceptron", os.linesep,
-                                 evaluation]
-
-    return ''.join(string_representation)
-
-
-def classifier(clf, parameters, features, target, reverse=False, plot_roc=False):
-    """
-    Trains and tests a classifier
-    :param clf: The classifier to be trained
-    :param parameters: parameter dict for grid search
-    :param features: feature matrix
-    :param target: target vector
-    :param reverse: Uses test set for training and training set for test
-    :param plot_roc: if True ROC curve will be plotted
-    :return: evaluation
-    :rtype: String
-    """
-    _, x_train_std, x_test_std, y_train, y_test = data_preparation(features, target, partial=True, reverse=reverse)
-
-    y_train = y_train.to_numpy()
-
-    k_fold = model_selection.KFold(n_splits=10, shuffle=True, random_state=1)
-
-    grid_search = GridSearchCV(estimator=clf, param_grid=parameters, cv=k_fold, n_jobs=10)  # TODO: evtl. anpassen
-    grid_search.fit(x_train_std, y_train)
-
-    evaluation = [os.linesep, "Best Score ", str(grid_search.best_score_), os.linesep,
-                  "Best Params", str(grid_search.best_estimator_), os.linesep,
-                  "Grid ", os.linesep, pd.DataFrame(grid_search.cv_results_).to_string(), os.linesep]
-
-    y_pred = grid_search.predict(x_test_std)
-
-    if plot_roc:
-        roc_display = plot_roc_curve(clf, x_test_std, y_test)
-        plt.show()
-
-    evaluation.append(evaluate_model(y_test, y_pred))
-
-    return ''.join(evaluation)
-
-
-def evaluate_all(plot_roc=False):
-    """
-    Trains and tests all implemented models
-    :return: evaluation
-    :rtype: String
-    """
-    x, y, mean_error, coverage = load_data()
-    string_representation = [get_data_metrics(x, y, mean_error, coverage), os.linesep, os.linesep,
-                             support_vector_machine(x, y, plot_roc=plot_roc), os.linesep, os.linesep,
-                             linear_discriminant_analysis(x, y, plot_roc=plot_roc), os.linesep, os.linesep,
-                             decision_tree(x, y, plot_roc=plot_roc), os.linesep, os.linesep,
-                             random_forest(x, y, plot_roc=plot_roc), os.linesep, os.linesep,
-                             multilayer_perceptron(x, y, plot_roc=plot_roc), os.linesep, os.linesep,
-                             ]
-    return ''.join(string_representation)
-
-
-def evaluate_paper_statistical_features():
-    """
-    Evaluates all models according to the paper "https://ieeexplore.ieee.org/document/7591234 and prints results"
-    """
-    x, y, mean_error, coverage = load_data()
-    print(get_data_metrics(x, y, mean_error, coverage), os.linesep)
-    print(support_vector_machine(x, y), os.linesep, os.linesep)
-    print(linear_discriminant_analysis(x, y), os.linesep, os.linesep)
-    print(decision_tree(x, y), os.linesep, os.linesep)
-    print(random_forest(x, y), os.linesep, os.linesep)
-    print(multilayer_perceptron(x, y), os.linesep, os.linesep)
-    print(support_vector_machine(x, y, reverse=True), os.linesep, os.linesep)
-    print(linear_discriminant_analysis(x, y, reverse=True), os.linesep, os.linesep)
-    print(decision_tree(x, y, reverse=True), os.linesep, os.linesep)
-    print(random_forest(x, y, reverse=True), os.linesep, os.linesep)
-    print(multilayer_perceptron(x, y, reverse=True))
-
-
-def get_data_metrics(features, target, mean_error, coverage):
-    """
-    Returns a description of the given data, incl. mean bbi error, coverage and training and test group
-    :param features: feature matrix
-    :param target: target vector
-    :param mean_error: mean bbi error for each segment
-    :type: pandas.Series
-    :param coverage: coverage for each segment
-    :type: pandas.Series
-    :return: data description
-    :rtype: String
-    """
-    data_description, _, _, y_train, y_test = data_preparation(features, target)
-
-    string_representation = [data_description, os.linesep]
-
-    string_representation.extend(
-        ["Mean bbi error on all data: ", str(calc_avg_mean_error(mean_error, target)), os.linesep])
-    string_representation.extend(["Coverage on all data: ", str(calc_coverage(coverage, target)), os.linesep])
-
-    string_representation.extend(
-        ["Mean bbi error on training set: ", str(calc_avg_mean_error(mean_error, y_train)), os.linesep])
-    string_representation.extend(["Coverage on training set: ", str(calc_coverage(coverage, y_train)), os.linesep])
-
-    string_representation.extend(
-        ["Mean bbi error on test set: ", str(calc_avg_mean_error(mean_error, y_test)), os.linesep])
-    string_representation.extend(["Coverage on test set: ", str(calc_coverage(coverage, y_test)), os.linesep])
-
-    return ''.join(string_representation)
+    return mlp, parameters
 
 
 def calc_avg_mean_error(mean_error, predicted, actual=None):
@@ -383,7 +195,124 @@ def calc_coverage(coverage, predicted, actual=None):
     return coverage
 
 
+def _create_list_dict(params):
+    list_dict = {}
+    for k, v in params.items():
+        list_dict[k] = [v]
+    return list_dict
+
+
+def get_dataframe_from_cv_results(res):
+    return pd.concat([pd.DataFrame(res["params"]),
+                      pd.DataFrame(res["mean_test_score"], columns=["Accuracy"])], axis=1)
+
+
+def eval_classifier_paper(features, target, clf, grid_folder_name, grid_params=None):
+    grid_folder_name = 'data/grid_params/' + grid_folder_name
+    if not os.path.isdir(os.path.join(get_project_root(), grid_folder_name)):
+        if not grid_params:
+            raise Exception("No existing folder and no params given")
+        else:
+            os.mkdir(path=os.path.join(get_project_root(), grid_folder_name))
+
+    path = os.path.join(get_project_root(), grid_folder_name)
+    model_filename = 'fitted_model.sav'
+    params_filename = 'params.json'
+    score_filename = 'score.json'
+
+    # split in g1 and g2
+    x_g1, x_g2, y_g1, y_g2 = train_test_split(features, target, test_size=0.43, random_state=1, stratify=target)
+
+    # standardize with g1 as trainings set
+    sc = StandardScaler()
+    sc.fit(x_g1)
+    x_train = sc.transform(x_g1)
+    x_test = sc.transform(x_g2)
+    y_train = y_g1
+    y_test = y_g2
+
+    k_fold = KFold(n_splits=10, shuffle=True, random_state=1)
+
+    # initialize parameters
+    score = {}
+    best_params = {}
+    grid_search = None
+
+    # load or reconstruct fitted grid_search, best_params and score with G1 as training
+    if not grid_params:  # no parameters for grid search, load existing data
+        if os.path.isfile(os.path.join(path, score_filename)):
+            with open(os.path.join(path, score_filename)) as file:
+                score = json.loads(file.read())
+        if os.path.isfile(os.path.join(path, params_filename)):
+            with open(os.path.join(path, params_filename)) as file:
+                best_params = json.loads(file.read())
+        if os.path.isfile(os.path.join(path, 'fitted_model.sav')):
+            with open(os.path.join(path, 'fitted_model.sav'), 'rb') as file:
+                grid_search = pickle.load(file)
+        if not grid_search:
+            if not best_params:  # if params are missing data can't be reconstructed
+                raise Exception('Expected Data is missing in folder')
+            else:
+                warnings.warn('Model is missing and needs to be reconstructed. This may need some time')
+                grid_params = _create_list_dict(best_params)
+
+    if not grid_search:  # either not loaded or didn't performed yet
+        grid_search = GridSearchCV(estimator=clf, param_grid=grid_params, cv=k_fold, n_jobs=10)
+        grid_search.fit(x_train, y_train)
+        # save fitted model
+        with open(os.path.join(path, model_filename), 'wb') as file:
+            pickle.dump(grid_search, file)
+        if not best_params:  # if params weren't loaded (means full grid search)
+            get_dataframe_from_cv_results(grid_search.cv_results_).to_csv(os.path.join(path, 'grid.csv'))
+
+    if not best_params:  # if params weren't loaded
+        # save params
+        with open(os.path.join(path, params_filename), 'w') as file:
+            best_params = grid_search.best_params_
+            file.write(json.dumps(best_params))
+
+    if not score:  # if score wasn't loaded
+        # save score
+        score['score'] = grid_search.best_score_
+        with open(os.path.join(path, score_filename), 'w') as file:
+            file.write(json.dumps(score))
+
+    # scoring with G1 as training
+    g2_predicted = grid_search.predict(x_test)
+    g2_actual = y_g2
+    mean_score_g1 = score['score']
+
+    # use G2 as training
+    # standardize with G2 as training
+    sc = StandardScaler()
+    sc.fit(x_g2)
+    x_train = sc.transform(x_g2)
+    x_test = sc.transform(x_g1)
+    y_train = y_g2
+    y_test = y_g1
+    # cross validation
+    clf = clf.set_params(**best_params)
+    mean_score_g2 = np.mean(cross_val_score(clf, x_train, y=y_train, cv=k_fold))
+    # train model with g2
+    clf.fit(x_train, y_train)
+    g1_predicted = clf.predict(x_test)
+    g1_actual = y_g1
+
+    return grid_search.best_estimator_, mean_score_g1, g2_predicted, g2_actual, mean_score_g2, g1_predicted, g1_actual
+
+
+def reconstruct_models_paper(grid_search: bool):
+    paths = ['SVC_0717', 'LDA_0717', 'DT_0717', 'RF_0717', 'MLP_0717']
+    functions = (get_svm_grid_params, get_lda_grid_params, get_dt_grid_params, get_rf_grid_params, get_mlp_grid_params)
+
+    x, y, mean_error, coverage, patient_id = load_data(segment_length=10, overlap_amount=0)
+
+    for path, function in zip(paths, functions):
+        clf, params = function()
+        if not grid_search:
+            params = None
+        eval_classifier_paper(x, y, clf=clf, grid_folder_name=path, grid_params=params)
+
+
 if __name__ == "__main__":
-    # print(evaluate_all(True))
-    evaluate_paper_statistical_features()
-    sys.exit(0)
+    pass

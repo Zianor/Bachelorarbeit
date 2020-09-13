@@ -1,0 +1,5 @@
+{
+  "n_estimators": 100,
+  "criterion": "entropy",
+  "class_weight": "balanced"
+}
