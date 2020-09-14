@@ -72,10 +72,9 @@ def brueser_csv(fs, data_path, path, use_existing=True):
 
 
 def get_brueser(fs, brueser_id, use_existing=True):
-    data_path = os.path.join(get_project_root(), 'data/bcg/ml_data')
     filename = 'ML_data_patient_' + brueser_id + '.mat'
-    path = os.path.join(data_path, filename)
-    data_path = os.path.join(get_project_root(), '/data/bcg/brueser')
+    path = os.path.join(get_project_root(), 'data/bcg/ml_data', filename)
+    data_path = os.path.join(get_project_root(), 'data', 'bcg', 'brueser')
     return brueser_csv(fs=fs, data_path=data_path, path=path, use_existing=use_existing)
 
 
@@ -105,10 +104,10 @@ def get_ecg_segment_hr(start, end, r_peaks, sample_rate, lower_threshold=30, upp
 
 
 def ecg_csv_all(use_existing=True):
-    data_path = os.path.join(get_project_root(), 'data/ecg/')
+    data_path = os.path.join(get_project_root(), 'data/ecg')
     paths = [path for path in os.listdir(data_path) if path.lower().endswith(".edf")]
     for path in paths:
-        path = os.path.join(os.path.join(get_project_root(), 'data/ecg/'), path)
+        path = os.path.join(os.path.join(get_project_root(), 'data/ecg'), path)
         ecg_csv(data_path=data_path, path=path, use_existing=use_existing)
 
 
@@ -146,18 +145,17 @@ def ecg_csv(data_path, path, use_existing=True):
 
 
 def serialize_ecg_hrs():
-    data_path = os.path.join(get_project_root(), 'data/ecg/')
+    data_path = os.path.join(get_project_root(), 'data/ecg')
     paths = [path for path in os.listdir(data_path) if
              path.lower().endswith(".edf")]
     for path in paths:
-        path = os.path.join(os.path.join(get_project_root(), 'data/ecg/'), path)
+        path = os.path.join(os.path.join, 'data/ecg', path)
         ecg_csv(data_path=data_path, path=path)
-    brueser_csv_all(100)
-    data_path = os.path.join(get_project_root(), 'data/ecg/')
+    data_path = os.path.join(get_project_root(), 'data/ecg')
     paths = [path for path in os.listdir(data_path) if path.lower().endswith(".csv")]
     ecg_hrs = {}
     for path in paths:
-        path = os.path.join(os.path.join(get_project_root(), 'data/ecg/'), path)
+        path = os.path.join(get_project_root(), 'data/ecg', path)
         data = pd.read_csv(path)
         ecg_hrs[path] = get_ecg_hr(data.to_numpy(), 10 * 1000, 1000)
     ecg_data = pd.DataFrame(dict([(k, pd.Series(v)) for k, v in ecg_hrs.items()]))
