@@ -20,3 +20,20 @@ def _get_row_data_distribution(y_g1, y_g2):
     column3 = "| %i (%i%s)|\n" % (len(y_g1), round(100 / (len(y_g2) + len(y_g1)) * len(y_g1)), '%')
 
     return column1 + column2 + column3
+
+
+def get_md_mean_accuracy_grid(scores: dict):
+    """Returns Markdown string to show table of mean accuracy
+    """
+    header = "| | "
+    g1 = " | G1 | "
+    g2 = " | G2 | "
+    for key, value in scores.items():
+        header += key + "| "
+        acc1 = value['mean_score_g1'] * 100
+        acc2 = value['mean_score_g2'] * 100
+        g1 += " %.2f  | " % acc1
+        g2 += " %.2f  | " % acc2
+    header += "\n|:--|:--:|:--:|:--:|:--:|:--:|\n"
+    return header + g1 + "\n" + g2
+
