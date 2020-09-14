@@ -37,3 +37,22 @@ def get_md_mean_accuracy_grid(scores: dict):
     header += "\n|:--|:--:|:--:|:--:|:--:|:--:|\n"
     return header + g1 + "\n" + g2
 
+
+def get_md_test_accuracy_grid(scores: dict):
+    """Returns Markdown string to show table of accuracy of test
+    """
+    header = "| | "
+    g1 = " | Exp1 | "
+    g2 = " | Exp2 | "
+    avg = " | Mean | "
+    for key, value in scores.items():
+        header += key + "| "
+        acc1 = value['accuracy_g1'] * 100
+        acc2 = value['accuracy_g2'] * 100
+        curr_avg = (acc1 + acc2)/2
+        g1 += " %.2f  | " % acc1
+        g2 += " %.2f  | " % acc2
+        avg += " %.2f | " % curr_avg
+    header += "\n|:--|:--:|:--:|:--:|:--:|:--:|\n"
+    return header + g1 + "\n" + g2 + "\n" + avg
+
