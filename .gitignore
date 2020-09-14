@@ -136,3 +136,4 @@ dmypy.json
 /Implementation/data/*.csv
 /Implementation/data/ecg/*
 /Implementation/data/images/*
+/Implementation/data/grid_params/*/*.sav
