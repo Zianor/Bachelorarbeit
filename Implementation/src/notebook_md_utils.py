@@ -1,8 +1,7 @@
 import numpy as np
 
-
 def get_md_data_distribution_string(y_g1, y_g2):
-    """Returns Markdown string to show data distribution after split in informative and non-informative
+    """Returns Markdown string to show table of data distribution after split in informative and non-informative
     """
     header = "|   | informativ | nicht-informativ | gesamt    |\n|:--|:--------- :|:----------------:|:---------:|\n"
     row1 = "|G1 " + _get_row_data_distribution(y_g1, y_g2)
