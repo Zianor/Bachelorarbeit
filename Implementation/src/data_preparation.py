@@ -1,6 +1,7 @@
 from scipy.io import loadmat
 from src.utils import get_project_root
 from data_processing import ecg_csv, get_brueser
+import pandas as pd
 import numpy as np
 import os
 import json
@@ -31,15 +32,47 @@ class ECGSeries:
 
 
 class DataSeries:
+    bcg_sample_rate = 100
+    reference_threshold = 90
 
     def __init__(self, ecg_series: ECGSeries):
         self.ecg = ecg_series
         self.bcg_series = {}
         self.patient_id = ecg_series.patient_id
+        self.drift = None
 
     def add_bcg(self, bcg: BCGSeries):
         if bcg not in self.bcg_series:
             self.bcg_series[bcg.bcg_id] = bcg
+
+    def reference_exists(self, bcg_start, bcg_end) -> bool:
+        """Checks if more than reference_threshold % of the values are not nan
+        """
+        start_second = np.floor(bcg_start / self.bcg_sample_rate)
+        end_second = np.floor(bcg_end / self.bcg_sample_rate)
+        area = self.drift.loc[start_second:end_second]
+        if 100/len(area.index.values) * area.count() < self.reference_threshold:
+            return False
+        return True
+
+    def get_ecg_area(self, bcg_start, bcg_end):
+        """Returns corresponding ecg indices for the given bcg area
+        """
+        start_second = np.floor(bcg_start / self.bcg_sample_rate)
+        end_second = np.floor(bcg_end / self.bcg_sample_rate)
+        area = self.drift.loc[start_second:end_second].dropna()  # end incl.
+        diff = np.mean(area.values - area.index.values)
+        return (start_second + diff) * self.ecg.sample_rate, (end_second + diff) * self.ecg.sample_rate
+
+    def get_first_reference_index(self):
+        """Returns first bcg index, where reference exists
+        """
+        return self.drift.first_valid_index() * self.ecg.sample_rate
+
+    def get_last_reference_index(self):
+        """Returns first bcg index, where reference exists
+        """
+        return self.drift.last_valid_index() * self.ecg.sample_rate
 
 
 class Data:
@@ -50,9 +83,20 @@ class Data:
         bcg_series = self.load_bcg_data()
         self.data_series = {}
         self.create_data_series()
-        for series in bcg_series:
+        for series in bcg_series:  # TODO: do it while loading?
             curr_id = series.ecg_id
             self.data_series[str(curr_id)].add_bcg(series)
+        self.load_drift_compensation()
+
+    def load_drift_compensation(self):
+        paths = [path for path in os.listdir(os.path.join(get_project_root(), 'data/drift_compensation')) if
+                 path.lower().endswith(".mat")]
+        paths = [os.path.join(os.path.join(get_project_root(), 'data/drift_compensation'), path) for path in paths]
+        for path in paths:
+            mat_dict = loadmat(path)
+            patient_id = path.lower().split("_")[-1].replace(".mat", "")
+            drift = pd.Series(index=mat_dict['t_bcg_samp'][0], data=mat_dict['t_ecg_corresp'][0])
+            self.data_series[patient_id].drift = drift
 
     @staticmethod
     def load_mapping():
