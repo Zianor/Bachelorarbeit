@@ -319,5 +319,24 @@ def reconstruct_models_paper(grid_search: bool):
         eval_classifier_paper(x, y, clf=clf, grid_folder_name=path, grid_params=params)
 
 
+def get_all_scores(reconstruct: bool):
+    if reconstruct:
+        reconstruct_models_paper(grid_search=False)
+    score_dict = {}
+    filename = 'score.json'
+    paths = ['RF_0717', 'SVC_0717', 'MLP_0717', 'LDA_0717', 'DT_0717']
+    clf_names =['RF', 'SVM', 'MLP', 'LDA', 'DT']
+    for clf_name, folder in zip(clf_names, paths):
+        location = 'data/grid_params/' + folder + '/' + filename
+        path = os.path.join(get_project_root(), location)
+        if os.path.isfile(path):
+            with open(path) as file:
+                score = json.loads(file.read())
+        else:
+            raise Exception('No score file found')
+        score_dict[clf_name] = score
+    return score_dict
+
+
 if __name__ == "__main__":
     pass
