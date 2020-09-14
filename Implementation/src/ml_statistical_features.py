@@ -272,15 +272,13 @@ def eval_classifier_paper(features, target, clf, grid_folder_name, grid_params=N
             file.write(json.dumps(best_params))
 
     if not score:  # if score wasn't loaded
-        # save score
-        score['score'] = grid_search.best_score_
-        with open(os.path.join(path, score_filename), 'w') as file:
-            file.write(json.dumps(score))
+        score['mean_score_g1'] = grid_search.best_score_
 
     # scoring with G1 as training
     g2_predicted = grid_search.predict(x_test)
     g2_actual = y_g2
-    mean_score_g1 = score['score']
+    mean_score_g1 = score['mean_score_g1']
+    score['accuracy_g1'] = accuracy_score(y_true=g2_actual, y_pred=g2_predicted)
 
     # use G2 as training
     # standardize with G2 as training
@@ -293,10 +291,17 @@ def eval_classifier_paper(features, target, clf, grid_folder_name, grid_params=N
     # cross validation
     clf = clf.set_params(**best_params)
     mean_score_g2 = np.mean(cross_val_score(clf, x_train, y=y_train, cv=k_fold))
+    score['mean_score_g2'] = mean_score_g2
     # train model with g2
     clf.fit(x_train, y_train)
     g1_predicted = clf.predict(x_test)
     g1_actual = y_g1
+    score['accuracy_g2'] = accuracy_score(y_true=g1_actual, y_pred=g1_predicted)
+
+    # save score
+    score['mean_score_g1'] = grid_search.best_score_
+    with open(os.path.join(path, score_filename), 'w') as file:
+        file.write(json.dumps(score))
 
     return grid_search.best_estimator_, mean_score_g1, g2_predicted, g2_actual, mean_score_g2, g1_predicted, g1_actual
 
