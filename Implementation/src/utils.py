@@ -37,7 +37,7 @@ def get_rpeaks_path() -> Path:
 
 
 def get_drift_path() -> Path:
-    return os.path.join(get_project_root(), 'drift_compensation')
+    return os.path.join(get_data_path(), 'drift_compensation')
 
 
 def get_data_path() -> Path:
