@@ -6,9 +6,9 @@ import numpy as np
 from scipy.signal import find_peaks, hilbert, butter, lfilter
 from scipy.stats import median_absolute_deviation, kurtosis, skew
 
+import src.utils as utils
 from src.data_preparation import Data, BCGSeries, DataSeries
 from src.data_processing import get_ecg_segment_hr, get_brueser_segment_hr
-from src.utils import get_project_root
 
 
 class DataSet:
@@ -18,10 +18,8 @@ class DataSet:
     """
 
     def __init__(self, segment_length=10, overlap_amount=0.9, coverage_threshold=90, mean_error_threshold=0.015, hr_threshold=10):
-        filename = 'data/data_statistical_features_l' + str(segment_length) + '_o' + str(overlap_amount) + '_hr' + \
-                   str(hr_threshold) + '.csv'
-        self.path_csv = os.path.join(get_project_root(), filename)
-        self.path_images = os.path.join(get_project_root(), 'data/images')
+        self.path_csv = utils.get_statistical_features_csv_path(segment_length, overlap_amount, hr_threshold)
+        self.path_images = os.path.join(utils.get_data_path(), 'images')
         self.coverage_threshold = coverage_threshold
         self.mean_error_threshold = mean_error_threshold
         self.hr_threshold = hr_threshold
@@ -143,7 +141,7 @@ class Segment:
     vital signs with opportunistic ambient sensing' (https://ieeexplore.ieee.org/document/7591234)
     """
 
-    def __init__(self, patient_id, raw_data, samplerate, informative_ce, informative_hr, ecg_hr, bcg_hr, coverage, mean_error):
+    def __init__(self, patient_id, raw_data, sample_rate, informative_ce, informative_hr, ecg_hr, bcg_hr, coverage, mean_error):
         """
         Creates a segment and computes several statistical features
         :param raw_data: raw BCG data
@@ -151,7 +149,7 @@ class Segment:
         :param coverage:
         :param mean_error: mean BBI error to reference
         """
-        self.bcg = Segment._butter_bandpass_filter(raw_data, 1, 12, samplerate)
+        self.bcg = Segment._butter_bandpass_filter(raw_data, 1, 12, sample_rate)
         self.patient_id = patient_id
         self.coverage = coverage
         self.mean_error = mean_error
@@ -262,3 +260,4 @@ class Segment:
                          self.coverage,
                          self.patient_id])
 
+DataSet()

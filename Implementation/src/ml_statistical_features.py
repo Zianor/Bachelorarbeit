@@ -15,16 +15,15 @@ from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 
 from data_statistical_features import DataSet
-from utils import get_project_root
+import src.utils as utils
 
 
-def load_data(segment_length=10, overlap_amount=0.9):
+def load_data(segment_length=10, overlap_amount=0.9, hr_threshold=10):
     """
     Loads BCG data features with its target labels
     :return: BCG data features, target labels
     """
-    filename = 'data/data_statistical_features_l' + str(segment_length) + '_o' + str(overlap_amount) + '.csv'
-    path = os.path.join(get_project_root(), filename)
+    path = utils.get_statistical_features_csv_path(segment_length, overlap_amount, hr_threshold)
     if not os.path.isfile(path):
         warnings.warn('No csv, data needs to be reproduced. This may take some time')
         DataSet()
@@ -37,13 +36,12 @@ def load_data(segment_length=10, overlap_amount=0.9):
     return features, target, mean_error, coverage, patient_id
 
 
-def load_data_as_dataframe(segment_length=10, overlap_amount=0.9):
+def load_data_as_dataframe(segment_length=10, overlap_amount=0.9, hr_threshold=10):
     """
     Loads BCG data as Dataframe
     :return: Dataframe
     """
-    filename = 'data/data_statistical_features_l' + str(segment_length) + '_o' + str(overlap_amount) + '.csv'
-    path = os.path.join(get_project_root(), filename)
+    path = utils.get_statistical_features_csv_path(segment_length, overlap_amount, hr_threshold)
     if not os.path.isfile(path):
         warnings.warn('No csv, data needs to be reproduced. This may take some time')
         DataSet()
@@ -208,14 +206,13 @@ def get_dataframe_from_cv_results(res):
 
 
 def eval_classifier_paper(features, target, clf, grid_folder_name, grid_params=None):
-    grid_folder_name = 'data/grid_params/' + grid_folder_name
-    if not os.path.isdir(os.path.join(get_project_root(), grid_folder_name)):
+    if not os.path.isdir(os.path.join(utils.get_grid_params_path(), grid_folder_name)):
         if not grid_params:
             raise Exception("No existing folder and no params given")
         else:
-            os.mkdir(path=os.path.join(get_project_root(), grid_folder_name))
+            os.mkdir(path=os.path.join(utils.get_grid_params_path(), grid_folder_name))
 
-    path = os.path.join(get_project_root(), grid_folder_name)
+    path = os.path.join(utils.get_grid_params_path(), grid_folder_name)
     model_filename = 'fitted_model.sav'
     params_filename = 'params.json'
     score_filename = 'score.json'
@@ -327,8 +324,8 @@ def get_all_scores(reconstruct: bool):
     paths = ['RF_0717', 'SVC_0717', 'MLP_0717', 'LDA_0717', 'DT_0717']
     clf_names = ['RF', 'SVM', 'MLP', 'LDA', 'DT']
     for clf_name, folder in zip(clf_names, paths):
-        location = 'data/grid_params/' + folder + '/' + filename
-        path = os.path.join(get_project_root(), location)
+        location = folder + '/' + filename
+        path = os.path.join(utils.get_grid_params_path(), location)
         if os.path.isfile(path):
             with open(path) as file:
                 score = json.loads(file.read())

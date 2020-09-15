@@ -1,5 +1,5 @@
 from scipy.io import loadmat
-from src.utils import get_project_root
+import utils
 from data_processing import ecg_csv, get_brueser
 import pandas as pd
 import numpy as np
@@ -93,9 +93,9 @@ class Data:
         self.load_drift_compensation()
 
     def load_drift_compensation(self):
-        paths = [path for path in os.listdir(os.path.join(get_project_root(), 'data/drift_compensation')) if
+        paths = [path for path in os.listdir(utils.get_drift_path()) if
                  path.lower().endswith(".mat")]
-        paths = [os.path.join(os.path.join(get_project_root(), 'data/drift_compensation'), path) for path in paths]
+        paths = [os.path.join(utils.get_drift_path(), path) for path in paths]
         for path in paths:
             mat_dict = loadmat(path)
             patient_id = path.lower().split("_")[-1].replace(".mat", "")
@@ -107,18 +107,17 @@ class Data:
         """
         :return: mapping from bcg to ecg
         """
-        path = os.path.join(get_project_root(), 'data/mapping.json')
+        path = os.path.join(utils.get_data_path(), 'mapping.json')
         with open(path, encoding='utf-8') as file:
             mapping = json.load(file)
         return mapping
 
     def create_data_series(self):
-        data_path = os.path.join(get_project_root(), 'data/ecg/')
-        paths = [path for path in os.listdir(data_path) if
+        paths = [path for path in os.listdir(utils.get_ecg_data_path()) if
                  path.lower().endswith(".edf")]
         for path in paths:
-            path = os.path.join(os.path.join(get_project_root(), 'data/ecg/'), path)
-            r_peaks, ecg_id, sample_rate, length = ecg_csv(data_path=data_path, path=path, use_existing=True)
+            path = os.path.join(utils.get_ecg_data_path(), path)
+            r_peaks, ecg_id, sample_rate, length = ecg_csv(path=path, use_existing=True)
             self.data_series[ecg_id] = DataSeries(ECGSeries(
                     patient_id=ecg_id,
                     r_peaks=r_peaks.to_numpy(),
@@ -131,9 +130,9 @@ class Data:
         """Loads all bcg data
         :return: array of found bcg_series
         """
-        paths = [path for path in os.listdir(os.path.join(get_project_root(), 'data/bcg/ml_data')) if
+        paths = [path for path in os.listdir(utils.get_bcg_data_path()) if
                  path.lower().endswith(".mat")]
-        paths = [os.path.join(os.path.join(get_project_root(), 'data/bcg/ml_data'), path) for path in paths]
+        paths = [os.path.join(utils.get_bcg_data_path(), path) for path in paths]
         bcg_series = []
         for path in paths:
             mat_dict = loadmat(path)
