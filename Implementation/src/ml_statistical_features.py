@@ -30,7 +30,7 @@ def load_data(segment_length=10, overlap_amount=0.9):
         DataSet()
     df = pd.read_csv(path)
     features = df.iloc[:, 0:13]
-    target = df['informative']
+    target = df['informative_ce']  # TODO: add second label
     mean_error = df['mean error']
     coverage = df['coverage']
     patient_id = df['patient_id']  # TODO: do sth with it
@@ -325,7 +325,7 @@ def get_all_scores(reconstruct: bool):
     score_dict = {}
     filename = 'score.json'
     paths = ['RF_0717', 'SVC_0717', 'MLP_0717', 'LDA_0717', 'DT_0717']
-    clf_names =['RF', 'SVM', 'MLP', 'LDA', 'DT']
+    clf_names = ['RF', 'SVM', 'MLP', 'LDA', 'DT']
     for clf_name, folder in zip(clf_names, paths):
         location = 'data/grid_params/' + folder + '/' + filename
         path = os.path.join(get_project_root(), location)

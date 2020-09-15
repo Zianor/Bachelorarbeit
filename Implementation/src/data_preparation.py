@@ -20,6 +20,8 @@ class BCGSeries:
         self.sample_rate = sample_rate
         self.length = len(raw_data) / sample_rate  # in seconds
         self.brueser_df = get_brueser(self.sample_rate, self.bcg_id)
+        self.medians = self.brueser_df['medians']
+        self.unique_peaks = self.brueser_df['unique_peaks']
 
 
 class ECGSeries:
@@ -51,7 +53,7 @@ class DataSeries:
         start_second = np.floor(bcg_start / self.bcg_sample_rate)
         end_second = np.floor(bcg_end / self.bcg_sample_rate)
         area = self.drift.loc[start_second:end_second]
-        if 100/len(area.index.values) * area.count() < self.reference_threshold:
+        if len(area.index.values) == 0 or 100/len(area.index.values) * area.count() < self.reference_threshold:
             return False
         return True
 
@@ -62,7 +64,9 @@ class DataSeries:
         end_second = np.floor(bcg_end / self.bcg_sample_rate)
         area = self.drift.loc[start_second:end_second].dropna()  # end incl.
         diff = np.mean(area.values - area.index.values)
-        return (start_second + diff) * self.ecg.sample_rate, (end_second + diff) * self.ecg.sample_rate
+        start_ecg = np.floor((start_second + diff) * self.ecg.sample_rate)
+        end_ecg = start_ecg + (bcg_end - bcg_start) * (self.ecg.sample_rate / self.bcg_sample_rate)
+        return start_ecg, end_ecg
 
     def get_first_reference_index(self):
         """Returns first bcg index, where reference exists

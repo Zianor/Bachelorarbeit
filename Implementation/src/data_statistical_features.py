@@ -6,7 +6,8 @@ import numpy as np
 from scipy.signal import find_peaks, hilbert, butter, lfilter
 from scipy.stats import median_absolute_deviation, kurtosis, skew
 
-from src.data_preparation import Data
+from src.data_preparation import Data, BCGSeries, DataSeries
+from src.data_processing import get_ecg_segment_hr, get_brueser_segment_hr
 from src.utils import get_project_root
 
 
@@ -16,15 +17,17 @@ class DataSet:
     statistical feature representation of all segments.
     """
 
-    def __init__(self, segment_length=10, overlap_amount=0.9, coverage_threshold=90, mean_error_threshold=0.015):
-        filename = 'data/data_statistical_features_l' + str(segment_length) + '_o' + str(overlap_amount) + '.csv'
+    def __init__(self, segment_length=10, overlap_amount=0.9, coverage_threshold=90, mean_error_threshold=0.015, hr_threshold=10):
+        filename = 'data/data_statistical_features_l' + str(segment_length) + '_o' + str(overlap_amount) + '_hr' + \
+                   str(hr_threshold) + '.csv'
         self.path_csv = os.path.join(get_project_root(), filename)
         self.path_images = os.path.join(get_project_root(), 'data/images')
         self.coverage_threshold = coverage_threshold
         self.mean_error_threshold = mean_error_threshold
+        self.hr_threshold = hr_threshold
         data = Data()
         self.segment_length = DataSet._seconds_to_frames(segment_length, data.sample_rate)  # in samples
-        self.segment_distance = DataSet._seconds_to_frames(segment_length - segment_length*overlap_amount,
+        self.segment_distance = DataSet._seconds_to_frames(segment_length - segment_length * overlap_amount,
                                                            data.sample_rate)
         self._create_segments(data)
         self.save_csv()
@@ -38,13 +41,29 @@ class DataSet:
             for bcg_data in data_series.bcg_series.values():
                 # TODO: wie passiert der Übergang/sync bei der gesplitteten Aufnahme? friemel ich die händisch aneinander?
                 for i in range(0, len(bcg_data.raw_data), self.segment_distance):
-                    if i + self.segment_length < len(bcg_data.raw_data):  # prevent shorter segments, last shorter one ignored
+                    if i + self.segment_length < len(
+                            bcg_data.raw_data):  # prevent shorter segments, last shorter one ignored
+                        if not data_series.reference_exists(i, i + self.segment_length):  # ignore if no reference ecg
+                            continue
                         segment_data = np.array(bcg_data.raw_data[i:i + self.segment_length])
-                        informative, coverage, mean_error = self.is_informative(bcg_data, i, i + self.segment_length)  # label
+                        informative_ce, coverage, mean_error = self.is_informative_ce(bcg_data,
+                                                                                      i,
+                                                                                      i + self.segment_length)  # label
+                        informative_hr, ecg_hr, bcg_hr = self.is_informative_hr(data_series, bcg_data, i, i + self.segment_length)
                         self.segments.append(Segment(data_series.patient_id, segment_data, bcg_data.sample_rate,
-                                                     informative, coverage, mean_error))
+                                                     informative_ce, informative_hr, ecg_hr, bcg_hr, coverage, mean_error))
 
-    def is_informative(self, series, start, end):
+    def is_informative_hr(self, series: DataSeries, bcg_series: BCGSeries, bcg_start, bcg_end):
+        ecg_start, ecg_end = series.get_ecg_area(bcg_start, bcg_end)
+        ecg_hr = get_ecg_segment_hr(ecg_start, ecg_end, series.ecg.r_peaks, series.ecg.sample_rate)
+        bcg_hr = get_brueser_segment_hr(bcg_start, bcg_end, bcg_series.unique_peaks, bcg_series.medians,
+                                        bcg_series.sample_rate)
+        abs_diff = np.abs(ecg_hr-bcg_hr)
+        if ecg_hr == 0 or 100/ecg_hr * abs_diff > self.hr_threshold:
+            return False, ecg_hr, bcg_hr
+        return True, ecg_hr, bcg_hr
+
+    def is_informative_ce(self, series: BCGSeries, start, end):
         """
         Decides based on the coverage of detected intervals and the absolute mean error of these intervals to the ecg
         reference if the segment is informative
@@ -90,7 +109,7 @@ class DataSet:
         for segment in self.segments:
             if count_non_informative + count_informative > count:
                 break
-            if segment.informative:
+            if segment.informative_ce:
                 count_informative += 1
                 plt.plot(segment.bcg)
                 plt.title("Coverage " + str(segment.coverage) + ", Mean Error " + str(segment.mean_error))
@@ -124,7 +143,7 @@ class Segment:
     vital signs with opportunistic ambient sensing' (https://ieeexplore.ieee.org/document/7591234)
     """
 
-    def __init__(self, patient_id, raw_data, samplerate, informative, coverage, mean_error):
+    def __init__(self, patient_id, raw_data, samplerate, informative_ce, informative_hr, ecg_hr, bcg_hr, coverage, mean_error):
         """
         Creates a segment and computes several statistical features
         :param raw_data: raw BCG data
@@ -157,7 +176,10 @@ class Segment:
         else:
             self.variance_local_minima = np.var(self.bcg[minima])
         self.mean_signal_envelope = Segment._calc_mean_signal_envelope(self.bcg)
-        self.informative = informative
+        self.informative_ce = informative_ce
+        self.informative_hr = informative_hr
+        self.ecg_hr = ecg_hr
+        self.bcg_hr = bcg_hr
 
     @staticmethod
     def _calc_mean_signal_envelope(signal):
@@ -207,7 +229,10 @@ class Segment:
                          'variance local maxima',
                          'variance local minima',
                          'mean signal envelope',
-                         'informative',
+                         'informative_ce',
+                         'informative_hr',
+                         'ecg_hr',
+                         'bcg_hr'
                          'mean error',
                          'coverage',
                          'patient_id'])
@@ -229,7 +254,11 @@ class Segment:
                          self.variance_local_maxima,
                          self.variance_local_minima,
                          self.mean_signal_envelope,
-                         self.informative,
+                         self.informative_ce,
+                         self.informative_hr,
+                         self.ecg_hr,
+                         self.bcg_hr,
                          self.mean_error,
                          self.coverage,
                          self.patient_id])
+
