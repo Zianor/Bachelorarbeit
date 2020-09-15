@@ -23,11 +23,7 @@ def load_data(segment_length=10, overlap_amount=0.9, hr_threshold=10):
     Loads BCG data features with its target labels
     :return: BCG data features, target labels
     """
-    path = utils.get_statistical_features_csv_path(segment_length, overlap_amount, hr_threshold)
-    if not os.path.isfile(path):
-        warnings.warn('No csv, data needs to be reproduced. This may take some time')
-        DataSet(segment_length=10, overlap_amount=0.9, hr_threshold=10)
-    df = pd.read_csv(path)
+    df = load_data_as_dataframe(segment_length=segment_length, overlap_amount=overlap_amount, hr_threshold=hr_threshold)
     features = df.iloc[:, 0:13]
     target = df['informative_ce']  # TODO: add second label
     mean_error = df['mean error']
@@ -45,7 +41,7 @@ def load_data_as_dataframe(segment_length=10, overlap_amount=0.9, hr_threshold=1
     if not os.path.isfile(path):
         warnings.warn('No csv, data needs to be reproduced. This may take some time')
         DataSet(segment_length=10, overlap_amount=0.9, hr_threshold=10)
-    return pd.read_csv(path)
+    return pd.read_csv(path, index_col=False)
 
 
 def evaluate_model(y_actual, y_pred):
