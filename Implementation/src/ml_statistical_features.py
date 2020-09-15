@@ -26,7 +26,7 @@ def load_data(segment_length=10, overlap_amount=0.9, hr_threshold=10):
     path = utils.get_statistical_features_csv_path(segment_length, overlap_amount, hr_threshold)
     if not os.path.isfile(path):
         warnings.warn('No csv, data needs to be reproduced. This may take some time')
-        DataSet()
+        DataSet(segment_length=10, overlap_amount=0.9, hr_threshold=10)
     df = pd.read_csv(path)
     features = df.iloc[:, 0:13]
     target = df['informative_ce']  # TODO: add second label
@@ -44,7 +44,7 @@ def load_data_as_dataframe(segment_length=10, overlap_amount=0.9, hr_threshold=1
     path = utils.get_statistical_features_csv_path(segment_length, overlap_amount, hr_threshold)
     if not os.path.isfile(path):
         warnings.warn('No csv, data needs to be reproduced. This may take some time')
-        DataSet()
+        DataSet(segment_length=10, overlap_amount=0.9, hr_threshold=10)
     return pd.read_csv(path)
 
 
