@@ -259,5 +259,3 @@ class Segment:
                          self.mean_error,
                          self.coverage,
                          self.patient_id])
-
-DataSet()

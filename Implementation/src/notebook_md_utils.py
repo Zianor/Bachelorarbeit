@@ -60,9 +60,9 @@ def get_md_test_accuracy_grid(scores: dict):
 def get_md_confusion_matrix_grid(confusion_matrix):
     """Returns Markdown string to show confusion matrix
     """
-    header = "|||| Actual ||\n|:--|:--|:--:|:--:|:--:|\n|||| informativ | nicht-informativ |\n||||||\n"
+    header = "||| Actual ||\n|:--|:--:|:--:|:--:|\n||| informativ | nicht-informativ |\n|||||\n"
     # careful, at own data, non-informative is first entry
     tn, fp, fn, tp = confusion_matrix.ravel()
-    informative_predicted = "||**Predicted**| informativ | %i | %i |" % (tp, fp)
-    non_informative_predicted = "||| nicht-informativ | %i | %i |" % (fn, tn)
+    informative_predicted = "|**Predicted**| informativ | %i | %i |" % (tp, fp)
+    non_informative_predicted = "|| nicht-informativ | %i | %i |" % (fn, tn)
     return header + informative_predicted + "\n" + non_informative_predicted
