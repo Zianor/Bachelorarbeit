@@ -8,7 +8,7 @@ import numpy as np
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
-from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV, KFold
+from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV, KFold, LeaveOneGroupOut
 from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
@@ -201,7 +201,17 @@ def get_dataframe_from_cv_results(res):
                       pd.DataFrame(res["mean_test_score"], columns=["Accuracy"])], axis=1)
 
 
-def eval_classifier_paper(features, target, clf, grid_folder_name, grid_params=None):
+def get_patient_split(features, target, patient_id, test_size):
+    patient_ids_1, patient_ids_2 = train_test_split(patient_id.unique(), random_state=1, test_size=test_size)
+    x1 = features[np.isin(patient_id, patient_ids_1)]
+    x2 = features[np.isin(patient_id, patient_ids_2)]
+    y1 = target[np.isin(patient_id, patient_ids_1)]
+    y2 = target[np.isin(patient_id, patient_ids_2)]
+    return x1, x2, y1, y2
+
+
+def eval_classifier(features, target, patient_id, clf, grid_folder_name, test_size=0.33, grid_params=None,
+                    patient_cv=True):
     if not os.path.isdir(os.path.join(utils.get_grid_params_path(), grid_folder_name)):
         if not grid_params:
             raise Exception("No existing folder and no params given")
@@ -214,7 +224,11 @@ def eval_classifier_paper(features, target, clf, grid_folder_name, grid_params=N
     score_filename = 'score.json'
 
     # split in g1 and g2
-    x_g1, x_g2, y_g1, y_g2 = train_test_split(features, target, test_size=0.43, random_state=1, stratify=target)
+    if patient_cv:
+        x_g1, x_g2, y_g1, y_g2 = get_patient_split(features, target, patient_id, test_size)
+    else:
+        x_g1, x_g2, y_g1, y_g2 = train_test_split(features, target, test_size=test_size, random_state=1,
+                                                  stratify=target)
 
     # standardize with g1 as trainings set
     sc = StandardScaler()
@@ -224,7 +238,12 @@ def eval_classifier_paper(features, target, clf, grid_folder_name, grid_params=N
     y_train = y_g1
     y_test = y_g2
 
-    k_fold = KFold(n_splits=10, shuffle=True, random_state=1)
+    if patient_cv:
+        cv = LeaveOneGroupOut()
+        groups = patient_id
+    else:
+        cv = KFold(n_splits=10, shuffle=True, random_state=1)
+        groups = None
 
     # initialize parameters
     score = {}
@@ -250,8 +269,8 @@ def eval_classifier_paper(features, target, clf, grid_folder_name, grid_params=N
                 grid_params = _create_list_dict(best_params)
 
     if not grid_search:  # either not loaded or didn't performed yet
-        grid_search = GridSearchCV(estimator=clf, param_grid=grid_params, cv=k_fold, n_jobs=10)
-        grid_search.fit(x_train, y_train)
+        grid_search = GridSearchCV(estimator=clf, param_grid=grid_params, cv=cv, n_jobs=10)
+        grid_search.fit(x_train, y_train, groups=groups)
         # save fitted model
         with open(os.path.join(path, model_filename), 'wb') as file:
             pickle.dump(grid_search, file)
@@ -283,7 +302,7 @@ def eval_classifier_paper(features, target, clf, grid_folder_name, grid_params=N
     y_test = y_g1
     # cross validation
     clf = clf.set_params(**best_params)
-    mean_score_g2 = np.mean(cross_val_score(clf, x_train, y=y_train, cv=k_fold))
+    mean_score_g2 = np.mean(cross_val_score(clf, x_train, y=y_train, cv=cv, groups=groups))
     score['mean_score_g2'] = mean_score_g2
     # train model with g2
     clf.fit(x_train, y_train)
@@ -299,6 +318,11 @@ def eval_classifier_paper(features, target, clf, grid_folder_name, grid_params=N
     return grid_search.best_estimator_, mean_score_g1, g2_predicted, g2_actual, mean_score_g2, g1_predicted, g1_actual
 
 
+def eval_classifier_paper(features, target, patient_id, clf, grid_folder_name, grid_params=None):
+    return eval_classifier_paper(features, target, patient_id, clf, grid_folder_name, test_size=0.43,
+                                 grid_params=grid_params, patient_cv=False)
+
+
 def reconstruct_models_paper(grid_search: bool):
     paths = ['SVC_0717', 'LDA_0717', 'DT_0717', 'RF_0717', 'MLP_0717']
     functions = (get_svm_grid_params, get_lda_grid_params, get_dt_grid_params, get_rf_grid_params, get_mlp_grid_params)
@@ -309,7 +333,7 @@ def reconstruct_models_paper(grid_search: bool):
         clf, params = function()
         if not grid_search:
             params = None
-        eval_classifier_paper(x, y, clf=clf, grid_folder_name=path, grid_params=params)
+        eval_classifier_paper(x, y, patient_id, clf=clf, grid_folder_name=path, grid_params=params)
 
 
 def get_all_scores(reconstruct: bool):
