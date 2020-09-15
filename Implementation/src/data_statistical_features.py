@@ -230,7 +230,7 @@ class Segment:
                          'informative_ce',
                          'informative_hr',
                          'ecg_hr',
-                         'bcg_hr'
+                         'bcg_hr',
                          'mean error',
                          'coverage',
                          'patient_id'])
