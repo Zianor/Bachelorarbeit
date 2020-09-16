@@ -1,0 +1,9 @@
+,class_weight,criterion,splitter,Accuracy
+0,,gini,best,0.7520886529514234
+1,,gini,random,0.7482188453869343
+2,,entropy,best,0.7524258167247849
+3,,entropy,random,0.7503818824281714
+4,balanced,gini,best,0.7585580054936574
+5,balanced,gini,random,0.7557798260866827
+6,balanced,entropy,best,0.7590541435533001
+7,balanced,entropy,random,0.7544502326299309
