@@ -348,4 +348,5 @@ def get_all_scores(reconstruct: bool):
 
 
 if __name__ == "__main__":
+    os.environ['JOBLIB_START_METHOD'] = "forkserver"
     pass
