@@ -25,7 +25,7 @@ def load_data(segment_length=10, overlap_amount=0.9, hr_threshold=10):
     """
     df = load_data_as_dataframe(segment_length=segment_length, overlap_amount=overlap_amount, hr_threshold=hr_threshold)
     features = df.iloc[:, 0:13]
-    target = df['informative_ce']  # TODO: add second label
+    target = df['informative_hr']  # TODO: add second label
     mean_error = df['mean error']
     coverage = df['coverage']
     patient_id = df['patient_id']  # TODO: do sth with it
@@ -319,7 +319,7 @@ def eval_classifier(features, target, patient_id, clf, grid_folder_name, test_si
 
 
 def eval_classifier_paper(features, target, patient_id, clf, grid_folder_name, grid_params=None):
-    return eval_classifier_paper(features, target, patient_id, clf, grid_folder_name, test_size=0.43,
+    return eval_classifier(features, target, patient_id, clf, grid_folder_name, test_size=0.43,
                                  grid_params=grid_params, patient_cv=False)
 
 
