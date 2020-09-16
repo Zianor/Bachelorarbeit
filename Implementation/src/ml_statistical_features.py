@@ -10,6 +10,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV, KFold, LeaveOneGroupOut
 from sklearn.neural_network import MLPClassifier
+from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
@@ -76,9 +77,9 @@ def get_svm_grid_params():
     :return: base estimator and dict of parameters for grid search
     """
     parameters = {
-        'kernel': ('linear', 'rbf', 'poly', 'sigmoid'),
-        'C': [1, 10],
-        'class_weight': (None, 'balanced')
+        'clf__kernel': ('linear', 'rbf', 'poly', 'sigmoid'),
+        'clf__C': [1, 10],
+        'clf__class_weight': (None, 'balanced')
     }
     svm = SVC(random_state=1)
 
@@ -92,7 +93,7 @@ def get_lda_grid_params():
     lda = LinearDiscriminantAnalysis()
 
     parameters = {
-        'solver': ('svd', 'lsqr', 'eigen')
+        'clf__solver': ('svd', 'lsqr', 'eigen')
     }
 
     return lda, parameters
@@ -106,9 +107,9 @@ def get_dt_grid_params():
     dt = DecisionTreeClassifier(random_state=1)
 
     parameters = {
-        'criterion': ("gini", "entropy"),
-        'splitter': ("best", "random"),
-        'class_weight': (None, 'balanced')
+        'clf__criterion': ("gini", "entropy"),
+        'clf__splitter': ("best", "random"),
+        'clf__class_weight': (None, 'balanced')
     }
 
     return dt, parameters
@@ -122,9 +123,9 @@ def get_rf_grid_params():
     rf = RandomForestClassifier(random_state=1)
 
     parameters = {
-        'n_estimators': [10, 30, 50, 75, 100],
-        'criterion': ("gini", "entropy"),
-        'class_weight': ("balanced", None)
+        'clf__n_estimators': [10, 30, 50, 75, 100],
+        'clf__criterion': ("gini", "entropy"),
+        'clf__class_weight': ("balanced", None)
     }
 
     return rf, parameters
@@ -138,11 +139,11 @@ def get_mlp_grid_params():
     mlp = MLPClassifier()
 
     parameters = {
-        'hidden_layer_sizes': [(10,), (20,), (30,), (40,), (50,), (60,), (70,), (80,), (90,), (100,)],
-        'activation': ('identity', 'logistic', 'tanh', 'relu'),
-        'alpha': [0.0001],
-        'learning_rate': ('constant', 'invscaling', 'adaptive'),
-        'learning_rate_init': [0.0001]
+        'clf__hidden_layer_sizes': [(10,), (20,), (30,), (40,), (50,), (60,), (70,), (80,), (90,), (100,)],
+        'clf__activation': ('identity', 'logistic', 'tanh', 'relu'),
+        'clf__alpha': [0.0001],
+        'clf__learning_rate': ('constant', 'invscaling', 'adaptive'),
+        'clf__learning_rate_init': [0.0001]
     }
 
     return mlp, parameters
@@ -210,7 +211,7 @@ def get_patient_split(features, target, patient_id, test_size):
     return x1, x2, y1, y2
 
 
-def eval_classifier(features, target, patient_id, clf, grid_folder_name, test_size=0.33, grid_params=None,
+def eval_classifier(features, target, patient_id, pipe_with_params, grid_folder_name, test_size=0.33, grid_params=None,
                     patient_cv=True):
     if not os.path.isdir(os.path.join(utils.get_grid_params_path(), grid_folder_name)):
         if not grid_params:
@@ -230,13 +231,8 @@ def eval_classifier(features, target, patient_id, clf, grid_folder_name, test_si
         x_g1, x_g2, y_g1, y_g2 = train_test_split(features, target, test_size=test_size, random_state=1,
                                                   stratify=target)
 
-    # standardize with g1 as trainings set
-    sc = StandardScaler()
-    sc.fit(x_g1)
-    x_train = sc.transform(x_g1)
-    x_test = sc.transform(x_g2)
-    y_train = y_g1
-    y_test = y_g2
+    # create pipeline for standardization
+    pipe = Pipeline([('scaler', StandardScaler()), ('clf', pipe_with_params)])
 
     if patient_cv:
         cv = LeaveOneGroupOut()
@@ -269,8 +265,8 @@ def eval_classifier(features, target, patient_id, clf, grid_folder_name, test_si
                 grid_params = _create_list_dict(best_params)
 
     if not grid_search:  # either not loaded or didn't performed yet
-        grid_search = GridSearchCV(estimator=clf, param_grid=grid_params, cv=cv, n_jobs=10)
-        grid_search.fit(x_train, y_train, groups=groups)
+        grid_search = GridSearchCV(estimator=pipe, param_grid=grid_params, cv=cv, n_jobs=8, verbose=4)
+        grid_search.fit(x_g1, y_g1, groups=groups)
         # save fitted model
         with open(os.path.join(path, model_filename), 'wb') as file:
             pickle.dump(grid_search, file)
@@ -287,35 +283,27 @@ def eval_classifier(features, target, patient_id, clf, grid_folder_name, test_si
         score['mean_score_g1'] = grid_search.best_score_
 
     # scoring with G1 as training
-    g2_predicted = grid_search.predict(x_test)
+    g2_predicted = grid_search.predict(x_g2)
     g2_actual = y_g2
     mean_score_g1 = score['mean_score_g1']
-    score['accuracy_g1'] = accuracy_score(y_true=g2_actual, y_pred=g2_predicted)
+    score['accuracy_g1'] = accuracy_score(y_true=y_g2, y_pred=g2_predicted)
 
     # use G2 as training
-    # standardize with G2 as training
-    sc = StandardScaler()
-    sc.fit(x_g2)
-    x_train = sc.transform(x_g2)
-    x_test = sc.transform(x_g1)
-    y_train = y_g2
-    y_test = y_g1
     # cross validation
-    clf = clf.set_params(**best_params)
-    mean_score_g2 = np.mean(cross_val_score(clf, x_train, y=y_train, cv=cv, groups=groups))
+    pipe_with_params = pipe.set_params(**best_params)
+    mean_score_g2 = np.mean(cross_val_score(pipe_with_params, x_g2, y=y_g2, cv=cv, groups=groups))
     score['mean_score_g2'] = mean_score_g2
     # train model with g2
-    clf.fit(x_train, y_train)
-    g1_predicted = clf.predict(x_test)
-    g1_actual = y_g1
-    score['accuracy_g2'] = accuracy_score(y_true=g1_actual, y_pred=g1_predicted)
+    pipe_with_params.fit(x_g2, y_g2)
+    g1_predicted = pipe_with_params.predict(x_g1)
+    score['accuracy_g2'] = accuracy_score(y_true=y_g1, y_pred=g1_predicted)
 
     # save score
     score['mean_score_g1'] = grid_search.best_score_
     with open(os.path.join(path, score_filename), 'w') as file:
         file.write(json.dumps(score))
 
-    return grid_search.best_estimator_, mean_score_g1, g2_predicted, g2_actual, mean_score_g2, g1_predicted, g1_actual
+    return grid_search.best_estimator_, mean_score_g1, g2_predicted, y_g2, mean_score_g2, g1_predicted, y_g1
 
 
 def eval_classifier_paper(features, target, patient_id, clf, grid_folder_name, grid_params=None):
