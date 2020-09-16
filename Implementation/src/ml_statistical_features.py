@@ -270,6 +270,7 @@ def eval_classifier(features, target, patient_id, pipe_with_params, grid_folder_
         # save fitted model
         with open(os.path.join(path, model_filename), 'wb') as file:
             pickle.dump(grid_search, file)
+            file.flush()
         if not best_params:  # if params weren't loaded (means full grid search)
             get_dataframe_from_cv_results(grid_search.cv_results_).to_csv(os.path.join(path, 'grid.csv'))
 
@@ -278,6 +279,7 @@ def eval_classifier(features, target, patient_id, pipe_with_params, grid_folder_
         with open(os.path.join(path, params_filename), 'w') as file:
             best_params = grid_search.best_params_
             file.write(json.dumps(best_params))
+            file.flush()
 
     if not score:  # if score wasn't loaded
         score['mean_score_g1'] = grid_search.best_score_
@@ -302,6 +304,7 @@ def eval_classifier(features, target, patient_id, pipe_with_params, grid_folder_
     score['mean_score_g1'] = grid_search.best_score_
     with open(os.path.join(path, score_filename), 'w') as file:
         file.write(json.dumps(score))
+        file.flush()
 
     return grid_search.best_estimator_, mean_score_g1, g2_predicted, y_g2, mean_score_g2, g1_predicted, y_g1
 
