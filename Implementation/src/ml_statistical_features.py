@@ -312,7 +312,7 @@ def eval_classifier_paper(features, target, patient_id, clf, grid_folder_name, g
 
 
 def reconstruct_models_paper(grid_search: bool):
-    paths = ['SVC_0717', 'LDA_0717', 'DT_0717', 'RF_0717', 'MLP_0717']
+    paths = ['SVC_0916_hr10', 'LDA_0916_hr10', 'DT_0916_hr10', 'RF_0916_hr10', 'MLP_0916_hr10']
     functions = (get_svm_grid_params, get_lda_grid_params, get_dt_grid_params, get_rf_grid_params, get_mlp_grid_params)
 
     x, y, mean_error, coverage, patient_id = load_data(segment_length=10, overlap_amount=0)
@@ -329,7 +329,7 @@ def get_all_scores(reconstruct: bool):
         reconstruct_models_paper(grid_search=False)
     score_dict = {}
     filename = 'score.json'
-    paths = ['RF_0717', 'SVC_0717', 'MLP_0717', 'LDA_0717', 'DT_0717']
+    paths = ['RF_0916_hr10', 'SVC_0916_hr10', 'MLP_0916_hr10', 'LDA_0916_hr10', 'DT_0916_hr10']
     clf_names = ['RF', 'SVM', 'MLP', 'LDA', 'DT']
     for clf_name, folder in zip(clf_names, paths):
         location = folder + '/' + filename
