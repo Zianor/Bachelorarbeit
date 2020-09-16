@@ -132,7 +132,9 @@ dmypy.json
 .idea/*
 
 # data
-/Implementation/data/*.mat
+/Implementation/data/bcg/*
 /Implementation/data/*.csv
 /Implementation/data/ecg/*
 /Implementation/data/images/*
+/Implementation/data/drift_compensation/*
+/Implementation/data/grid_params/*/*.sav

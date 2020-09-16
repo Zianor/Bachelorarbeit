@@ -8,46 +8,40 @@ import numpy as np
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
-from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV, KFold
+from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV, KFold, LeaveOneGroupOut
 from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 
 from data_statistical_features import DataSet
-from utils import get_project_root
+import src.utils as utils
 
 
-def load_data(segment_length=10, overlap_amount=0.9):
+def load_data(segment_length=10, overlap_amount=0.9, hr_threshold=10):
     """
     Loads BCG data features with its target labels
     :return: BCG data features, target labels
     """
-    filename = 'data/data_statistical_features_l' + str(segment_length) + '_o' + str(overlap_amount) + '.csv'
-    path = os.path.join(get_project_root(), filename)
-    if not os.path.isfile(path):
-        warnings.warn('No csv, data needs to be reproduced. This may take some time')
-        DataSet()
-    df = pd.read_csv(path)
+    df = load_data_as_dataframe(segment_length=segment_length, overlap_amount=overlap_amount, hr_threshold=hr_threshold)
     features = df.iloc[:, 0:13]
-    target = df['informative']
+    target = df['informative_ce']  # TODO: add second label
     mean_error = df['mean error']
     coverage = df['coverage']
     patient_id = df['patient_id']  # TODO: do sth with it
     return features, target, mean_error, coverage, patient_id
 
 
-def load_data_as_dataframe(segment_length=10, overlap_amount=0.9):
+def load_data_as_dataframe(segment_length=10, overlap_amount=0.9, hr_threshold=10):
     """
     Loads BCG data as Dataframe
     :return: Dataframe
     """
-    filename = 'data/data_statistical_features_l' + str(segment_length) + '_o' + str(overlap_amount) + '.csv'
-    path = os.path.join(get_project_root(), filename)
+    path = utils.get_statistical_features_csv_path(segment_length, overlap_amount, hr_threshold)
     if not os.path.isfile(path):
         warnings.warn('No csv, data needs to be reproduced. This may take some time')
-        DataSet()
-    return pd.read_csv(path)
+        DataSet(segment_length=10, overlap_amount=0.9, hr_threshold=10)
+    return pd.read_csv(path, index_col=False)
 
 
 def evaluate_model(y_actual, y_pred):
@@ -207,21 +201,34 @@ def get_dataframe_from_cv_results(res):
                       pd.DataFrame(res["mean_test_score"], columns=["Accuracy"])], axis=1)
 
 
-def eval_classifier_paper(features, target, clf, grid_folder_name, grid_params=None):
-    grid_folder_name = 'data/grid_params/' + grid_folder_name
-    if not os.path.isdir(os.path.join(get_project_root(), grid_folder_name)):
+def get_patient_split(features, target, patient_id, test_size):
+    patient_ids_1, patient_ids_2 = train_test_split(patient_id.unique(), random_state=1, test_size=test_size)
+    x1 = features[np.isin(patient_id, patient_ids_1)]
+    x2 = features[np.isin(patient_id, patient_ids_2)]
+    y1 = target[np.isin(patient_id, patient_ids_1)]
+    y2 = target[np.isin(patient_id, patient_ids_2)]
+    return x1, x2, y1, y2
+
+
+def eval_classifier(features, target, patient_id, clf, grid_folder_name, test_size=0.33, grid_params=None,
+                    patient_cv=True):
+    if not os.path.isdir(os.path.join(utils.get_grid_params_path(), grid_folder_name)):
         if not grid_params:
             raise Exception("No existing folder and no params given")
         else:
-            os.mkdir(path=os.path.join(get_project_root(), grid_folder_name))
+            os.mkdir(path=os.path.join(utils.get_grid_params_path(), grid_folder_name))
 
-    path = os.path.join(get_project_root(), grid_folder_name)
+    path = os.path.join(utils.get_grid_params_path(), grid_folder_name)
     model_filename = 'fitted_model.sav'
     params_filename = 'params.json'
     score_filename = 'score.json'
 
     # split in g1 and g2
-    x_g1, x_g2, y_g1, y_g2 = train_test_split(features, target, test_size=0.43, random_state=1, stratify=target)
+    if patient_cv:
+        x_g1, x_g2, y_g1, y_g2 = get_patient_split(features, target, patient_id, test_size)
+    else:
+        x_g1, x_g2, y_g1, y_g2 = train_test_split(features, target, test_size=test_size, random_state=1,
+                                                  stratify=target)
 
     # standardize with g1 as trainings set
     sc = StandardScaler()
@@ -231,7 +238,12 @@ def eval_classifier_paper(features, target, clf, grid_folder_name, grid_params=N
     y_train = y_g1
     y_test = y_g2
 
-    k_fold = KFold(n_splits=10, shuffle=True, random_state=1)
+    if patient_cv:
+        cv = LeaveOneGroupOut()
+        groups = patient_id
+    else:
+        cv = KFold(n_splits=10, shuffle=True, random_state=1)
+        groups = None
 
     # initialize parameters
     score = {}
@@ -257,8 +269,8 @@ def eval_classifier_paper(features, target, clf, grid_folder_name, grid_params=N
                 grid_params = _create_list_dict(best_params)
 
     if not grid_search:  # either not loaded or didn't performed yet
-        grid_search = GridSearchCV(estimator=clf, param_grid=grid_params, cv=k_fold, n_jobs=10)
-        grid_search.fit(x_train, y_train)
+        grid_search = GridSearchCV(estimator=clf, param_grid=grid_params, cv=cv, n_jobs=10)
+        grid_search.fit(x_train, y_train, groups=groups)
         # save fitted model
         with open(os.path.join(path, model_filename), 'wb') as file:
             pickle.dump(grid_search, file)
@@ -272,15 +284,13 @@ def eval_classifier_paper(features, target, clf, grid_folder_name, grid_params=N
             file.write(json.dumps(best_params))
 
     if not score:  # if score wasn't loaded
-        # save score
-        score['score'] = grid_search.best_score_
-        with open(os.path.join(path, score_filename), 'w') as file:
-            file.write(json.dumps(score))
+        score['mean_score_g1'] = grid_search.best_score_
 
     # scoring with G1 as training
     g2_predicted = grid_search.predict(x_test)
     g2_actual = y_g2
-    mean_score_g1 = score['score']
+    mean_score_g1 = score['mean_score_g1']
+    score['accuracy_g1'] = accuracy_score(y_true=g2_actual, y_pred=g2_predicted)
 
     # use G2 as training
     # standardize with G2 as training
@@ -292,13 +302,25 @@ def eval_classifier_paper(features, target, clf, grid_folder_name, grid_params=N
     y_test = y_g1
     # cross validation
     clf = clf.set_params(**best_params)
-    mean_score_g2 = np.mean(cross_val_score(clf, x_train, y=y_train, cv=k_fold))
+    mean_score_g2 = np.mean(cross_val_score(clf, x_train, y=y_train, cv=cv, groups=groups))
+    score['mean_score_g2'] = mean_score_g2
     # train model with g2
     clf.fit(x_train, y_train)
     g1_predicted = clf.predict(x_test)
     g1_actual = y_g1
+    score['accuracy_g2'] = accuracy_score(y_true=g1_actual, y_pred=g1_predicted)
+
+    # save score
+    score['mean_score_g1'] = grid_search.best_score_
+    with open(os.path.join(path, score_filename), 'w') as file:
+        file.write(json.dumps(score))
 
     return grid_search.best_estimator_, mean_score_g1, g2_predicted, g2_actual, mean_score_g2, g1_predicted, g1_actual
+
+
+def eval_classifier_paper(features, target, patient_id, clf, grid_folder_name, grid_params=None):
+    return eval_classifier_paper(features, target, patient_id, clf, grid_folder_name, test_size=0.43,
+                                 grid_params=grid_params, patient_cv=False)
 
 
 def reconstruct_models_paper(grid_search: bool):
@@ -311,7 +333,26 @@ def reconstruct_models_paper(grid_search: bool):
         clf, params = function()
         if not grid_search:
             params = None
-        eval_classifier_paper(x, y, clf=clf, grid_folder_name=path, grid_params=params)
+        eval_classifier_paper(x, y, patient_id, clf=clf, grid_folder_name=path, grid_params=params)
+
+
+def get_all_scores(reconstruct: bool):
+    if reconstruct:
+        reconstruct_models_paper(grid_search=False)
+    score_dict = {}
+    filename = 'score.json'
+    paths = ['RF_0717', 'SVC_0717', 'MLP_0717', 'LDA_0717', 'DT_0717']
+    clf_names = ['RF', 'SVM', 'MLP', 'LDA', 'DT']
+    for clf_name, folder in zip(clf_names, paths):
+        location = folder + '/' + filename
+        path = os.path.join(utils.get_grid_params_path(), location)
+        if os.path.isfile(path):
+            with open(path) as file:
+                score = json.loads(file.read())
+        else:
+            raise Exception('No score file found')
+        score_dict[clf_name] = score
+    return score_dict
 
 
 if __name__ == "__main__":

@@ -10,7 +10,7 @@ from scipy import signal
 from scipy.io import loadmat
 
 import brueser
-from utils import get_project_root
+import src.utils as utils
 
 
 def get_brueser_hr(unique_peaks, medians, segment_length, sample_rate):
@@ -33,17 +33,15 @@ def get_brueser_segment_hr(start, end, unique_peaks, medians, sample_rate):
 
 
 def brueser_csv_all(fs, use_existing=True):
-    data_path = os.path.join(get_project_root(), 'data/')
-    paths = [path for path in os.listdir(data_path) if
+    paths = [path for path in os.listdir(utils.get_bcg_data_path()) if
              path.lower().endswith(".mat")]
-
     for path in paths:
         if use_existing:
-            path = os.path.join(os.path.join(get_project_root(), 'data/'), path)
-            brueser_csv(fs=fs, data_path=data_path, path=path, use_existing=use_existing)
+            path = os.path.join(utils.get_bcg_data_path(), path)
+            brueser_csv(fs=fs, path=path, use_existing=use_existing)
 
 
-def brueser_csv(fs, data_path, path, use_existing=True):
+def brueser_csv(fs, path, use_existing=True):
     """
     :return: Dataframe of unique_peaks, medians and qualities, where medians is the estimated length
     :rtype: pandas.Dataframe
@@ -52,7 +50,7 @@ def brueser_csv(fs, data_path, path, use_existing=True):
     number = path.lower().split("_")[-1]
     number = number.replace("mat", "")
     filename = 'brueser' + str(number) + 'csv'
-    path_csv = os.path.join(data_path, filename)
+    path_csv = os.path.join(utils.get_brueser_path(), filename)
 
     if not use_existing or not os.path.isfile(path_csv):
         win = np.arange(0.3 * fs, 2 * fs + 1, dtype=np.int32)
@@ -70,10 +68,9 @@ def brueser_csv(fs, data_path, path, use_existing=True):
 
 
 def get_brueser(fs, brueser_id, use_existing=True):
-    data_path = os.path.join(get_project_root(), 'data/')
     filename = 'ML_data_patient_' + brueser_id + '.mat'
-    path = os.path.join(data_path, filename)
-    return brueser_csv(fs=fs, data_path=data_path, path=path, use_existing=use_existing)
+    path = os.path.join(utils.get_bcg_data_path(), filename)
+    return brueser_csv(fs=fs, path=path, use_existing=use_existing)
 
 
 def get_ecg_hr(r_peaks, segment_length, sample_rate, lower_threshold=30, upper_threshold=200):
@@ -102,17 +99,16 @@ def get_ecg_segment_hr(start, end, r_peaks, sample_rate, lower_threshold=30, upp
 
 
 def ecg_csv_all(use_existing=True):
-    data_path = os.path.join(get_project_root(), 'data/ecg/')
-    paths = [path for path in os.listdir(data_path) if path.lower().endswith(".edf")]
+    paths = [path for path in os.listdir(utils.get_ecg_data_path()) if path.lower().endswith(".edf")]
     for path in paths:
-        path = os.path.join(os.path.join(get_project_root(), 'data/ecg/'), path)
-        ecg_csv(data_path=data_path, path=path, use_existing=use_existing)
+        path = os.path.join(utils.get_ecg_data_path(), path)
+        ecg_csv(path=path, use_existing=use_existing)
 
 
-def ecg_csv(data_path, path, use_existing=True):
+def ecg_csv(path, use_existing=True):
     ecg_id = path.lower().split("_")[-1].replace(".edf", "")
     filename = 'rpeaks' + str(ecg_id) + '.csv'
-    path_csv = os.path.join(data_path, filename)
+    path_csv = os.path.join(utils.get_rpeaks_path(), filename)
 
     length = None
     sample_rate = None
@@ -143,32 +139,28 @@ def ecg_csv(data_path, path, use_existing=True):
 
 
 def serialize_ecg_hrs():
-    data_path = os.path.join(get_project_root(), 'data/ecg/')
-    paths = [path for path in os.listdir(data_path) if
+    paths = [path for path in os.listdir(utils.get_ecg_data_path()) if
              path.lower().endswith(".edf")]
     for path in paths:
-        path = os.path.join(os.path.join(get_project_root(), 'data/ecg/'), path)
-        ecg_csv(data_path=data_path, path=path)
-    brueser_csv_all(100)
-    data_path = os.path.join(get_project_root(), 'data/ecg/')
-    paths = [path for path in os.listdir(data_path) if path.lower().endswith(".csv")]
+        path = os.path.join(utils.get_ecg_data_path(), path)
+        ecg_csv(path=path)
+    paths = [path for path in os.listdir(utils.get_rpeaks_path()) if path.lower().endswith(".csv")]
     ecg_hrs = {}
     for path in paths:
-        path = os.path.join(os.path.join(get_project_root(), 'data/ecg/'), path)
+        path = os.path.join(utils.get_rpeaks_path(), path)
         data = pd.read_csv(path)
         ecg_hrs[path] = get_ecg_hr(data.to_numpy(), 10 * 1000, 1000)
     ecg_data = pd.DataFrame(dict([(k, pd.Series(v)) for k, v in ecg_hrs.items()]))
-    ecg_data.to_csv(os.path.join(get_project_root(), 'data/ecg/ecg_hrs.csv'))
+    ecg_data.to_csv(os.path.join(utils.get_ecg_path(), 'ecg_hrs.csv'))
 
 
 def serialize_bcg_hrs():
-    data_path = os.path.join(get_project_root(), 'data/')
-    paths = [path for path in os.listdir(data_path) if
+    paths = [path for path in os.listdir(utils.get_brueser_path()) if
              path.lower().endswith(".csv") and path.lower().startswith('brueser')]
     bcg_hrs = {}
     for path in paths:
-        path = os.path.join(os.path.join(get_project_root(), 'data/'), path)
+        path = os.path.join(utils.get_brueser_path(), path)
         data = pd.read_csv(path)
         bcg_hrs[path] = get_brueser_hr(data['unique_peaks'], data['medians'], 10 * 100, 100)
     bcg_data = pd.DataFrame(dict([(k, pd.Series(v)) for k, v in bcg_hrs.items()]))
-    bcg_data.to_csv(os.path.join(get_project_root(), 'data/bcg_hrs.csv'))
+    bcg_data.to_csv(os.path.join(utils.get_bcg_path(), 'bcg_hrs.csv'))
