@@ -265,7 +265,7 @@ def eval_classifier(features, target, patient_id, pipe_with_params, grid_folder_
                 grid_params = _create_list_dict(best_params)
 
     if not grid_search:  # either not loaded or didn't performed yet
-        grid_search = GridSearchCV(estimator=pipe, param_grid=grid_params, cv=cv, n_jobs=8, verbose=4)
+        grid_search = GridSearchCV(estimator=pipe, param_grid=grid_params, cv=cv, n_jobs=-2, verbose=2)
         grid_search.fit(x_g1, y_g1, groups=groups)
         # save fitted model
         with open(os.path.join(path, model_filename), 'wb') as file:
