@@ -1,0 +1,9 @@
+,clf__class_weight,clf__criterion,clf__splitter,Accuracy
+0,,gini,best,0.7517314628437868
+1,,gini,random,0.7442896242640735
+2,,entropy,best,0.7524059951426493
+3,,entropy,random,0.7513148276774493
+4,balanced,gini,best,0.7570696425027641
+5,balanced,gini,random,0.7558788749342431
+6,balanced,entropy,best,0.7586373863231871
+7,balanced,entropy,random,0.7531801157322093
