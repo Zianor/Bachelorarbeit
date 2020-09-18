@@ -81,22 +81,23 @@ def get_svm_grid_params():
         'clf__C': [1, 10],
         'clf__class_weight': (None, 'balanced')
     }
-    svm = SVC(random_state=1)
+    # create pipeline for standardization
+    pipe = Pipeline([('scaler', StandardScaler()), ('clf', SVC(random_state=1))])
 
-    return svm, parameters
+    return pipe, parameters
 
 
 def get_lda_grid_params():
     """Linear Discriminant Analysis
     :return: base estimator and dict of parameters for grid search
     """
-    lda = LinearDiscriminantAnalysis()
-
     parameters = {
         'clf__solver': ('svd', 'lsqr', 'eigen')
     }
+    # create pipeline for standardization
+    pipe = Pipeline([('scaler', StandardScaler()), ('clf', LinearDiscriminantAnalysis())])
 
-    return lda, parameters
+    return pipe, parameters
 
 
 def get_dt_grid_params():
@@ -104,15 +105,16 @@ def get_dt_grid_params():
     Decision tree
     :return: base estimator and dict of parameters for grid search
     """
-    dt = DecisionTreeClassifier(random_state=1)
-
     parameters = {
         'clf__criterion': ("gini", "entropy"),
         'clf__splitter': ("best", "random"),
         'clf__class_weight': (None, 'balanced')
     }
 
-    return dt, parameters
+    # create pipeline for standardization
+    pipe = Pipeline([('scaler', StandardScaler()), ('clf', DecisionTreeClassifier(random_state=1))])
+
+    return pipe, parameters
 
 
 def get_rf_grid_params():
@@ -120,15 +122,16 @@ def get_rf_grid_params():
     Random forest
     :return: base estimator and dict of parameters for grid search
     """
-    rf = RandomForestClassifier(random_state=1)
-
     parameters = {
         'clf__n_estimators': [10, 30, 50, 75, 100],
         'clf__criterion': ("gini", "entropy"),
         'clf__class_weight': ("balanced", None)
     }
 
-    return rf, parameters
+    # create pipeline for standardization
+    pipe = Pipeline([('scaler', StandardScaler()), ('clf', RandomForestClassifier(random_state=1))])
+
+    return pipe, parameters
 
 
 def get_mlp_grid_params():
@@ -136,8 +139,6 @@ def get_mlp_grid_params():
     Multilayer Perceptron
     :return: base estimator and dict of parameters for grid search
     """
-    mlp = MLPClassifier()
-
     parameters = {
         'clf__hidden_layer_sizes': [(10,), (20,), (30,), (40,), (50,), (60,), (70,), (80,), (90,), (100,)],
         'clf__activation': ('identity', 'logistic', 'tanh', 'relu'),
@@ -146,7 +147,10 @@ def get_mlp_grid_params():
         'clf__learning_rate_init': [0.0001]
     }
 
-    return mlp, parameters
+    # create pipeline for standardization
+    pipe = Pipeline([('scaler', StandardScaler()), ('clf', MLPClassifier(random_state=1))])
+
+    return pipe, parameters
 
 
 def calc_avg_mean_error(mean_error, predicted, actual=None):
@@ -211,7 +215,7 @@ def get_patient_split(features, target, patient_id, test_size):
     return x1, x2, y1, y2
 
 
-def eval_classifier(features, target, patient_id, pipe_with_params, grid_folder_name, test_size=0.33, grid_params=None,
+def eval_classifier(features, target, patient_id, pipe, grid_folder_name, test_size=0.33, grid_params=None,
                     patient_cv=True):
     if not os.path.isdir(os.path.join(utils.get_grid_params_path(), grid_folder_name)):
         if not grid_params:
@@ -230,9 +234,6 @@ def eval_classifier(features, target, patient_id, pipe_with_params, grid_folder_
     else:
         x_g1, x_g2, y_g1, y_g2 = train_test_split(features, target, test_size=test_size, random_state=1,
                                                   stratify=target)
-
-    # create pipeline for standardization
-    pipe = Pipeline([('scaler', StandardScaler()), ('clf', pipe_with_params)])
 
     if patient_cv:
         cv = LeaveOneGroupOut()
