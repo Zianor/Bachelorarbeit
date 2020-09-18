@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def get_md_data_distribution_string(y_g1, y_g2):
     """Returns Markdown string to show table of data distribution after split in informative and non-informative
     """

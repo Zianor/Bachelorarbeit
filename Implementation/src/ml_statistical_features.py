@@ -15,7 +15,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 
-from data_statistical_features import DataSet
+from src.data_statistical_features import DataSet
 import src.utils as utils
 
 

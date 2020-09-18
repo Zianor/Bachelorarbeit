@@ -9,7 +9,7 @@ from pyedflib import highlevel
 from scipy import signal
 from scipy.io import loadmat
 
-import brueser
+import src.brueser as brueser
 import src.utils as utils
 
 
