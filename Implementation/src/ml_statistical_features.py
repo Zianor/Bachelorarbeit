@@ -321,12 +321,12 @@ def eval_classifier(features, target, patient_id, pipe, grid_folder_name, test_s
     return grid_search.best_estimator_, mean_score_g1, g2_predicted, y_g2, mean_score_g2, g1_predicted, y_g1
 
 
-def eval_classifier_paper(features, target, patient_id, clf, grid_folder_name, grid_params=None):
+def eval_classifier_paper(features, target, patient_id, clf, grid_folder_name, patient_cv=False, grid_params=None):
     return eval_classifier(features, target, patient_id, clf, grid_folder_name, test_size=0.43,
-                           grid_params=grid_params, patient_cv=False)
+                           grid_params=grid_params, patient_cv=patient_cv)
 
 
-def reconstruct_models_paper(grid_search: bool):
+def reconstruct_models_paper(grid_search: bool, patient_cv: bool):
     paths = ['LDA_0916_hr10', 'DT_0916_hr10', 'RF_0916_hr10', 'MLP_0916_hr10', 'SVC_0916_hr10']
     functions = (get_lda_grid_params, get_dt_grid_params, get_rf_grid_params, get_mlp_grid_params, get_svm_grid_params)
 
@@ -337,7 +337,7 @@ def reconstruct_models_paper(grid_search: bool):
         if not grid_search:
             params = None
         print(path)
-        eval_classifier_paper(x, y, patient_id, clf=clf, grid_folder_name=path, grid_params=params)
+        eval_classifier_paper(x, y, patient_id, clf=clf, grid_folder_name=path, grid_params=params, patient_cv=patient_cv)
 
 
 def get_all_scores(reconstruct: bool):
