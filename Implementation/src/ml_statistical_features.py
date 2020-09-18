@@ -7,6 +7,7 @@ import pandas as pd
 import numpy as np
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.kernel_approximation import Nystroem
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV, KFold, LeaveOneGroupOut
 from sklearn.neural_network import MLPClassifier
@@ -84,6 +85,16 @@ def get_svm_grid_params():
     # create pipeline for standardization
     pipe = Pipeline([('scaler', StandardScaler()), ('clf', SVC(random_state=1))])
 
+    return pipe, parameters
+
+
+def get_linear_svc_grid_params():
+    parameters = {
+        'trans__kernel': ['linear', 'rbf', 'sigmoid', 'poly'],
+        'clf__C': [1, 10],
+        'clf__class_weight': [None, 'balanced']
+    }
+    pipe = Pipeline(steps=[('scaler', StandardScaler()), ('trans', Nystroem(random_state=1)), ('clf', SVC(random_state=1))])
     return pipe, parameters
 
 
@@ -312,7 +323,7 @@ def eval_classifier(features, target, patient_id, pipe, grid_folder_name, test_s
 
 def eval_classifier_paper(features, target, patient_id, clf, grid_folder_name, grid_params=None):
     return eval_classifier(features, target, patient_id, clf, grid_folder_name, test_size=0.43,
-                                 grid_params=grid_params, patient_cv=False)
+                           grid_params=grid_params, patient_cv=False)
 
 
 def reconstruct_models_paper(grid_search: bool):
