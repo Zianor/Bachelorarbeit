@@ -213,8 +213,7 @@ def _create_list_dict(params):
 
 
 def get_dataframe_from_cv_results(res):
-    return pd.concat([pd.DataFrame(res["params"]),
-                      pd.DataFrame(res["mean_test_score"], columns=["Accuracy"])], axis=1)
+    return pd.DataFrame(res)
 
 
 def get_patient_split(features, target, patient_id, test_size):
@@ -223,7 +222,9 @@ def get_patient_split(features, target, patient_id, test_size):
     x2 = features[np.isin(patient_id, patient_ids_2)]
     y1 = target[np.isin(patient_id, patient_ids_1)]
     y2 = target[np.isin(patient_id, patient_ids_2)]
-    return x1, x2, y1, y2
+    groups1 = patient_id[np.isin(patient_id, patient_ids_1)]
+    groups2 = patient_id[np.isin(patient_id, patient_ids_2)]
+    return x1, x2, y1, y2, groups1, groups2
 
 
 def eval_classifier(features, target, patient_id, pipe, grid_folder_name, test_size=0.33, grid_params=None,
@@ -241,17 +242,14 @@ def eval_classifier(features, target, patient_id, pipe, grid_folder_name, test_s
 
     # split in g1 and g2
     if patient_cv:
-        x_g1, x_g2, y_g1, y_g2 = get_patient_split(features, target, patient_id, test_size)
+        x_g1, x_g2, y_g1, y_g2, groups1, groups2 = get_patient_split(features, target, patient_id, test_size)
+        cv = LeaveOneGroupOut()
     else:
         x_g1, x_g2, y_g1, y_g2 = train_test_split(features, target, test_size=test_size, random_state=1,
                                                   stratify=target)
-
-    if patient_cv:
-        cv = LeaveOneGroupOut()
-        groups = patient_id
-    else:
         cv = KFold(n_splits=10, shuffle=True, random_state=1)
-        groups = None
+        groups1 = None
+        groups2 = None
 
     # initialize parameters
     score = {}
@@ -305,7 +303,7 @@ def eval_classifier(features, target, patient_id, pipe, grid_folder_name, test_s
     # use G2 as training
     # cross validation
     pipe_with_params = pipe.set_params(**best_params)
-    mean_score_g2 = np.mean(cross_val_score(pipe_with_params, x_g2, y=y_g2, cv=cv, groups=groups))
+    mean_score_g2 = np.mean(cross_val_score(pipe_with_params, x_g2, y=y_g2, cv=cv, groups=groups2))
     score['mean_score_g2'] = mean_score_g2
     # train model with g2
     pipe_with_params.fit(x_g2, y_g2)
@@ -327,8 +325,9 @@ def eval_classifier_paper(features, target, patient_id, clf, grid_folder_name, p
 
 
 def reconstruct_models_paper(grid_search: bool, patient_cv: bool):
-    paths = ['LDA_0916_hr10', 'DT_0916_hr10', 'RF_0916_hr10', 'MLP_0916_hr10', 'SVC_0916_hr10']
-    functions = (get_lda_grid_params, get_dt_grid_params, get_rf_grid_params, get_mlp_grid_params, get_svm_grid_params)
+    paths = ['LDA_0919_hr10', 'DT_0919_hr10', 'RF_0919_hr10', 'MLP_0919_hr10', 'SVC_0919_hr10']
+    functions = (get_lda_grid_params, get_dt_grid_params, get_rf_grid_params, get_mlp_grid_params,
+                 get_linear_svc_grid_params())
 
     x, y, mean_error, coverage, patient_id = load_data(segment_length=10, overlap_amount=0)
 
@@ -336,8 +335,8 @@ def reconstruct_models_paper(grid_search: bool, patient_cv: bool):
         clf, params = function()
         if not grid_search:
             params = None
-        print(path)
-        eval_classifier_paper(x, y, patient_id, clf=clf, grid_folder_name=path, grid_params=params, patient_cv=patient_cv)
+        eval_classifier_paper(x, y, patient_id, clf=clf, grid_folder_name=path, grid_params=params,
+                              patient_cv=patient_cv)
 
 
 def get_all_scores(reconstruct: bool):
@@ -361,4 +360,5 @@ def get_all_scores(reconstruct: bool):
 
 if __name__ == "__main__":
     os.environ['JOBLIB_START_METHOD'] = "forkserver"
+    reconstruct_models_paper(grid_search=True, patient_cv=False)
     pass
