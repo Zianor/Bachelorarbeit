@@ -7,6 +7,7 @@ import pandas as pd
 import numpy as np
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.kernel_approximation import Nystroem
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV, KFold, LeaveOneGroupOut
 from sklearn.neural_network import MLPClassifier
@@ -15,7 +16,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 
-from data_statistical_features import DataSet
+from src.data_statistical_features import DataSet
 import src.utils as utils
 
 
@@ -81,22 +82,33 @@ def get_svm_grid_params():
         'clf__C': [1, 10],
         'clf__class_weight': (None, 'balanced')
     }
-    svm = SVC(random_state=1)
+    # create pipeline for standardization
+    pipe = Pipeline([('scaler', StandardScaler()), ('clf', SVC(random_state=1))])
 
-    return svm, parameters
+    return pipe, parameters
+
+
+def get_linear_svc_grid_params():
+    parameters = {
+        'trans__kernel': ['linear', 'rbf', 'sigmoid', 'poly'],
+        'clf__C': [1, 10],
+        'clf__class_weight': [None, 'balanced']
+    }
+    pipe = Pipeline(steps=[('scaler', StandardScaler()), ('trans', Nystroem(random_state=1)), ('clf', SVC(random_state=1))])
+    return pipe, parameters
 
 
 def get_lda_grid_params():
     """Linear Discriminant Analysis
     :return: base estimator and dict of parameters for grid search
     """
-    lda = LinearDiscriminantAnalysis()
-
     parameters = {
         'clf__solver': ('svd', 'lsqr', 'eigen')
     }
+    # create pipeline for standardization
+    pipe = Pipeline([('scaler', StandardScaler()), ('clf', LinearDiscriminantAnalysis())])
 
-    return lda, parameters
+    return pipe, parameters
 
 
 def get_dt_grid_params():
@@ -104,15 +116,16 @@ def get_dt_grid_params():
     Decision tree
     :return: base estimator and dict of parameters for grid search
     """
-    dt = DecisionTreeClassifier(random_state=1)
-
     parameters = {
         'clf__criterion': ("gini", "entropy"),
         'clf__splitter': ("best", "random"),
         'clf__class_weight': (None, 'balanced')
     }
 
-    return dt, parameters
+    # create pipeline for standardization
+    pipe = Pipeline([('scaler', StandardScaler()), ('clf', DecisionTreeClassifier(random_state=1))])
+
+    return pipe, parameters
 
 
 def get_rf_grid_params():
@@ -120,15 +133,16 @@ def get_rf_grid_params():
     Random forest
     :return: base estimator and dict of parameters for grid search
     """
-    rf = RandomForestClassifier(random_state=1)
-
     parameters = {
         'clf__n_estimators': [10, 30, 50, 75, 100],
         'clf__criterion': ("gini", "entropy"),
         'clf__class_weight': ("balanced", None)
     }
 
-    return rf, parameters
+    # create pipeline for standardization
+    pipe = Pipeline([('scaler', StandardScaler()), ('clf', RandomForestClassifier(random_state=1))])
+
+    return pipe, parameters
 
 
 def get_mlp_grid_params():
@@ -136,8 +150,6 @@ def get_mlp_grid_params():
     Multilayer Perceptron
     :return: base estimator and dict of parameters for grid search
     """
-    mlp = MLPClassifier()
-
     parameters = {
         'clf__hidden_layer_sizes': [(10,), (20,), (30,), (40,), (50,), (60,), (70,), (80,), (90,), (100,)],
         'clf__activation': ('identity', 'logistic', 'tanh', 'relu'),
@@ -146,7 +158,10 @@ def get_mlp_grid_params():
         'clf__learning_rate_init': [0.0001]
     }
 
-    return mlp, parameters
+    # create pipeline for standardization
+    pipe = Pipeline([('scaler', StandardScaler()), ('clf', MLPClassifier(random_state=1))])
+
+    return pipe, parameters
 
 
 def calc_avg_mean_error(mean_error, predicted, actual=None):
@@ -198,8 +213,7 @@ def _create_list_dict(params):
 
 
 def get_dataframe_from_cv_results(res):
-    return pd.concat([pd.DataFrame(res["params"]),
-                      pd.DataFrame(res["mean_test_score"], columns=["Accuracy"])], axis=1)
+    return pd.DataFrame(res)
 
 
 def get_patient_split(features, target, patient_id, test_size):
@@ -208,10 +222,12 @@ def get_patient_split(features, target, patient_id, test_size):
     x2 = features[np.isin(patient_id, patient_ids_2)]
     y1 = target[np.isin(patient_id, patient_ids_1)]
     y2 = target[np.isin(patient_id, patient_ids_2)]
-    return x1, x2, y1, y2
+    groups1 = patient_id[np.isin(patient_id, patient_ids_1)]
+    groups2 = patient_id[np.isin(patient_id, patient_ids_2)]
+    return x1, x2, y1, y2, groups1, groups2
 
 
-def eval_classifier(features, target, patient_id, pipe_with_params, grid_folder_name, test_size=0.33, grid_params=None,
+def eval_classifier(features, target, patient_id, pipe, grid_folder_name, test_size=0.33, grid_params=None,
                     patient_cv=True):
     if not os.path.isdir(os.path.join(utils.get_grid_params_path(), grid_folder_name)):
         if not grid_params:
@@ -226,20 +242,14 @@ def eval_classifier(features, target, patient_id, pipe_with_params, grid_folder_
 
     # split in g1 and g2
     if patient_cv:
-        x_g1, x_g2, y_g1, y_g2 = get_patient_split(features, target, patient_id, test_size)
+        x_g1, x_g2, y_g1, y_g2, groups1, groups2 = get_patient_split(features, target, patient_id, test_size)
+        cv = LeaveOneGroupOut()
     else:
         x_g1, x_g2, y_g1, y_g2 = train_test_split(features, target, test_size=test_size, random_state=1,
                                                   stratify=target)
-
-    # create pipeline for standardization
-    pipe = Pipeline([('scaler', StandardScaler()), ('clf', pipe_with_params)])
-
-    if patient_cv:
-        cv = LeaveOneGroupOut()
-        groups = patient_id
-    else:
         cv = KFold(n_splits=10, shuffle=True, random_state=1)
-        groups = None
+        groups1 = None
+        groups2 = None
 
     # initialize parameters
     score = {}
@@ -265,8 +275,10 @@ def eval_classifier(features, target, patient_id, pipe_with_params, grid_folder_
                 grid_params = _create_list_dict(best_params)
 
     if not grid_search:  # either not loaded or didn't performed yet
-        grid_search = GridSearchCV(estimator=pipe, param_grid=grid_params, cv=cv, n_jobs=-2, verbose=2)
-        grid_search.fit(x_g1, y_g1, groups=groups)
+        scores = ['accuracy', 'balanced_accuracy', 'f1', 'roc_auc', 'f1_weighted', 'precision', 'recall']
+        grid_search = GridSearchCV(estimator=pipe, param_grid=grid_params, scoring=scores, cv=cv, n_jobs=-2, verbose=2,
+                                   refit='balanced_accuracy')
+        grid_search.fit(x_g1, y_g1, groups=groups1)
         # save fitted model
         with open(os.path.join(path, model_filename), 'wb') as file:
             pickle.dump(grid_search, file)
@@ -293,7 +305,7 @@ def eval_classifier(features, target, patient_id, pipe_with_params, grid_folder_
     # use G2 as training
     # cross validation
     pipe_with_params = pipe.set_params(**best_params)
-    mean_score_g2 = np.mean(cross_val_score(pipe_with_params, x_g2, y=y_g2, cv=cv, groups=groups))
+    mean_score_g2 = np.mean(cross_val_score(pipe_with_params, x_g2, y=y_g2, cv=cv, groups=groups2))
     score['mean_score_g2'] = mean_score_g2
     # train model with g2
     pipe_with_params.fit(x_g2, y_g2)
@@ -309,14 +321,15 @@ def eval_classifier(features, target, patient_id, pipe_with_params, grid_folder_
     return grid_search.best_estimator_, mean_score_g1, g2_predicted, y_g2, mean_score_g2, g1_predicted, y_g1
 
 
-def eval_classifier_paper(features, target, patient_id, clf, grid_folder_name, grid_params=None):
+def eval_classifier_paper(features, target, patient_id, clf, grid_folder_name, patient_cv=False, grid_params=None):
     return eval_classifier(features, target, patient_id, clf, grid_folder_name, test_size=0.43,
-                                 grid_params=grid_params, patient_cv=False)
+                           grid_params=grid_params, patient_cv=patient_cv)
 
 
-def reconstruct_models_paper(grid_search: bool):
-    paths = ['LDA_0916_hr10', 'DT_0916_hr10', 'RF_0916_hr10', 'MLP_0916_hr10', 'SVC_0916_hr10']
-    functions = (get_lda_grid_params, get_dt_grid_params, get_rf_grid_params, get_mlp_grid_params, get_svm_grid_params)
+def reconstruct_models_paper(grid_search: bool, patient_cv: bool):
+    paths = ['LDA_0919_hr10', 'DT_0919_hr10', 'RF_0919_hr10', 'MLP_0919_hr10', 'SVC_0919_hr10']
+    functions = (get_lda_grid_params, get_dt_grid_params, get_rf_grid_params, get_mlp_grid_params,
+                 get_linear_svc_grid_params())
 
     x, y, mean_error, coverage, patient_id = load_data(segment_length=10, overlap_amount=0)
 
@@ -324,8 +337,8 @@ def reconstruct_models_paper(grid_search: bool):
         clf, params = function()
         if not grid_search:
             params = None
-        print(path)
-        eval_classifier_paper(x, y, patient_id, clf=clf, grid_folder_name=path, grid_params=params)
+        eval_classifier_paper(x, y, patient_id, clf=clf, grid_folder_name=path, grid_params=params,
+                              patient_cv=patient_cv)
 
 
 def get_all_scores(reconstruct: bool):
@@ -349,4 +362,5 @@ def get_all_scores(reconstruct: bool):
 
 if __name__ == "__main__":
     os.environ['JOBLIB_START_METHOD'] = "forkserver"
+    reconstruct_models_paper(grid_search=True, patient_cv=False)
     pass
