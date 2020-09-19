@@ -275,8 +275,10 @@ def eval_classifier(features, target, patient_id, pipe, grid_folder_name, test_s
                 grid_params = _create_list_dict(best_params)
 
     if not grid_search:  # either not loaded or didn't performed yet
-        grid_search = GridSearchCV(estimator=pipe, param_grid=grid_params, cv=cv, n_jobs=-2, verbose=2)
-        grid_search.fit(x_g1, y_g1, groups=groups)
+        scores = ['accuracy', 'balanced_accuracy', 'f1', 'roc_auc', 'f1_weighted', 'precision', 'recall']
+        grid_search = GridSearchCV(estimator=pipe, param_grid=grid_params, scoring=scores, cv=cv, n_jobs=-2, verbose=2,
+                                   refit='balanced_accuracy')
+        grid_search.fit(x_g1, y_g1, groups=groups1)
         # save fitted model
         with open(os.path.join(path, model_filename), 'wb') as file:
             pickle.dump(grid_search, file)
