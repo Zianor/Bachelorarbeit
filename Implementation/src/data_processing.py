@@ -121,7 +121,7 @@ def ecg_csv(path, use_existing=True):
                 sample_rate = signal_headers[i]['sample_rate']
                 length = len(s)
                 detectors = Detectors(sample_rate)
-                r_peaks[signal_headers[i]['label']] = detectors.pan_tompkins_detector(s)
+                r_peaks[signal_headers[i]['label']] = detectors.two_average_detector(s)
         r_peaks_data = pd.DataFrame(dict([(k, pd.Series(v)) for k, v in r_peaks.items()]))
         r_peaks_data.to_csv(path_csv)
     else:
