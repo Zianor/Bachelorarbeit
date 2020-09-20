@@ -326,10 +326,9 @@ def eval_classifier_paper(features, target, patient_id, clf, grid_folder_name, p
                            grid_params=grid_params, patient_cv=patient_cv)
 
 
-def reconstruct_models_paper(grid_search: bool, patient_cv: bool):
-    paths = ['LDA_0919_hr10', 'DT_0919_hr10', 'RF_0919_hr10', 'MLP_0919_hr10', 'SVC_0919_hr10']
+def reconstruct_models_paper(paths, grid_search: bool, patient_cv: bool):
     functions = (get_lda_grid_params, get_dt_grid_params, get_rf_grid_params, get_mlp_grid_params,
-                 get_linear_svc_grid_params())
+                 get_linear_svc_grid_params)
 
     x, y, mean_error, coverage, patient_id = load_data(segment_length=10, overlap_amount=0)
 
