@@ -1,0 +1,1 @@
+{"clf__activation":"relu","clf__alpha":0.0001,"clf__hidden_layer_sizes":{"__class__":"tuple","__value__":[100]},"clf__learning_rate":"constant","clf__learning_rate_init":0.0001}
