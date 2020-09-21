@@ -334,11 +334,11 @@ def eval_classifier_paper(features, target, patient_id, clf, grid_folder_name, p
                            grid_params=grid_params, patient_cv=patient_cv)
 
 
-def reconstruct_models_paper(paths, grid_search: bool, patient_cv: bool):
+def reconstruct_models_paper(paths, grid_search: bool, patient_cv: bool, hr_threshold=10):
     functions = (get_lda_grid_params, get_dt_grid_params, get_rf_grid_params, get_mlp_grid_params,
                  get_linear_svc_grid_params)
 
-    x, y, mean_error, coverage, patient_id = load_data(segment_length=10, overlap_amount=0)
+    x, y, mean_error, coverage, patient_id = load_data(segment_length=10, overlap_amount=0, hr_threshold=hr_threshold)
 
     for path, function in zip(paths, functions):
         clf, params = function()
@@ -370,6 +370,6 @@ if __name__ == "__main__":
     os.environ['JOBLIB_START_METHOD'] = "forkserver"
     paths_paper = ['LDA_paper_hr15', 'DT_paper_hr15', 'RF_paper_hr15', 'MLP_paper_hr15', 'SVC_paper_hr15']
     paths_patient_cv = ['LDA_patient_hr15', 'DT_patient_hr15', 'RF_patient_hr15', 'MLP_patient_hr15', 'SVC_patient_hr15']
-    reconstruct_models_paper(paths=paths_paper, grid_search=True, patient_cv=False)
-    reconstruct_models_paper(paths=paths_patient_cv, grid_search=True, patient_cv=True)
+    reconstruct_models_paper(paths=paths_paper, grid_search=True, patient_cv=False, hr_threshold=15)
+    reconstruct_models_paper(paths=paths_patient_cv, grid_search=True, patient_cv=True, hr_threshold=15)
     # pass
