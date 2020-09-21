@@ -213,7 +213,14 @@ def _create_list_dict(params):
 
 
 def get_dataframe_from_cv_results(res):
-    return pd.DataFrame(res)
+    scores = ['accuracy', 'balanced_accuracy', 'f1', 'roc_auc', 'f1_weighted', 'precision', 'recall']
+    columns = ['params']
+    for scoring in scores:
+        rank = 'rank_test_' + scoring
+        mean = 'mean_test_' + scoring
+        columns.append(rank)
+        columns.append(mean)
+    return res[columns].copy()
 
 
 def get_patient_split(features, target, patient_id, test_size):
