@@ -340,12 +340,11 @@ def reconstruct_models_paper(paths, grid_search: bool, patient_cv: bool):
                               patient_cv=patient_cv)
 
 
-def get_all_scores(reconstruct: bool):
+def get_all_scores(reconstruct: bool, paths):
     if reconstruct:
         reconstruct_models_paper(grid_search=False)
     score_dict = {}
     filename = 'score.json'
-    paths = ['RF_0916_hr10', 'SVC_0916_hr10', 'MLP_0916_hr10', 'LDA_0916_hr10', 'DT_0916_hr10']
     clf_names = ['RF', 'SVM', 'MLP', 'LDA', 'DT']
     for clf_name, folder in zip(clf_names, paths):
         location = folder + '/' + filename
@@ -361,8 +360,8 @@ def get_all_scores(reconstruct: bool):
 
 if __name__ == "__main__":
     os.environ['JOBLIB_START_METHOD'] = "forkserver"
-    paths_paper = ['LDA_paper_hr10', 'DT_paper_hr10', 'RF_paper_hr10', 'MLP_paper_hr10', 'SVC_paper_hr10']
-    paths_patient_cv = ['LDA_patient_hr10_', 'DT_patient_hr10', 'RF_patient_hr10', 'MLP_patient_hr10', 'SVC_patient_hr10']
-    reconstruct_models_paper(paths=paths_paper, grid_search=True, patient_cv=False)
-    reconstruct_models_paper(paths=paths_patient_cv, grid_search=True, patient_cv=True)
+    # paths_paper = ['LDA_paper_hr10', 'DT_paper_hr10', 'RF_paper_hr10', 'MLP_paper_hr10', 'SVC_paper_hr10']
+    # paths_patient_cv = ['LDA_patient_hr10_', 'DT_patient_hr10', 'RF_patient_hr10', 'MLP_patient_hr10', 'SVC_patient_hr10']
+    # reconstruct_models_paper(paths=paths_paper, grid_search=True, patient_cv=False)
+    # reconstruct_models_paper(paths=paths_patient_cv, grid_search=True, patient_cv=True)
     pass
