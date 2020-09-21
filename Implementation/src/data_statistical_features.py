@@ -48,6 +48,8 @@ class DataSet:
                                                                                       i,
                                                                                       i + self.segment_length)  # label
                         informative_hr, ecg_hr, bcg_hr = self.is_informative_hr(data_series, bcg_data, i, i + self.segment_length)
+                        if ecg_hr == 0:
+                            continue
                         self.segments.append(Segment(data_series.patient_id, segment_data, bcg_data.sample_rate,
                                                      informative_ce, informative_hr, ecg_hr, bcg_hr, coverage, mean_error))
 
