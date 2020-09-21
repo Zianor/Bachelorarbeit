@@ -88,6 +88,8 @@ class Data:
         self.data_series = {}
         self.create_data_series()
         for series in bcg_series:  # TODO: do it while loading?
+            if series.bcg_id == '14':  # no drift compensation, skip
+                continue
             curr_id = series.ecg_id
             self.data_series[str(curr_id)].add_bcg(series)
         self.load_drift_compensation()
