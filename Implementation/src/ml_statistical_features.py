@@ -140,7 +140,7 @@ def get_rf_grid_params():
     }
 
     # create pipeline for standardization
-    pipe = Pipeline([('scaler', StandardScaler()), ('clf', RandomForestClassifier(random_state=1))])
+    pipe = Pipeline([('scaler', StandardScaler()), ('clf', RandomForestClassifier(random_state=1, n_jobs=-2))])
 
     return pipe, parameters
 
