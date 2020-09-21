@@ -139,6 +139,8 @@ class Data:
         for path in paths:
             mat_dict = loadmat(path)
             bcg_id = path.lower().split("_")[-1].replace(".mat", "")
+            if bcg_id == '14':  # skip file without drift vector
+                continue
             bcg_series.append(
                 BCGSeries(
                     ecg_id=self.mapping[bcg_id],

@@ -42,7 +42,7 @@ def load_data_as_dataframe(segment_length=10, overlap_amount=0.9, hr_threshold=1
     path = utils.get_statistical_features_csv_path(segment_length, overlap_amount, hr_threshold)
     if not os.path.isfile(path):
         warnings.warn('No csv, data needs to be reproduced. This may take some time')
-        DataSet(segment_length=10, overlap_amount=0.9, hr_threshold=10)
+        DataSet(segment_length=segment_length, overlap_amount=overlap_amount, hr_threshold=hr_threshold)
     return pd.read_csv(path, index_col=False)
 
 
