@@ -345,7 +345,7 @@ def get_all_scores(reconstruct: bool, paths):
         reconstruct_models_paper(grid_search=False)
     score_dict = {}
     filename = 'score.json'
-    clf_names = ['RF', 'SVM', 'MLP', 'LDA', 'DT']
+    clf_names = ['LDA', 'DT', 'RF', 'MLP', 'SVM']
     for clf_name, folder in zip(clf_names, paths):
         location = folder + '/' + filename
         path = os.path.join(utils.get_grid_params_path(), location)
