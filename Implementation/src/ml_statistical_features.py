@@ -228,7 +228,7 @@ def get_patient_split(features, target, patient_id, test_size):
 
 
 def eval_classifier(features, target, patient_id, pipe, grid_folder_name, test_size=0.33, grid_params=None,
-                    patient_cv=True):
+                    patient_cv=True, scoring='accuracy'):
     if not os.path.isdir(os.path.join(utils.get_grid_params_path(), grid_folder_name)):
         if not grid_params:
             raise Exception("No existing folder and no params given")
@@ -277,7 +277,7 @@ def eval_classifier(features, target, patient_id, pipe, grid_folder_name, test_s
     if not grid_search:  # either not loaded or didn't performed yet
         scores = ['accuracy', 'balanced_accuracy', 'f1', 'roc_auc', 'f1_weighted', 'precision', 'recall']
         grid_search = GridSearchCV(estimator=pipe, param_grid=grid_params, scoring=scores, cv=cv, n_jobs=-2, verbose=2,
-                                   refit='balanced_accuracy')
+                                   refit='scoring')
         grid_search.fit(x_g1, y_g1, groups=groups1)
         # save fitted model
         with open(os.path.join(path, model_filename), 'wb') as file:
@@ -305,7 +305,7 @@ def eval_classifier(features, target, patient_id, pipe, grid_folder_name, test_s
     # use G2 as training
     # cross validation
     pipe_with_params = pipe.set_params(**best_params)
-    mean_score_g2 = np.mean(cross_val_score(pipe_with_params, x_g2, y=y_g2, cv=cv, groups=groups2))
+    mean_score_g2 = np.mean(cross_val_score(pipe_with_params, x_g2, y=y_g2, cv=cv, groups=groups2, scoring=scoring))
     score['mean_score_g2'] = mean_score_g2
     # train model with g2
     pipe_with_params.fit(x_g2, y_g2)
