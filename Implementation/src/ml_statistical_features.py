@@ -213,6 +213,7 @@ def _create_list_dict(params):
 
 
 def get_dataframe_from_cv_results(res):
+    data = pd.DataFrame(res)
     scores = ['accuracy', 'balanced_accuracy', 'f1', 'roc_auc', 'f1_weighted', 'precision', 'recall']
     columns = ['params']
     for scoring in scores:
@@ -220,7 +221,7 @@ def get_dataframe_from_cv_results(res):
         mean = 'mean_test_' + scoring
         columns.append(rank)
         columns.append(mean)
-    return res[columns].copy()
+    return data.filter(items=columns, axis='columns')
 
 
 def get_patient_split(features, target, patient_id, test_size):
@@ -284,7 +285,7 @@ def eval_classifier(features, target, patient_id, pipe, grid_folder_name, test_s
     if not grid_search:  # either not loaded or didn't performed yet
         scores = ['accuracy', 'balanced_accuracy', 'f1', 'roc_auc', 'f1_weighted', 'precision', 'recall']
         grid_search = GridSearchCV(estimator=pipe, param_grid=grid_params, scoring=scores, cv=cv, n_jobs=-2, verbose=2,
-                                   refit='scoring')
+                                   refit=scoring)
         grid_search.fit(x_g1, y_g1, groups=groups1)
         # save fitted model
         with open(os.path.join(path, model_filename), 'wb') as file:
