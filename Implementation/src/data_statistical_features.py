@@ -59,7 +59,7 @@ class DataSet:
         bcg_hr = get_brueser_segment_hr(bcg_start, bcg_end, bcg_series.unique_peaks, bcg_series.medians,
                                         bcg_series.sample_rate)
         abs_diff = np.abs(ecg_hr-bcg_hr)
-        if ecg_hr == 0 or 100/ecg_hr * abs_diff > self.hr_threshold:
+        if ecg_hr == 0 or 100/ecg_hr * abs_diff > self.hr_threshold or np.isnan(bcg_hr):
             return False, ecg_hr, bcg_hr
         return True, ecg_hr, bcg_hr
 
