@@ -23,6 +23,13 @@ class BCGSeries:
         self.medians = self.brueser_df['medians']
         self.unique_peaks = self.brueser_df['unique_peaks']
 
+    def get_hr(self, start, end):
+        """Calculates heartrate in given interval by calculating the mean length of the detected intervals
+        """
+        indices = np.where(np.logical_and(start <= self.unique_peaks, self.unique_peaks < end))
+        hr = 60 / (np.mean(self.medians.to_numpy()[indices]) / self.sample_rate)
+        return hr
+
 
 class ECGSeries:
 
@@ -31,6 +38,53 @@ class ECGSeries:
         self.r_peaks = r_peaks
         self.length = length / sample_rate  # in seconds
         self.patient_id = patient_id
+
+    def get_hr_std(self, start, end, lower_threshold=30, upper_threshold=200):
+        """Calculates heartrate in given interval by calculating the mean length of the detected intervals.
+        It calculates the mean of all leads
+        """
+        curr_hr = []
+        for r_peaks_single in self.r_peaks.transpose():
+            indices = np.argwhere(np.logical_and(start <= r_peaks_single, r_peaks_single < end))
+            if len(indices) > 1:
+                hr_guess = (len(indices) - 1) / (
+                        r_peaks_single[indices[-1]] - r_peaks_single[indices[0]]) * self.sample_rate * 60
+                lower_threshold_count = lower_threshold * (end - start) / (self.sample_rate * 60)
+                upper_threshold_count = upper_threshold * (end - start) / (self.sample_rate * 60)
+                if lower_threshold < hr_guess < upper_threshold and lower_threshold_count < len(
+                        indices) < upper_threshold_count:
+                    curr_hr.append(hr_guess)
+        if curr_hr:
+            hr = np.mean(curr_hr)
+        else:
+            hr = 0
+        return hr
+
+    def get_hr_std(self, start, end, lower_threshold=30, upper_threshold=200):
+        """Calculates heartrate in given interval by calculating the mean length of the detected intervals.
+        It chooses lead with lowest std.
+        """
+        curr_hr = []
+        curr_std = []
+        for r_peaks_single in self.r_peaks.transpose():
+            indices = np.argwhere(np.logical_and(start <= r_peaks_single, r_peaks_single < end))
+            interval_lengths = [r_peaks_single[indices[i]] - r_peaks_single[indices[i - 1]] for i in
+                                range(1, len(indices))]
+            if interval_lengths:
+                hr_guess = np.mean(interval_lengths) / self.sample_rate * 60
+                std = np.std(interval_lengths)
+                lower_threshold_count = lower_threshold * (end - start) / (self.sample_rate * 60)
+                upper_threshold_count = upper_threshold * (end - start) / (self.sample_rate * 60)
+                if lower_threshold < hr_guess < upper_threshold and lower_threshold_count < len(
+                        indices) < upper_threshold_count:
+                    curr_hr.append(hr_guess)
+                    curr_std.append(std)
+        if curr_hr:
+            i = np.argmin(curr_std)
+            hr = curr_hr[i]
+        else:
+            hr = 0
+        return hr
 
 
 class DataSeries:
