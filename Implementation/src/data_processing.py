@@ -27,6 +27,8 @@ def get_brueser_hr(unique_peaks, medians, segment_length, sample_rate):
 
 
 def get_brueser_segment_hr(start, end, unique_peaks, medians, sample_rate):
+    """Calculates Heartrate in given interval by calculating the mean of the detected intervals
+    """
     indices = np.where(np.logical_and(start <= unique_peaks, unique_peaks < end))
     hr = 60 / (np.mean(medians.to_numpy()[indices]) / sample_rate)
     return hr
@@ -84,13 +86,52 @@ def get_ecg_hr(r_peaks, segment_length, sample_rate, lower_threshold=30, upper_t
     return hr
 
 
+def get_std_ecg_hr(r_peaks, segment_length, sample_rate, lower_threshold=30, upper_threshold=200):
+    last_peak = np.nanmax(r_peaks[-1, :])
+    segment_count = int(last_peak // segment_length)
+    hr = np.zeros(segment_count)
+    for i, _ in enumerate(hr):
+        start = i * segment_length
+        end = (i + 1) * segment_length
+        hr[i] = get_std_ecg_segment_hr(start, end, r_peaks, sample_rate, lower_threshold, upper_threshold)
+    return hr
+
+
+def get_std_ecg_segment_hr(start, end, r_peaks, sample_rate, lower_threshold=30, upper_threshold=200):
+    curr_hr = []
+    curr_std = []
+    for r_peaks_single in r_peaks.transpose():
+        indices = np.argwhere(np.logical_and(start <= r_peaks_single, r_peaks_single < end))
+        interval_lengths = [r_peaks_single[indices[i]] - r_peaks_single[indices[i - 1]] for i in range(1, len(indices))]
+        if interval_lengths:
+            hr_guess = np.mean(interval_lengths) / sample_rate * 60
+            std = np.std(interval_lengths)
+            lower_threshold_count = lower_threshold * (end - start) / (sample_rate * 60)
+            upper_threshold_count = upper_threshold * (end - start) / (sample_rate * 60)
+            if lower_threshold < hr_guess < upper_threshold and lower_threshold_count < len(
+                    indices) < upper_threshold_count:
+                curr_hr.append(hr_guess)
+                curr_std.append(std)
+    if curr_hr:
+        i = np.argmin(curr_std)
+        hr = curr_hr[i]
+    else:
+        hr = 0
+    return hr
+
+
 def get_ecg_segment_hr(start, end, r_peaks, sample_rate, lower_threshold=30, upper_threshold=200):
     curr_hr = []
     for r_peaks_single in r_peaks.transpose():
         indices = np.argwhere(np.logical_and(start <= r_peaks_single, r_peaks_single < end))
-        hr_guess = len(indices) / (end - start) * sample_rate * 60
-        if lower_threshold < hr_guess < upper_threshold:
-            curr_hr.append(hr_guess)
+        if len(indices) > 1:
+            hr_guess = (len(indices) - 1) / (
+                    r_peaks_single[indices[-1]] - r_peaks_single[indices[0]]) * sample_rate * 60
+            lower_threshold_count = lower_threshold * (end - start) / (sample_rate * 60)
+            upper_threshold_count = upper_threshold * (end - start) / (sample_rate * 60)
+            if lower_threshold < hr_guess < upper_threshold and lower_threshold_count < len(
+                    indices) < upper_threshold_count:
+                curr_hr.append(hr_guess)
     if curr_hr:
         hr = np.mean(curr_hr)
     else:
@@ -144,7 +185,8 @@ def serialize_ecg_hrs():
     for path in paths:
         path = os.path.join(utils.get_ecg_data_path(), path)
         ecg_csv(path=path)
-    paths = [path for path in os.listdir(utils.get_rpeaks_path()) if path.lower().endswith(".csv")]
+    paths = [path for path in os.listdir(utils.get_rpeaks_path()) if
+             path.lower().endswith(".csv") and path.lower().startswith("rpeaks")]
     ecg_hrs = {}
     for path in paths:
         path = os.path.join(utils.get_rpeaks_path(), path)
@@ -164,3 +206,21 @@ def serialize_bcg_hrs():
         bcg_hrs[path] = get_brueser_hr(data['unique_peaks'], data['medians'], 10 * 100, 100)
     bcg_data = pd.DataFrame(dict([(k, pd.Series(v)) for k, v in bcg_hrs.items()]))
     bcg_data.to_csv(os.path.join(utils.get_bcg_path(), 'bcg_hrs.csv'))
+
+
+def compare_ecg_hr_methods():
+    paths = [path for path in os.listdir(utils.get_rpeaks_path()) if
+             path.lower().endswith(".csv") and path.lower().startswith("rpeaks")]
+    for path in paths:
+        hrs = {}
+        path = os.path.join(utils.get_rpeaks_path(), path)
+        data = pd.read_csv(path)
+        path_comparison = path.replace("rpeaks", "comparison")
+        hrs["mean"] = get_ecg_hr(data.to_numpy(), 10 * 1000, 1000)
+        hrs["std"] = get_std_ecg_hr(data.to_numpy(), 10 * 1000, 1000)
+        hr_data = pd.DataFrame(dict([(k, pd.Series(v)) for k, v in hrs.items()]))
+        hr_data.to_csv(path_comparison)
+
+
+if __name__ == "__main__":
+    pass
