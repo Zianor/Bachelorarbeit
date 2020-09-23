@@ -1,9 +1,23 @@
 \chapter{Einleitung}\label{einleitung}
 
 \section{Motivation}
+
+Der derzeitige demographische Wandel stellt das Gesundheitssystem vor eine große Herausforderung: Immer mehr Patient*innen müssen im Alter überwacht und versorgt werden. Eine kontinuierliche autonome Überwachung von Vitalparametern im Krankenhaus oder auch Zuhause erlaubt es, Erkrankungen frühzeitig zu erkennen oder zu beobachten, ohne dass große Personalkapazitäten von Nöten sind.
+
+Für diesen Anwendungszweck eignen sich vor allem Messmethoden, die die Patient*innen im Alltag nicht einschränken und wenig invasiv sind. Im Englischen wird dies mit dem Begriff \textit{unobtrusive} bezeichnet. Da es keine zufriedenstellende deutsche Entsprechung gibt, wird dieser im Folgenden nicht übersetzt verwendet werden. Solche \textit{unobtrusive} Messmethoden beinhalten meist keine Notwendigkeit für direkten Körper- oder Hautkontakt, liefern aber Information über Atmung und Herzschlag. Die Herausforderung bei so ermitteltem Signal besteht in der Signalverarbeitung, da Messungenauigkeiten und Alltagsbewegungen zu Störungen im Signal führen. Nicht informatives, also nicht für die Verarbeitung geeignetes Signal muss aber zwingend identifiziert werden, da die Ergebnisse stark verfälscht werden.
+
+Eine solche \textit{unobtrusive} Messmethode ist die \acf{BKG}. Sensoren lassen sich beispielsweise in Betten und Stühlen implementieren. Aufgezeichnet werden Aktivitäten des Herzens und der Atmung. Die Signalmorphologie variiert jedoch sowohl zwischen den Patient*innen als auch innerhalb einer Person sehr stark, wodurch die automatische Beurteilung der Signalqualität erschwert wird. Um eine aussagekräftige Signalverarbeitung zu ermöglichen, ist dies jedoch essentiell. Besonders bei in Betten aufgenommenem Signal ist die Variation des Signals in Kombination mit Artefakten durch Körperbewegungen oder ähnliches problematisch.  
  
 
 \section{Ziel der Arbeit}
+
+Das Ziel dieser Arbeit ist es, Möglichkeiten der Beurteilung der Signalqualität von \ac{BKG}-Signalen mittels maschinellen Lernens zu untersuchen. Im besonderen Fokus liegen dabei Langzeitaufnahmen von bettlägerigen Patient*innen, da diese sich in der Vergangenheit als besonders anfällig für geringe Signalqualität gezeigt haben.
+
+Dafür werden zunächst existierende Verfahren der Artefakterkennung für die vorliegenden Daten getestet und bewertet. Anschließend wird auf Basis von Domainenexpertise Merkmalskonstruktion betrieben und verschiedene Verfahren und Eingabeparameter verglichen. Auch wird der Einfluss der Vorverarbeitung des Signals untersucht. % TODO: was genau soll das Ergebnis sein?
+
+Langfristig soll ermöglicht werden, \acf{BKG} im medizinschen Alltag anzuwenden. % TODO: sinnvoller schreiben
+
+
 
 
 \section{Gliederung}
