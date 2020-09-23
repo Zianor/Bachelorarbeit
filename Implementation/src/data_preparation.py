@@ -93,13 +93,9 @@ class DataSeries:
 
     def __init__(self, ecg_series: ECGSeries):
         self.ecg = ecg_series
-        self.bcg_series = {}
+        self.bcg = None
         self.patient_id = ecg_series.patient_id
         self.drift = None
-
-    def add_bcg(self, bcg: BCGSeries):
-        if bcg not in self.bcg_series:
-            self.bcg_series[bcg.bcg_id] = bcg
 
     def reference_exists(self, bcg_start, bcg_end) -> bool:
         """Checks if more than reference_threshold % of the values are not nan
@@ -132,20 +128,26 @@ class DataSeries:
         """
         return self.drift.last_valid_index() * self.ecg.sample_rate
 
+    def get_ecg_hr(self, bcg_start, bcg_end):
+        ecg_start, ecg_end = self.get_ecg_area(bcg_start=bcg_start, bcg_end=bcg_end)
+        return self.ecg.get_hr(ecg_start, ecg_end)
+
+    def get_ecg_hr(self, bcg_start, bcg_end):
+        ecg_start, ecg_end = self.get_ecg_area(bcg_start=bcg_start, bcg_end=bcg_end)
+        return self.ecg.get_hr_std(ecg_start, ecg_end)
+
+    def get_bcg_hr(self, bcg_start, bcg_end):
+        return self.bcg.get_hr(bcg_start, bcg_end)
+
 
 class Data:
     sample_rate = 100
 
     def __init__(self):
         self.mapping = Data.load_mapping()
-        bcg_series = self.load_bcg_data()
         self.data_series = {}
         self.create_data_series()
-        for series in bcg_series:  # TODO: do it while loading?
-            if series.bcg_id == '14':  # no drift compensation, skip
-                continue
-            curr_id = series.ecg_id
-            self.data_series[str(curr_id)].add_bcg(series)
+        self.load_bcg_data()
         self.load_drift_compensation()
 
     def load_drift_compensation(self):
@@ -189,14 +191,12 @@ class Data:
         paths = [path for path in os.listdir(utils.get_bcg_data_path()) if
                  path.lower().endswith(".mat")]
         paths = [os.path.join(utils.get_bcg_data_path(), path) for path in paths]
-        bcg_series = []
         for path in paths:
             mat_dict = loadmat(path)
             bcg_id = path.lower().split("_")[-1].replace(".mat", "")
             if bcg_id == '14':  # skip file without drift vector
                 continue
-            bcg_series.append(
-                BCGSeries(
+            bcg = BCGSeries(
                     ecg_id=self.mapping[bcg_id],
                     raw_data=mat_dict['BCG_raw_data'][0],
                     sqi=mat_dict['q_BCG'][:, 0],
@@ -206,8 +206,8 @@ class Data:
                     sample_rate=self.sample_rate,
                     patient_id=bcg_id
                 )
-            )
-        return bcg_series
+            ecg_id = bcg.ecg_id
+            self.data_series[str(ecg_id)].bcg = bcg
 
     def get_total_time(self):
         """
