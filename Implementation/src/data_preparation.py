@@ -20,15 +20,22 @@ class BCGSeries:
         self.sample_rate = sample_rate
         self.length = len(raw_data) / sample_rate  # in seconds
         self.brueser_df = get_brueser(self.sample_rate, self.bcg_id)
-        self.medians = self.brueser_df['medians']
-        self.unique_peaks = self.brueser_df['unique_peaks']
+        self.medians = self.brueser_df['medians'].to_numpy()
+        self.unique_peaks = self.brueser_df['unique_peaks'].to_numpy()
+        self.brueser_sqi = self.brueser_df['qualities'].to_numpy()
 
     def get_hr(self, start, end):
         """Calculates heartrate in given interval by calculating the mean length of the detected intervals
         """
         indices = np.where(np.logical_and(start <= self.unique_peaks, self.unique_peaks < end))
-        hr = 60 / (np.mean(self.medians.to_numpy()[indices]) / self.sample_rate)
+        hr = 60 / (np.mean(self.medians[indices]) / self.sample_rate)
         return hr
+
+    def get_sqi(self, start, end):
+        """Returns mean brueser sqi in given interval"""
+        indices = np.where(np.logical_and(start <= self.unique_peaks, self.unique_peaks < end))
+        sqi = np.mean(self.brueser_sqi[indices])
+        return sqi
 
 
 class ECGSeries:
@@ -39,7 +46,7 @@ class ECGSeries:
         self.length = length / sample_rate  # in seconds
         self.patient_id = patient_id
 
-    def get_hr_std(self, start, end, lower_threshold=30, upper_threshold=200):
+    def get_hr(self, start, end, lower_threshold=30, upper_threshold=200):
         """Calculates heartrate in given interval by calculating the mean length of the detected intervals.
         It calculates the mean of all leads
         """
@@ -132,12 +139,15 @@ class DataSeries:
         ecg_start, ecg_end = self.get_ecg_area(bcg_start=bcg_start, bcg_end=bcg_end)
         return self.ecg.get_hr(ecg_start, ecg_end)
 
-    def get_ecg_hr(self, bcg_start, bcg_end):
+    def get_ecg_hr_std(self, bcg_start, bcg_end):
         ecg_start, ecg_end = self.get_ecg_area(bcg_start=bcg_start, bcg_end=bcg_end)
         return self.ecg.get_hr_std(ecg_start, ecg_end)
 
     def get_bcg_hr(self, bcg_start, bcg_end):
         return self.bcg.get_hr(bcg_start, bcg_end)
+
+    def get_brueser_sqi(self, bcg_start, bcg_end):
+        return self.bcg.get_sqi(bcg_start, bcg_end)
 
 
 class Data:
