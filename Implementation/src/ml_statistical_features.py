@@ -16,7 +16,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 
-from src.data_statistical_features import DataSet
+from src.data_statistical_features import DataSet, Segment, DataSetStatistical
 import src.utils as utils
 
 
@@ -26,12 +26,10 @@ def load_data(segment_length=10, overlap_amount=0.9, hr_threshold=10):
     :return: BCG data features, target labels
     """
     df = load_data_as_dataframe(segment_length=segment_length, overlap_amount=overlap_amount, hr_threshold=hr_threshold)
-    features = df.iloc[:, 0:13]
-    target = df['informative_hr']  # TODO: add second label
-    mean_error = df['mean error']
-    coverage = df['coverage']
-    patient_id = df['patient_id']  # TODO: do sth with it
-    return features, target, mean_error, coverage, patient_id
+    features = df.drop(Segment.get_feature_name_array(), axis='columns')
+    target = df['informative']
+    patient_id = df['patient_id']
+    return features, target, patient_id
 
 
 def load_data_as_dataframe(segment_length=10, overlap_amount=0.9, hr_threshold=10):
@@ -39,11 +37,18 @@ def load_data_as_dataframe(segment_length=10, overlap_amount=0.9, hr_threshold=1
     Loads BCG data as Dataframe
     :return: Dataframe
     """
-    path = utils.get_statistical_features_csv_path(segment_length, overlap_amount, hr_threshold)
-    if not os.path.isfile(path):
-        warnings.warn('No csv, data needs to be reproduced. This may take some time')
-        DataSet(segment_length=segment_length, overlap_amount=overlap_amount, hr_threshold=hr_threshold)
-    return pd.read_csv(path, index_col=False)
+    path_hr = utils.get_statistical_features_csv_path(segment_length, overlap_amount, hr_threshold)
+    if not os.path.isfile(path_hr):
+        path = utils.get_statistical_features_csv_path(segment_length, overlap_amount)  # other threshold?
+        if os.path.isfile(path):
+            data = pd.read_csv(path, index_col=False)
+            warnings.warn('Labels are recalculated')
+            data['informative'] = data['rel_err'] < hr_threshold
+            data.to_csv(path_hr, index=False)
+        else:
+            warnings.warn('No csv, data needs to be reproduced. This may take some time')
+            DataSetStatistical(segment_length=segment_length, overlap_amount=overlap_amount, hr_threshold=hr_threshold)
+    return pd.read_csv(path_hr, index_col=False)
 
 
 def evaluate_model(y_actual, y_pred):
@@ -368,8 +373,8 @@ def get_all_scores(reconstruct: bool, paths):
 
 if __name__ == "__main__":
     os.environ['JOBLIB_START_METHOD'] = "forkserver"
-    paths_paper = ['LDA_paper_hr15', 'DT_paper_hr15', 'RF_paper_hr15', 'MLP_paper_hr15', 'SVC_paper_hr15']
-    paths_patient_cv = ['LDA_patient_hr15', 'DT_patient_hr15', 'RF_patient_hr15', 'MLP_patient_hr15', 'SVC_patient_hr15']
-    reconstruct_models_paper(paths=paths_paper, grid_search=True, patient_cv=False, hr_threshold=15)
-    reconstruct_models_paper(paths=paths_patient_cv, grid_search=True, patient_cv=True, hr_threshold=15)
+    # paths_paper = ['LDA_paper_hr15', 'DT_paper_hr15', 'RF_paper_hr15', 'MLP_paper_hr15', 'SVC_paper_hr15']
+    # paths_patient_cv = ['LDA_patient_hr15', 'DT_patient_hr15', 'RF_patient_hr15', 'MLP_patient_hr15', 'SVC_patient_hr15']
+    # reconstruct_models_paper(paths=paths_paper, grid_search=True, patient_cv=False, hr_threshold=15)
+    # reconstruct_models_paper(paths=paths_patient_cv, grid_search=True, patient_cv=True, hr_threshold=15)
     # pass
