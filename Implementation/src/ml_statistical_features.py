@@ -372,9 +372,8 @@ def get_all_scores(reconstruct: bool, paths):
 
 
 if __name__ == "__main__":
-    os.environ['JOBLIB_START_METHOD'] = "forkserver"
     # paths_paper = ['LDA_paper_hr15', 'DT_paper_hr15', 'RF_paper_hr15', 'MLP_paper_hr15', 'SVC_paper_hr15']
     # paths_patient_cv = ['LDA_patient_hr15', 'DT_patient_hr15', 'RF_patient_hr15', 'MLP_patient_hr15', 'SVC_patient_hr15']
     # reconstruct_models_paper(paths=paths_paper, grid_search=True, patient_cv=False, hr_threshold=15)
     # reconstruct_models_paper(paths=paths_patient_cv, grid_search=True, patient_cv=True, hr_threshold=15)
-    # pass
+    pass
