@@ -113,8 +113,9 @@ class DataSeries:
         start_second = np.floor(bcg_start / self.bcg_sample_rate)
         end_second = np.floor(bcg_end / self.bcg_sample_rate)
         area = self.drift.loc[start_second:end_second]
-        if len(area.index.values) == 0 or 100 / len(
-                area.index.values) * area.count() < self.reference_threshold or self.get_ecg_hr(bcg_end, bcg_end) == 0:
+        if len(area.index.values) == 0 or 100 / len(area.index.values) * area.count() < self.reference_threshold:
+            return False
+        if self.get_ecg_hr(bcg_start, bcg_end) == 0:
             return False
         return True
 
