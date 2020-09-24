@@ -110,7 +110,8 @@ class DataSeries:
         start_second = np.floor(bcg_start / self.bcg_sample_rate)
         end_second = np.floor(bcg_end / self.bcg_sample_rate)
         area = self.drift.loc[start_second:end_second]
-        if len(area.index.values) == 0 or 100/len(area.index.values) * area.count() < self.reference_threshold:
+        if len(area.index.values) == 0 or 100 / len(
+                area.index.values) * area.count() < self.reference_threshold or self.get_ecg_hr(bcg_end, bcg_end) == 0:
             return False
         return True
 
@@ -187,11 +188,11 @@ class Data:
             path = os.path.join(utils.get_ecg_data_path(), path)
             r_peaks, ecg_id, sample_rate, length = ecg_csv(path=path, use_existing=True)
             self.data_series[ecg_id] = DataSeries(ECGSeries(
-                    patient_id=ecg_id,
-                    r_peaks=r_peaks.to_numpy(),
-                    length=length,
-                    sample_rate=sample_rate
-                )
+                patient_id=ecg_id,
+                r_peaks=r_peaks.to_numpy(),
+                length=length,
+                sample_rate=sample_rate
+            )
             )
 
     def load_bcg_data(self):
@@ -207,15 +208,15 @@ class Data:
             if bcg_id == '14':  # skip file without drift vector
                 continue
             bcg = BCGSeries(
-                    ecg_id=self.mapping[bcg_id],
-                    raw_data=mat_dict['BCG_raw_data'][0],
-                    sqi=mat_dict['q_BCG'][:, 0],
-                    bbi_bcg=mat_dict['BBI_BCG'][:, 0],
-                    bbi_ecg=mat_dict['BBI_ECG'][:, 0],
-                    indices=mat_dict['indx'][:, 0],
-                    sample_rate=self.sample_rate,
-                    patient_id=bcg_id
-                )
+                ecg_id=self.mapping[bcg_id],
+                raw_data=mat_dict['BCG_raw_data'][0],
+                sqi=mat_dict['q_BCG'][:, 0],
+                bbi_bcg=mat_dict['BBI_BCG'][:, 0],
+                bbi_ecg=mat_dict['BBI_ECG'][:, 0],
+                indices=mat_dict['indx'][:, 0],
+                sample_rate=self.sample_rate,
+                patient_id=bcg_id
+            )
             ecg_id = bcg.ecg_id
             self.data_series[str(ecg_id)].bcg = bcg
 
@@ -224,4 +225,4 @@ class Data:
         :return: total recorded time in hours
         """
         time = np.array([[bcg_series.length for bcg_series in ecg_series] for ecg_series in self.data_series]).sum()
-        return time/60/60
+        return time / 60 / 60
