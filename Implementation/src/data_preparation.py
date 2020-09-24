@@ -28,7 +28,10 @@ class BCGSeries:
         """Calculates heartrate in given interval by calculating the mean length of the detected intervals
         """
         indices = np.where(np.logical_and(start <= self.unique_peaks, self.unique_peaks < end))
-        hr = 60 / (np.mean(self.medians[indices]) / self.sample_rate)
+        if len(indices) > 0:
+            hr = 60 / (np.mean(self.medians[indices]) / self.sample_rate)
+        else:
+            hr = np.nan
         return hr
 
     def get_sqi(self, start, end):
