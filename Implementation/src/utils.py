@@ -65,6 +65,14 @@ def get_statistical_features_csv_path(segment_length, overlap_amount, hr_thresho
     return os.path.join(get_data_set_folder(segment_length, overlap_amount), filename)
 
 
+def get_brueser_features_csv_path(segment_length, overlap_amount, sqi_threshold, hr_threshold=None) -> Path:
+    if hr_threshold:
+        filename = 'data_brueser_features_sqi' + str(sqi_threshold) + '_hr' + str(hr_threshold) + '.csv'
+    else:
+        filename = 'data_brueser_features_sqi' + str(sqi_threshold) + '.csv'
+    return os.path.join(get_data_set_folder(segment_length, overlap_amount), filename)
+
+
 def get_image_folder(segment_length, overlap_amount, hr_threshold):
     filename = 'images_hr' + str(hr_threshold) + '.csv'
     return os.path.join(get_data_set_folder(segment_length, overlap_amount), filename)
