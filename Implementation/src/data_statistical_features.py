@@ -3,147 +3,203 @@ import os
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 from scipy.signal import find_peaks, hilbert, butter, lfilter
 from scipy.stats import median_absolute_deviation, kurtosis, skew
 
 import src.utils as utils
-from src.data_preparation import Data, BCGSeries, DataSeries
-from src.data_processing import get_ecg_segment_hr, get_brueser_segment_hr
+from src.data_preparation import Data
 
 
 class DataSet:
-    """
-    A data set contains BCG Data in the form of 10 seconds segments. Furthermore a DataSet writes a .csv file with the
-    statistical feature representation of all segments.
+    """A data set contains BCG Data in the form of segments of a certain length and overlap. Furthermore a DataSet
+    writes a .csv file with the feature representation of all segments.
     """
 
-    def __init__(self, segment_length=10, overlap_amount=0.9, coverage_threshold=90, mean_error_threshold=0.015, hr_threshold=10):
-        self.path_csv = utils.get_statistical_features_csv_path(segment_length, overlap_amount, hr_threshold)
-        self.path_images = os.path.join(utils.get_data_path(), 'images')
-        self.coverage_threshold = coverage_threshold
-        self.mean_error_threshold = mean_error_threshold
+    def __init__(self, segment_length=10, overlap_amount=0.9, hr_threshold=10):
         self.hr_threshold = hr_threshold
-        data = Data()
-        self.segment_length = DataSet._seconds_to_frames(segment_length, data.sample_rate)  # in samples
-        self.segment_distance = DataSet._seconds_to_frames(segment_length - segment_length * overlap_amount,
-                                                           data.sample_rate)
-        self._create_segments(data)
+        self.segment_length = segment_length
+        self.overlap_amount = overlap_amount
+        self.segments = []
+        self._create_segments()
         self.save_csv()
 
-    def _create_segments(self, data):
+    def _create_segments(self):
         """
         Creates segments with a given length out of given BCG Data
         """
-        self.segments = []
-        for data_series in data.data_series.values():
-            for bcg_data in data_series.bcg_series.values():
-                # TODO: wie passiert der Übergang/sync bei der gesplitteten Aufnahme? friemel ich die händisch aneinander?
-                for i in range(0, len(bcg_data.raw_data), self.segment_distance):
-                    if i + self.segment_length < len(
-                            bcg_data.raw_data):  # prevent shorter segments, last shorter one ignored
-                        if not data_series.reference_exists(i, i + self.segment_length):  # ignore if no reference ecg
-                            continue
-                        segment_data = np.array(bcg_data.raw_data[i:i + self.segment_length])
-                        informative_ce, coverage, mean_error = self.is_informative_ce(bcg_data,
-                                                                                      i,
-                                                                                      i + self.segment_length)  # label
-                        informative_hr, ecg_hr, bcg_hr = self.is_informative_hr(data_series, bcg_data, i, i + self.segment_length)
-                        if ecg_hr == 0:
-                            continue
-                        self.segments.append(Segment(data_series.patient_id, segment_data, bcg_data.sample_rate,
-                                                     informative_ce, informative_hr, ecg_hr, bcg_hr, coverage, mean_error))
+        data = Data()
+        segment_length_frames = utils.seconds_to_frames(self.segment_length, data.sample_rate)  # in samples
+        segment_distance = utils.seconds_to_frames(self.segment_length - self.segment_length * self.overlap_amount,
+                                                        data.sample_rate)
+        for series in data.data_series.values():
+            for i in range(0, len(series.bcg.raw_data), segment_distance):
+                if i + self.segment_length < len(
+                        series.bcg.raw_data):  # prevent shorter segments, last shorter one ignored
+                    if not series.reference_exists(i, i + segment_length_frames):  # ignore if no reference ecg
+                        continue
+                    segment_data = np.array(series.bcg.raw_data[i:i + segment_length_frames])
+                    ecg_hr = series.get_ecg_hr(i, i + segment_length_frames)
+                    ecg_hr_std = series.get_ecg_hr_std(i, i + segment_length_frames)
+                    brueser_sqi = series.get_brueser_sqi(i, i + segment_length_frames)
+                    if ecg_hr == 0:
+                        continue
+                    bcg_hr = series.get_bcg_hr(i, i + segment_length_frames)
+                    informative = self.is_informative(ecg_hr, bcg_hr)
+                    self.segments.append(self._get_segment(series.patient_id, segment_data, series.bcg.sample_rate,
+                                                           ecg_hr, ecg_hr_std, bcg_hr,
+                                                           brueser_sqi, informative))
 
-    def is_informative_hr(self, series: DataSeries, bcg_series: BCGSeries, bcg_start, bcg_end):
-        ecg_start, ecg_end = series.get_ecg_area(bcg_start, bcg_end)
-        ecg_hr = get_ecg_segment_hr(ecg_start, ecg_end, series.ecg.r_peaks, series.ecg.sample_rate)
-        bcg_hr = get_brueser_segment_hr(bcg_start, bcg_end, bcg_series.unique_peaks, bcg_series.medians,
-                                        bcg_series.sample_rate)
-        abs_diff = np.abs(ecg_hr-bcg_hr)
-        if ecg_hr == 0 or 100/ecg_hr * abs_diff > self.hr_threshold or np.isnan(bcg_hr):
-            return False, ecg_hr, bcg_hr
-        return True, ecg_hr, bcg_hr
+    @staticmethod
+    def _get_segment(patient_id, segment_data, sample_rate, ecg_hr, ecg_hr_std, bcg_hr, brueser_sqi, informative):
+        return Segment(
+            raw_data=segment_data,
+            patient_id=patient_id,
+            ecg_hr=ecg_hr,
+            ecg_hr_std=ecg_hr_std,
+            bcg_hr=bcg_hr,
+            brueser_sqi=brueser_sqi,
+            informative=informative
+        )
 
-    def is_informative_ce(self, series: BCGSeries, start, end):
-        """
-        Decides based on the coverage of detected intervals and the absolute mean error of these intervals to the ecg
-        reference if the segment is informative
-        :param series: the series the segment is part of
-        :type series: DataSeries
-        :param start: start index of the segment
-        :type start: int
-        :param end: end index of the segment
-        :type end: int
-        :return: if segment is informative, coverage, mean_error
-        :rtype: boolean, float, float
-        """
-        indices = np.where(np.logical_and(start < series.indices, series.indices < end))[0]
-        coverage = 100 / self.segment_length * sum(
-            DataSet._seconds_to_frames(bbi, series.sample_rate) for bbi in series.bbi_bcg[indices])
-        if len(indices) > 0:
-            mean_error = sum(abs(series.bbi_bcg[i] - series.bbi_ecg[i]) for i in indices) / len(indices)
-        else:
-            mean_error = float("inf")
-        if coverage < self.coverage_threshold or mean_error > self.mean_error_threshold:
-            return False, coverage, mean_error
-        return True, coverage, mean_error
+    def is_informative(self, ecg_hr, bcg_hr):
+        abs_err = np.abs(ecg_hr - bcg_hr)
+        rel_err = 100 / ecg_hr * abs_err
+        if np.isnan(bcg_hr) or rel_err > self.hr_threshold:
+            return False
+        return True
 
     def save_csv(self):
         """
         Saves all segments as csv
         """
-        with open(self.path_csv, 'w') as f:
+        if not os.path.isdir(utils.get_data_set_folder(self.segment_length, self.overlap_amount)):
+            os.mkdir(utils.get_data_set_folder(self.segment_length, self.overlap_amount))
+        path = utils.get_features_csv_path(self.segment_length, self.overlap_amount, self.hr_threshold)
+        with open(path, 'w') as f:
             writer = csv.writer(f)
             writer.writerow(Segment.get_feature_name_array())
             for segment in self.segments:
                 writer.writerow(segment.get_feature_array())
+            f.flush()
+        data = pd.read_csv(path, index_col=False)
+        data = data.drop(labels='informative', axis='columns')
+        data.to_csv(utils.get_features_csv_path(self.segment_length, self.overlap_amount), index=False)
 
-    def save_images(self, count=1000):
+    def save_images(self, count=50):
         """
         Saves segments as images
         :param count: number of images saved
         """
-        if not os.path.exists(self.path_images):
-            os.makedirs(self.path_images)
+        path_images = utils.get_image_folder(self.segment_length_seconds, self.overlap_amount, self.hr_threshold)
+        if not os.path.exists(path_images):
+            os.makedirs(path_images)
         count_informative = 0
         count_non_informative = 0
         for segment in self.segments:
-            if count_non_informative + count_informative > count:
+            if count_non_informative > count and count_informative > count:
                 break
-            if segment.informative_ce:
+            if segment.informative and count_informative < count:
                 count_informative += 1
                 plt.plot(segment.bcg)
-                plt.title("Coverage " + str(segment.coverage) + ", Mean Error " + str(segment.mean_error))
+                plt.title("Abs Error " + str(segment.abs_err) + ", Rel Error " + str(segment.rel_err))
                 plt.savefig(os.path.join(self.path_images, 'informative' + str(count_informative)))
                 plt.clf()
             else:
-                count_non_informative += 1
-                plt.plot(segment.bcg)
-                plt.title("Coverage " + str(segment.coverage) + ", Mean Error " + str(segment.mean_error))
-                plt.savefig(os.path.join(self.path_images, 'non-informative' + str(count_non_informative)))
-                plt.clf()
+                if count_non_informative < count:
+                    count_non_informative += 1
+                    plt.plot(segment.bcg)
+                    plt.title("Abs Error " + str(segment.abs_err) + ", Rel Error " + str(segment.rel_err))
+                    plt.savefig(os.path.join(path_images, 'non-informative' + str(count_non_informative)))
+                    plt.clf()
+
+
+class DataSetStatistical(DataSet):
+
+    def __init__(self, segment_length=10, overlap_amount=0.9, hr_threshold=10):
+        super(DataSetStatistical, self).__init__(segment_length, overlap_amount, hr_threshold)
 
     @staticmethod
-    def _seconds_to_frames(duration_seconds, frequency):
+    def _get_segment(patient_id, segment_data, sample_rate, ecg_hr, ecg_hr_std, bcg_hr, brueser_sqi, informative):
+        return SegmentStatistical(
+            raw_data=segment_data,
+            patient_id=patient_id,
+            ecg_hr=ecg_hr,
+            ecg_hr_std=ecg_hr_std,
+            bcg_hr=bcg_hr,
+            brueser_sqi=brueser_sqi,
+            sample_rate=sample_rate,
+            informative=informative
+        )
+
+    def save_csv(self):
+        """Saves all segments as csv
         """
-        Converts a given duration in seconds to the number of frames in a given frequency
-        :param duration_seconds: given duration in seconds
-        :type duration_seconds: float
-        :param frequency: frequency in Hz
-        :type frequency: int
-        :return: duration in number of frames
-        :rtype: int
-        """
-        duration_frames = duration_seconds * frequency
-        return int(duration_frames)
+        if not os.path.isdir(utils.get_data_set_folder(self.segment_length, self.overlap_amount)):
+            os.mkdir(utils.get_data_set_folder(self.segment_length, self.overlap_amount))
+        path = utils.get_statistical_features_csv_path(self.segment_length, self.overlap_amount, self.hr_threshold)
+        with open(path, 'w') as f:
+            writer = csv.writer(f)
+            writer.writerow(SegmentStatistical.get_feature_name_array())
+            for segment in self.segments:
+                writer.writerow(segment.get_feature_array())
+            f.flush()
+        data = pd.read_csv(path, index_col=False)
+        data = data.drop(labels='informative', axis='columns')
+        data.to_csv(utils.get_statistical_features_csv_path(self.segment_length, self.overlap_amount), index=False)
 
 
 class Segment:
+    """A segment of bcg data without any features yet
+    """
+
+    def __init__(self, raw_data, patient_id, ecg_hr, ecg_hr_std, bcg_hr, brueser_sqi, informative):
+        self.bcg = raw_data
+        self.brueser_sqi = brueser_sqi
+        self.patient_id = patient_id
+        self.informative = informative
+        self.ecg_hr = ecg_hr
+        self.bcg_hr = bcg_hr
+        self.ecg_hr_std = ecg_hr_std
+        self.abs_err = np.abs(ecg_hr - bcg_hr)
+        self.rel_err = 100 / ecg_hr * self.abs_err
+
+    @staticmethod
+    def get_feature_name_array():
+        return np.array([
+            'brueser_sqi',
+            'patient_id',
+            'informative',
+            'ecg_hr',
+            'bcg_hr',
+            'ecg_hr_std',
+            'abs_err',
+            'rel_err'
+        ])
+
+    def get_feature_array(self):
+        """
+        :return: array representation of the segment
+        """
+        return np.array([
+            self.brueser_sqi,
+            self.patient_id,
+            self.informative,
+            self.ecg_hr,
+            self.bcg_hr,
+            self.ecg_hr_std,
+            self.abs_err,
+            self.rel_err,
+        ])
+
+
+class SegmentStatistical(Segment):
     """
     A segment of bcg data with its statistical features based on the paper 'Sensor data quality processing for
     vital signs with opportunistic ambient sensing' (https://ieeexplore.ieee.org/document/7591234)
     """
 
-    def __init__(self, patient_id, raw_data, sample_rate, informative_ce, informative_hr, ecg_hr, bcg_hr, coverage, mean_error):
+    def __init__(self, raw_data, patient_id, ecg_hr, ecg_hr_std, bcg_hr, brueser_sqi, sample_rate, informative):
         """
         Creates a segment and computes several statistical features
         :param raw_data: raw BCG data
@@ -151,10 +207,8 @@ class Segment:
         :param coverage:
         :param mean_error: mean BBI error to reference
         """
-        self.bcg = Segment._butter_bandpass_filter(raw_data, 1, 12, sample_rate)
-        self.patient_id = patient_id
-        self.coverage = coverage
-        self.mean_error = mean_error
+        super().__init__(raw_data, patient_id, ecg_hr, ecg_hr_std, bcg_hr, brueser_sqi, informative)
+        self.bcg = SegmentStatistical._butter_bandpass_filter(raw_data, 1, 12, sample_rate)
         self.minimum = np.min(self.bcg)
         self.maximum = np.max(self.bcg)
         self.mean = np.mean(self.bcg)
@@ -175,11 +229,7 @@ class Segment:
             self.variance_local_minima = 0
         else:
             self.variance_local_minima = np.var(self.bcg[minima])
-        self.mean_signal_envelope = Segment._calc_mean_signal_envelope(self.bcg)
-        self.informative_ce = informative_ce
-        self.informative_hr = informative_hr
-        self.ecg_hr = ecg_hr
-        self.bcg_hr = bcg_hr
+        self.mean_signal_envelope = SegmentStatistical._calc_mean_signal_envelope(self.bcg)
 
     @staticmethod
     def _calc_mean_signal_envelope(signal):
@@ -199,7 +249,7 @@ class Segment:
         :param highcut: highcut frequency in Hz
         :param fs: sample rate in Hz
         """
-        b, a = Segment._butter_bandpass(lowcut, highcut, fs, order=order)
+        b, a = SegmentStatistical._butter_bandpass(lowcut, highcut, fs, order=order)
         y = lfilter(b, a, data)
         return y
 
@@ -216,48 +266,46 @@ class Segment:
 
     @staticmethod
     def get_feature_name_array():
-        return np.array(['minimum',
-                         'maximum',
-                         'mean',
-                         'standard deviation',
-                         'range',
-                         'iqr',
-                         'mad',
-                         'number zero crossings',
-                         'kurtosis',
-                         'skewness',
-                         'variance local maxima',
-                         'variance local minima',
-                         'mean signal envelope',
-                         'informative_ce',
-                         'informative_hr',
-                         'ecg_hr',
-                         'bcg_hr',
-                         'mean error',
-                         'coverage',
-                         'patient_id'])
+        segment_array = Segment.get_feature_name_array()
+        own_array = np.array([
+            'minimum',
+            'maximum',
+            'mean',
+            'std',
+            'range',
+            'iqr',
+            'mad',
+            'number_zero_crossings',
+            'kurtosis',
+            'skewness',
+            'variance_local_maxima',
+            'variance_local_minima',
+            'mean_signal_envelope',
+        ])
+        return np.concatenate((segment_array, own_array), axis=0)
 
     def get_feature_array(self):
         """
         :return: array representation of the segment
         """
-        return np.array([self.minimum,
-                         self.maximum,
-                         self.mean,
-                         self.standard_deviation,
-                         self.range,
-                         self.iqr,
-                         self.mad,
-                         self.number_zero_crossings,
-                         self.kurtosis,
-                         self.skewness,
-                         self.variance_local_maxima,
-                         self.variance_local_minima,
-                         self.mean_signal_envelope,
-                         self.informative_ce,
-                         self.informative_hr,
-                         self.ecg_hr,
-                         self.bcg_hr,
-                         self.mean_error,
-                         self.coverage,
-                         self.patient_id])
+        segment_array = super().get_feature_array()
+        own_array = np.array([
+            self.minimum,
+            self.maximum,
+            self.mean,
+            self.standard_deviation,
+            self.range,
+            self.iqr,
+            self.mad,
+            self.number_zero_crossings,
+            self.kurtosis,
+            self.skewness,
+            self.variance_local_maxima,
+            self.variance_local_minima,
+            self.mean_signal_envelope,
+        ])
+        return np.concatenate((segment_array, own_array), axis=0)
+
+
+if __name__ == "__main__":
+    pass

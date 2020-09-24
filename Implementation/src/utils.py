@@ -44,8 +44,42 @@ def get_data_path() -> Path:
     return os.path.join(get_project_root(), 'data')
 
 
-def get_statistical_features_csv_path(segment_length, overlap_amount, hr_threshold) -> Path:
-    filename = 'data_statistical_features_l' + str(segment_length) + '_o' + str(overlap_amount) + '_hr' + \
-                   str(hr_threshold) + '.csv'
-    return os.path.join(get_data_path(), filename)
+def get_data_set_folder(segment_length, overlap_amount) -> Path:
+    folder_name = 'data_set_l' + str(segment_length) + '_o' + str(overlap_amount)
+    return os.path.join(get_data_path(), folder_name)
+
+
+def get_features_csv_path(segment_length, overlap_amount, hr_threshold=None):
+    if hr_threshold:
+        filename = 'data_' + str(hr_threshold) + '.csv'
+    else:
+        filename = 'data.csv'
+    return os.path.join(get_data_set_folder(segment_length, overlap_amount), filename)
+
+
+def get_statistical_features_csv_path(segment_length, overlap_amount, hr_threshold=None) -> Path:
+    if hr_threshold:
+        filename = 'data_statistical_features_hr' + str(hr_threshold) + '.csv'
+    else:
+        filename = 'data_statistical_features.csv'
+    return os.path.join(get_data_set_folder(segment_length, overlap_amount), filename)
+
+
+def get_image_folder(segment_length, overlap_amount, hr_threshold):
+    filename = 'images_hr' + str(hr_threshold) + '.csv'
+    return os.path.join(get_data_set_folder(segment_length, overlap_amount), filename)
+
+
+def seconds_to_frames(duration_seconds, frequency):
+    """
+    Converts a given duration in seconds to the number of frames in a given frequency
+    :param duration_seconds: given duration in seconds
+    :type duration_seconds: float
+    :param frequency: frequency in Hz
+    :type frequency: int
+    :return: duration in number of frames
+    :rtype: int
+    """
+    duration_frames = duration_seconds * frequency
+    return int(duration_frames)
 
