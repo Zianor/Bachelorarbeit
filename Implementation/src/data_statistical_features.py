@@ -342,5 +342,41 @@ class SegmentStatistical(Segment):
         return np.concatenate((segment_array, own_array), axis=0)
 
 
+class SegmentBrueserSQI(Segment):
+
+    def __init__(self, patient_id, ecg_hr, ecg_hr_std, bcg_hr, brueser_sqi, informative, threshold, medians, qualities,
+                 sample_rate, length_samples):
+        super().__init__(patient_id, ecg_hr, ecg_hr_std, bcg_hr, brueser_sqi, informative)
+        indices = np.argwhere(qualities >= threshold)
+        self.sqi_hr = np.nan
+        self.sqi_coverage = np.nan
+        if len(indices) > 0:
+            mean_interval_length = np.mean(medians[indices])
+            self.sqi_hr = 60 / (mean_interval_length / sample_rate)
+            self.sqi_coverage = 100 / length_samples * mean_interval_length * len(indices)
+            if self.sqi_coverage > 100:
+                self.sqi_coverage = 100
+
+    @staticmethod
+    def get_feature_name_array():
+        segment_array = Segment.get_feature_name_array()
+        own_array = np.array([
+            'sqi_hr',
+            'sqi_coverage'
+        ])
+        return np.concatenate((segment_array, own_array), axis=0)
+
+    def get_feature_array(self):
+        """
+        :return: array representation of the segment
+        """
+        segment_array = super().get_feature_array()
+        own_array = np.array([
+            self.sqi_hr,
+            self.sqi_coverage
+        ])
+        return np.concatenate((segment_array, own_array), axis=0)
+
+
 if __name__ == "__main__":
     pass
