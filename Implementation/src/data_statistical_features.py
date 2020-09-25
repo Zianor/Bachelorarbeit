@@ -8,7 +8,7 @@ from scipy.signal import find_peaks, hilbert, butter, lfilter
 from scipy.stats import median_absolute_deviation, kurtosis, skew
 
 import src.utils as utils
-from src.data_preparation import Data
+from src.data_preparation import Data, DataSeries
 
 
 class DataSet:
@@ -31,30 +31,26 @@ class DataSet:
         data = Data()
         segment_length_frames = utils.seconds_to_frames(self.segment_length, data.sample_rate)  # in samples
         segment_distance = utils.seconds_to_frames(self.segment_length - self.segment_length * self.overlap_amount,
-                                                        data.sample_rate)
+                                                   data.sample_rate)
         for series in data.data_series.values():
             for i in range(0, len(series.bcg.raw_data), segment_distance):
                 if i + self.segment_length < len(
                         series.bcg.raw_data):  # prevent shorter segments, last shorter one ignored
-                    if not series.reference_exists(i, i + segment_length_frames):  # ignore if no reference ecg
+                    start = i
+                    end = i + segment_length_frames
+                    if not series.reference_exists(start, end):  # ignore if no reference ecg
                         continue
-                    segment_data = np.array(series.bcg.raw_data[i:i + segment_length_frames])
-                    ecg_hr = series.get_ecg_hr(i, i + segment_length_frames)
-                    ecg_hr_std = series.get_ecg_hr_std(i, i + segment_length_frames)
-                    brueser_sqi = series.get_brueser_sqi(i, i + segment_length_frames)
-                    if ecg_hr == 0:
-                        continue
-                    bcg_hr = series.get_bcg_hr(i, i + segment_length_frames)
+                    ecg_hr = series.get_ecg_hr(start, end)
+                    ecg_hr_std = series.get_ecg_hr_std(start, end)
+                    brueser_sqi = series.get_brueser_sqi(start, end)
+                    bcg_hr = series.get_bcg_hr(start, end)
                     informative = self.is_informative(ecg_hr, bcg_hr)
-                    self.segments.append(self._get_segment(series.patient_id, segment_data, series.bcg.sample_rate,
-                                                           ecg_hr, ecg_hr_std, bcg_hr,
-                                                           brueser_sqi, informative))
+                    self.segments.append(
+                        self._get_segment(series, start, end, informative, ecg_hr, ecg_hr_std, brueser_sqi, bcg_hr))
 
-    @staticmethod
-    def _get_segment(patient_id, segment_data, sample_rate, ecg_hr, ecg_hr_std, bcg_hr, brueser_sqi, informative):
+    def _get_segment(self, series: DataSeries, start, end, informative, ecg_hr, ecg_hr_std, brueser_sqi, bcg_hr):
         return Segment(
-            raw_data=segment_data,
-            patient_id=patient_id,
+            patient_id=series.patient_id,
             ecg_hr=ecg_hr,
             ecg_hr_std=ecg_hr_std,
             bcg_hr=bcg_hr,
@@ -119,16 +115,15 @@ class DataSetStatistical(DataSet):
     def __init__(self, segment_length=10, overlap_amount=0.9, hr_threshold=10):
         super(DataSetStatistical, self).__init__(segment_length, overlap_amount, hr_threshold)
 
-    @staticmethod
-    def _get_segment(patient_id, segment_data, sample_rate, ecg_hr, ecg_hr_std, bcg_hr, brueser_sqi, informative):
+    def _get_segment(self, series: DataSeries, start, end, informative, ecg_hr, ecg_hr_std, brueser_sqi, bcg_hr):
         return SegmentStatistical(
-            raw_data=segment_data,
-            patient_id=patient_id,
+            raw_data=series.bcg.raw_data[start: end],
+            patient_id=series.patient_id,
             ecg_hr=ecg_hr,
             ecg_hr_std=ecg_hr_std,
             bcg_hr=bcg_hr,
             brueser_sqi=brueser_sqi,
-            sample_rate=sample_rate,
+            sample_rate=series.bcg_sample_rate,
             informative=informative
         )
 
@@ -149,12 +144,52 @@ class DataSetStatistical(DataSet):
         data.to_csv(utils.get_statistical_features_csv_path(self.segment_length, self.overlap_amount), index=False)
 
 
+class DataSetBrueser(DataSet):
+
+    def __init__(self, segment_length=10, overlap_amount=0.9, hr_threshold=10, sqi_threshold=0.4):
+        self.sqi_threshold = sqi_threshold
+        super(DataSetBrueser, self).__init__(segment_length, overlap_amount, hr_threshold)
+
+    def _get_segment(self, series: DataSeries, start, end, informative, ecg_hr, ecg_hr_std, brueser_sqi, bcg_hr):
+        indices = np.where(np.logical_and(start < series.bcg.unique_peaks, series.bcg.unique_peaks < end))
+        return SegmentBrueserSQI(
+            patient_id=series.patient_id,
+            ecg_hr=ecg_hr,
+            ecg_hr_std=ecg_hr_std,
+            bcg_hr=bcg_hr,
+            brueser_sqi=brueser_sqi,
+            sample_rate=series.bcg_sample_rate,
+            informative=informative,
+            threshold=self.sqi_threshold,
+            medians=series.bcg.medians[indices],
+            qualities=series.bcg.brueser_sqi[indices],
+            length_samples=utils.seconds_to_frames(self.segment_length, series.bcg_sample_rate)
+        )
+
+    def save_csv(self):
+        """Saves all segments as csv
+        """
+        if not os.path.isdir(utils.get_data_set_folder(self.segment_length, self.overlap_amount)):
+            os.mkdir(utils.get_data_set_folder(self.segment_length, self.overlap_amount))
+        path = utils.get_brueser_features_csv_path(self.segment_length, self.overlap_amount, self.sqi_threshold,
+                                                   self.hr_threshold)
+        with open(path, 'w') as file:
+            writer = csv.writer(file)
+            writer.writerow(SegmentBrueserSQI.get_feature_name_array())
+            for segment in self.segments:
+                writer.writerow(segment.get_feature_array())
+            file.flush()
+        data = pd.read_csv(path, index_col=False)
+        data = data.drop(labels='informative', axis='columns')
+        data.to_csv(utils.get_brueser_features_csv_path(self.segment_length, self.overlap_amount, self.sqi_threshold),
+                    index=False)
+
+
 class Segment:
     """A segment of bcg data without any features yet
     """
 
-    def __init__(self, raw_data, patient_id, ecg_hr, ecg_hr_std, bcg_hr, brueser_sqi, informative):
-        self.bcg = raw_data
+    def __init__(self, patient_id, ecg_hr, ecg_hr_std, bcg_hr, brueser_sqi, informative):
         self.brueser_sqi = brueser_sqi
         self.patient_id = patient_id
         self.informative = informative
