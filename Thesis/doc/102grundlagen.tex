@@ -94,14 +94,95 @@ Die vorliegende Arbeit beschäftigt sich mit der Beurteilung der Signalqualität
 
 	\subsection{Grundprinzipien}
 	
+	\begin{itemize}
+		\item „künstliche“ Generierung von Wissen auf Basis von Erfahrung: Lernen aus Beispielen -> verallgemeinern (Erkennung von Mustern, statistisches Modell basierend auf Daten mit denen trainiert wurde)
+		\item 3 Arten: supervised, unsupervised, reinforcement
+		\item Trainingsdaten X: Merkmale in Vektoren $x \in X \subseteq \mathbb{R}^n$
+		\item supervised, zB für Klassifizierung von Daten
+		\item Ziel Y bekannt
+		\item Daten sind Eingabe-Ausgabe-Paare (x1, y1),…,(xn, yn), xi element X
+		\item nur Funktion f: X -> Y unbekannt
+		\item gesucht: g dass f approximiert
+		\item Abbildung Supervised Learning
+		\item Entscheidungsfunktion
+		\item Unterscheidung zwischen Regression und Klassifikation
+		\item einfachstes Modell für linear separierbare Daten: Perzeptron
+		\item Komponenten Merkmalsvektor x unterschiedlich gewicheten
+		\item mit Gewichtungsvektor w element Rn
+		\item Ausgabe binärer Klassifikator y element Y {-1, 1}
+		\item Ermittlung schwellwert b mit y = +1 falls Summe wi*xi > b, y= -1 falls Summe wi*xi <b
+		\item wenn w0 = b und x0 =1 durch Umformen Perzeptron Gleichung h(x) = sign(wTx)
+		\item w so gewählt, dass Daten korrekt klassifiziert
+		\item Bild lineare Seperierung
+		\item unsupervised, Beschreibung von Daten
+		\item keine Labels -> Form der Eingabedaten (x1,….,xn)
+		\item f: X -> Y
+		\item gesucht: f, das Daten gut beschreibt
+		\item -> erstellt selbstständig Klassifikationen
+		\item Beispiel: Clustering zur Einteilung der Daten in Kategorien
+		\item reinforcement: Strategie gesucht, die eine Belohnung maximiert
+		\item in Arbeit supervised Learning betrachtet -> Daten müssen annotiert sein
+	\end{itemize}
+	
 	\subsection{Mathematischer Hintergrund}
 	
+	\begin{itemize}
+		\item Minimierungsproblem?
+		\item Kerneltrick bei nicht linear separierbaren Daten
+	\end{itemize}
+	
 	\subsection{Evaluation und Validierung}
+	
+	\begin{itemize}
+		\item Modell auf unbekannten Daten validieren
+		\item Hold-Out-Validierung: zufällige Verteilung in Trainings- und Testset
+		\item Kreuzvalidierung
+		\item Daten werden auf v gleich große Mengen (Folds) verteilt
+		\item V Modelle auf allen möglichen Folds trainiert
+		\item validierung auf ausgeschlossenem Fold
+		\item extrem: Leave-One-Out Kreuzvalidierung mit v = n (Menge der Datenpunkte)
+		\item üblich: v-fache Kreuzvalidierung
+		\item typische Werte v=5 oder 10
+		\item auch abhängig von verfügbarer Rechenleistung
+		\item Wofür
+		\item Schätzung von Fehler auf unbekannten Daten
+		\item Wahl von Modellen/Bestimmung von Hyperparametern
+		\item Parameter, die Modellarchitektur bestimmen
+		\item Parameter, die Lernalgorithmus betreffen
+		\item Regularisierungsparameter
+		\item Ergebnis: 3 Datensets
+		\item training, validierung, test
+		\item Validierungsset beeinflusst Lernalgorithmus
+		\item Testset nachdem alle Entscheidungen getroffen wurden
+		\item typisch: Validierung durch zB Kreuzvalidierung auf Testset
+		\item Retraining auf ganzem Trainingsset
+		\item Ablaufdiagramm
+		\item dafür evaluationsmetrik nötig -> Übergang
+		\item verschiedenste Metriken
+		\item begriffe TP, FP, TN, FN
+		\item Accuracy $ACC = \frac{TP + TN}{TP + TN + FN + FP}$ einfaches Gütemaß, problematisch bei ungleich großen Klassen, da eine hohe Genauigkeit erreicht wird, wenn immer die größere Klasse vorausgesagt wird
+		\item Precision, "bestraft" Falsch-Positive $PPV = \frac{TP}{TP + FP}$
+		\item Recall, auch Sensitivity genannt, "bestraft" Falsch-Negative $TPR = \frac{TP}{TP + FN}$
+		\item Oft Recall und Precision in einem Maß zusammengefasst: F1 score harmonisches Mittel aus beiden $F_1 = 2 * \frac{precision * recall}{precision + recall}$
+		\item nicht balancierte Datensets
+		\item balanced accuracy
+		\item roc kurz für Receiver Operating Characteristic. basiert auf True Positive Rate TPR und False Positive Rate FPR, charakterisiert, wie gut beide Verteilungen durch Schwellwert trennbar sind
+		\item auc Fläche unter der ROC Kurve
+	\end{itemize}
 	
 	\subsection{Probleme maschinellen Lernens}
 	
 	\subsection{Lernmodelle überwachten Lernens}
-
+		
+		\begin{itemize}
+			\item offensichtich: Underfitting
+			\item Overfitting -> gute Approximation aber schlechte Generalisierung auf unbekannte Daten
+			\item Einfluss von: Komplexität des Lernmodells, Datenmenge, Kontamination der Daten mit Rauschen
+			\item mehr Datenpunkte mehr gut, Rauschen und Komplexität schlecht
+			\item TODO: Bild
+			\item Regularisierung gegen Overvitting: TODO näher nachlesen
+			\item Stichprobenverzerrung
+		\end{itemize}
 	
 	
 
