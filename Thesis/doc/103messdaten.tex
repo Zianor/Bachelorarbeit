@@ -21,9 +21,34 @@
 	
 	\subsection{Erfassung}
 	
+	\begin{itemize}
+		\item aufgenommen in der Gefäßstation des Universitätskrankenhauses in Tampere in Finnland
+		\item 14 Patient*innen wurden bis zu 24 h überwacht
+		\item 2 weiblich, 12 männlich
+		\item Durchschnittsalter: 69,57 Jahre
+		\item nach verschiedenen gefäßchirurgischen Eingriffen
+		\item durchschnittliche Messdauer: 17.7 h, range 4,46 bis 22,96 h
+		\item EMFit QS Bettsensor, zwischen Matratze des Krankenhausbettes und Bettgestehl positioniert
+		\item Samplingrate des EMFit QS Systems: 100 Hz, Bandpass-limitiert auf 1 bis 5 Hz
+		\item Referenz EKG: Faros 360 5 lead Holter monitor, 1 kHz Abtastrate
+		\item variabler Drift zwischen beiden Signalen % TODO: näher beschreiben
+	\end{itemize}
+	
 	\subsection{Vorliegende Form}
 	
+	\begin{itemize}
+		\item unbearbeitetes \ac{BKG}-Signal, abgesehen von der Bandpasslimitierung auf 1 bis 5 Hz
+		\item unbearbeitetes 3-Kanal EKG Signal
+		\item mit CLIE-Algorithmus detektierte Herzschläge, schon nach Qualität gefiltert mitsamt Brüser SQI, Länge und Länge des Herzschlages der EKG Referenz
+		\item Vektoren, die den Drift der beiden Signale beschreiben, Form Sekunde \ac{BKG}-Signal und entsprechende Sekunde in \ac{EKG}-Referenz
+	\end{itemize}
+	
 	\subsection{Verarbeitung und Datenstruktur}
+	
+	\begin{itemize}
+		\item Datensatz von einem Patient besteht aus BKG Signal und EKG Referenz
+		\item beides wird eingelesen, geprüft ob schon Detektion von Herzschlägen (Erkennen von R-Peaks bzw. CLIE Algorithmus schon durchgeführt wurde und als csv-Datei existiert
+	\end{itemize}
 
 	\subsection{Annotation der Daten}
 
