@@ -9,9 +9,8 @@ import json
 
 class BCGSeries:
 
-    def __init__(self, patient_id, ecg_id, raw_data, sqi, bbi_bcg, bbi_ecg, indices, sample_rate=100):
-        self.bcg_id = patient_id
-        self.ecg_id = ecg_id
+    def __init__(self, bcg_id, raw_data, sqi, bbi_bcg, bbi_ecg, indices, sample_rate=100):
+        self.bcg_id = bcg_id
         self.raw_data = raw_data
         self.sqi = sqi
         self.bbi_bcg = bbi_bcg
@@ -212,14 +211,13 @@ class Data:
             if bcg_id == '14':  # skip file without drift vector
                 continue
             bcg = BCGSeries(
-                ecg_id=self.mapping[bcg_id],
                 raw_data=mat_dict['BCG_raw_data'][0],
                 sqi=mat_dict['q_BCG'][:, 0],
                 bbi_bcg=mat_dict['BBI_BCG'][:, 0],
                 bbi_ecg=mat_dict['BBI_ECG'][:, 0],
                 indices=mat_dict['indx'][:, 0],
                 sample_rate=self.sample_rate,
-                patient_id=bcg_id
+                bcg_id=bcg_id
             )
             ecg_id = bcg.ecg_id
             self.data_series[str(ecg_id)].bcg = bcg
