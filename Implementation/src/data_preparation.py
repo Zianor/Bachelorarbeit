@@ -158,13 +158,13 @@ class Data:
     sample_rate = 100
 
     def __init__(self):
-        self.mapping = Data.load_mapping()
+        self.mapping = Data._load_mapping()
         self.data_series = {}
-        self.create_data_series()
-        self.load_bcg_data()
-        self.load_drift_compensation()
+        self._create_data_series()
+        self._load_bcg_data()
+        self._load_drift_compensation()
 
-    def load_drift_compensation(self):
+    def _load_drift_compensation(self):
         paths = [path for path in os.listdir(utils.get_drift_path()) if
                  path.lower().endswith(".mat")]
         paths = [os.path.join(utils.get_drift_path(), path) for path in paths]
@@ -175,7 +175,7 @@ class Data:
             self.data_series[patient_id].drift = drift
 
     @staticmethod
-    def load_mapping():
+    def _load_mapping():
         """
         :return: mapping from bcg to ecg
         """
@@ -184,7 +184,7 @@ class Data:
             mapping = json.load(file)
         return mapping
 
-    def create_data_series(self):
+    def _create_data_series(self):
         paths = [path for path in os.listdir(utils.get_ecg_data_path()) if
                  path.lower().endswith(".edf")]
         for path in paths:
@@ -198,7 +198,7 @@ class Data:
             )
             )
 
-    def load_bcg_data(self):
+    def _load_bcg_data(self):
         """Loads all bcg data
         :return: array of found bcg_series
         """
