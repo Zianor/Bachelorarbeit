@@ -6,8 +6,26 @@
 
 \section{Detektion von Herzschlägen}
 
+	\begin{itemize}
+		\item in dieser Arbeit Fokus auf von Brüser entwickelter Algorithmus
+		\item in \ref{ballistokardiographie} erwähnte Annahme: aufeinander folgende Herzschläge ähneln sich
+	\end{itemize}
+
 \section{Artefakterkennung}
 
+	\begin{itemize}
+		\item Artefakte = irrelevante Signalteile mit variierender Amplitude, Frequenz und Dauer, die physiologiches Signal stören \footcite{Nizami2013}
+		\item Ziel Beurteilung Signalqualität: nur die Teile des Signals, die Vitalparameter enthalten verarbeiten
+		\item Bewegungsartefakte, Sensorstörungen etc nicht verarbeiten
+		\item Quelle Störung irrelevant, aben medizinische Abnormalitäten dürfen nicht als gestörtes Signal klassifiziert werden
+		\item Signalqualität oft mit so genannten Signal Quality Indices gemessen
+		\item je nach SQI und Anwendungsfall verschiedene Aussagen
+		\item \citeauthor{Sadek2016}: Unterscheidung in Bezug auf Signalqualität zwischen informativ und nicht informativ
+		\item informativ: noise und Signal von guter Qualität, Features können ohne weitere Verarbeitung extrahiert werden
+		\item nicht informativ: Informationen mit Artefakten und noise vermischt, weitere Verarbeitung vor Extraktion Vitalparameter nötig oder Extraktion von physiologischen Eigenschaften unmöglich
+		\item \footcite{HoogAntink2020} festgestellt, dass bei Messsystemen in Betten besonders die Messung während des Tages große Signalteile von schlechter Qualität aufweisen, mehr als Nachts
+
+	\end{itemize}
 
 	\subsection{Schwellwertbasierte Artefakterkennung}
 	
@@ -51,5 +69,16 @@
 	\end{itemize}
 
 	\subsection{Annotation der Daten}
+	
+	Die vorliegenden Daten sind nicht annotiert. Es ist im Rahmen dieser Arbeit nicht möglich, die Annotation durch Expert*innen durchführen zu lassen, weshalb auf das parallel aufgenommene \ac{EKG} zurückgegriffen wird.
+	
+	\begin{itemize}
+		\item aufgrund des nicht-linearen Drifts der Daten herzschlaggenaue Synchronisierung schwierig
+		\item Entscheidung Annotation von Bereichen von mehren Sekunden möglich zu machen
+		\item Ablauf: existiert EKG Signal zu diesem Zeitpunkt, bei dem eine Herzfrequenz ermittelt werden konnte
+		\item Berechnung dieser -> Anzahl der R-Peaks in diesem Bereich -1 geteilt durch den Abstand des letzten und des ersten Peaks
+		\item Berechnung \ac{BKG}-Herzfrequenz: Durchschnitt der geschätzten Längen der erkannten Peaks im Bereich
+		\item Annotation anhand von relativer oder absoluter Abweichung der beiden
+	\end{itemize}
+	
 
-Die vorliegenden Daten sind nicht annotiert. Es ist im Rahmen dieser Arbeit nicht möglich, die Annotation durch Expert*innen durchführen zu lassen, weshalb auf das parallel aufgenommene \ac{EKG} zurückgegriffen wird.

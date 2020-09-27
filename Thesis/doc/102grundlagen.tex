@@ -24,7 +24,7 @@ Die vorliegende Arbeit beschäftigt sich mit der Beurteilung der Signalqualität
 	
 	Oft gemeinsam mit dem \ac{BKG} betrachtet wird die \ac{SKG}, bei der die Vibration der Wand des Brustkorbs durch den Herzschlag aufgezeichnet wird.
 
-	\section{Ballistokardiographie}
+	\section{Ballistokardiographie}\label{ballistokardiographie}
 	
 	Im Folgenden wird die \acl{BKG} eingeführt. Das beinhaltet den medizinischen und technischen und Hintergrund, das Einsatzgebiet und die Signaleigenschaften. Des Weiteren wird näher beleuchtet, welche Probleme sich bei der Beurteilung der Signalqualität durch die Eigenschaften des Signals ergeben.
 	
@@ -43,7 +43,7 @@ Die vorliegende Arbeit beschäftigt sich mit der Beurteilung der Signalqualität
 	 \begin{figure}[H]
 	 	\centering
 		\includegraphics[width=0.7\textwidth]{pic/bcgBed.png}
-		\caption[Übersicht übeer die Funktionsweise eines allgemeinen im Bett eingebetteten \ac{BKG}-Systems]{Übersicht über die Funktionsweise eines allgemeinen im Bett eingebetteten \ac{BKG}-Systems.\protect\footnotemark}
+		\caption[Übersicht über die Funktionsweise eines allgemeinen im Bett eingebetteten \ac{BKG}-Systems]{Übersicht über die Funktionsweise eines allgemeinen im Bett eingebetteten \ac{BKG}-Systems.\protect\footnotemark}
 		\label{fig:bcgbed}
 	\end{figure}
 	\footnotetext{Entnommen aus \cite{Bruser2011}}
@@ -110,7 +110,12 @@ Die vorliegende Arbeit beschäftigt sich mit der Beurteilung der Signalqualität
 		\item Komponenten Merkmalsvektor x unterschiedlich gewicheten
 		\item mit Gewichtungsvektor w element Rn
 		\item Ausgabe binärer Klassifikator y element Y {-1, 1}
-		\item Ermittlung schwellwert b mit y = +1 falls Summe wi*xi > b, y= -1 falls Summe wi*xi <b
+		\item Ermittlung schwellwert b mit \[
+\begin{gathered}
+	y = +1, \text{ falls } \sum_{i=1}^{n} w_i \cdot x_i > b \\
+	y = -1, \text{ falls } \sum_{i=1}^{n} w_i \cdot x_i < b
+\end{gathered}
+\]
 		\item wenn w0 = b und x0 =1 durch Umformen Perzeptron Gleichung h(x) = sign(wTx)
 		\item w so gewählt, dass Daten korrekt klassifiziert
 		\item Bild lineare Seperierung
@@ -171,9 +176,7 @@ Die vorliegende Arbeit beschäftigt sich mit der Beurteilung der Signalqualität
 	\end{itemize}
 	
 	\subsection{Probleme maschinellen Lernens}
-	
-	\subsection{Lernmodelle überwachten Lernens}
-		
+				
 		\begin{itemize}
 			\item offensichtich: Underfitting
 			\item Overfitting -> gute Approximation aber schlechte Generalisierung auf unbekannte Daten
@@ -184,16 +187,14 @@ Die vorliegende Arbeit beschäftigt sich mit der Beurteilung der Signalqualität
 			\item Stichprobenverzerrung
 		\end{itemize}
 	
+	\subsection{Lernmodelle überwachten Lernens}
+
+	
 	
 
 
 % Beispiele Formeln
-\[
-\begin{gathered}
-	y = +1, \text{ falls } \sum_{i=1}^{n} w_i \cdot x_i > b \\
-	y = -1, \text{ falls } \sum_{i=1}^{n} w_i \cdot x_i < b
-\end{gathered}
-\]
+
 
 \[
 qSQI = \begin{cases}
