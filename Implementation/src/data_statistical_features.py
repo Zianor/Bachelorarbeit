@@ -305,7 +305,7 @@ class SegmentStatistical(Segment):
         :param coverage:
         :param mean_error: mean BBI error to reference
         """
-        super().__init__(raw_data, patient_id, ecg_hr, ecg_hr_std, bcg_hr, brueser_sqi, informative)
+        super().__init__(patient_id, ecg_hr, ecg_hr_std, bcg_hr, brueser_sqi, informative)
         self.bcg = SegmentStatistical._butter_bandpass_filter(raw_data, 1, 12, sample_rate)
         self.minimum = np.min(self.bcg)
         self.maximum = np.max(self.bcg)
