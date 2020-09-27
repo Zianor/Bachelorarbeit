@@ -219,7 +219,7 @@ class Data:
                 sample_rate=self.sample_rate,
                 bcg_id=bcg_id
             )
-            ecg_id = bcg.ecg_id
+            ecg_id = self.mapping[bcg_id]
             self.data_series[str(ecg_id)].bcg = bcg
 
     def get_total_time(self):
