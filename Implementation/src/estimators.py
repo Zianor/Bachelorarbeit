@@ -6,7 +6,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 
 import src.utils as utils
-from data_statistical_features import DataSet, Segment, DataSetBrueser
+from data_statistical_features import DataSet, Segment, DataSetBrueser, DataSetStatistical, DataSetPino
 
 
 class QualityEstimator:
@@ -98,13 +98,61 @@ class BrueserSingleSQI(QualityEstimator):
                 self.features['sqi_coverage'] >= self.coverage_threshold)
         return labels
 
+    def predict(self, X):
+        data_subset = self.features[X.indices]
+        labels = (data_subset['sqi_hr_diff_rel'] < self.hr_threshold) & (
+                data_subset['sqi_coverage'] >= self.coverage_threshold)
+        return labels
+
+
+class PinoMinMaxStd(QualityEstimator):
+
+    def __init__(self, segment_length=10, overlap_amount=0.9, hr_threshold=10):
+        super(PinoMinMaxStd, self).__init__(segment_length, overlap_amount, hr_threshold)
+
+    def _load_segments(self):
+        path_hr = utils.get_pino_features_csv_path(self.segment_length, self.overlap_amount, self.hr_threshold)
+        if not os.path.isfile(path_hr):
+            path = utils.get_pino_features_csv_path(self.segment_length, self.overlap_amount)  # other threshold?
+            if os.path.isfile(path):
+                data = pd.read_csv(path, index_col=False)
+                warnings.warn('Labels are recalculated')
+                data['informative'] = data['rel_err'] < self.hr_threshold
+                data.to_csv(path_hr, index=False)
+            else:
+                warnings.warn('No csv, data needs to be reproduced. This may take some time')
+                DataSetPino(segment_length=self.segment_length, overlap_amount=self.overlap_amount,
+                            hr_threshold=self.hr_threshold)
+        return pd.read_csv(path_hr, index_col=False)
+
+    def _get_features(self):
+        features = ['T1', 'T2']
+        return self.data[features].copy()
+
+    def predict_all_labels(self):
+        labels = self.features['T1'] <= self.features['T2']
+        return labels
+
+    def predict(self, X):
+        data_subset = self.features[X.indices]
+        labels = data_subset['T1'] <= data_subset['T2']
+        return labels
+
 
 if __name__ == "__main__":
     brueser = BrueserSingleSQI()
-    labels = brueser.predict_all_labels()
+    pred_labels = brueser.predict_all_labels()
     indices = brueser.informative_info.index
-    brueser_5bpm_coverage = brueser.get_5bpm_coverage(indices, labels)
+    brueser_5bpm_coverage = brueser.get_5bpm_coverage(indices, pred_labels)
     annotation_5bpm_coverage = brueser.get_5bpm_coverage(indices, brueser.informative_info['informative'])
     print("5 bpm Coverage Brueser Classification: %.2f" % brueser_5bpm_coverage)
+    print("5 bpm Coverage Annotation: %.2f" % annotation_5bpm_coverage)
+
+    pino = PinoMinMaxStd()
+    pred_labels = pino.predict_all_labels()
+    indices = pino.informative_info.index
+    pino_5bpm_coverage = pino.get_5bpm_coverage(indices, pred_labels)
+    annotation_5bpm_coverage = pino.get_5bpm_coverage(indices, pino.informative_info['informative'])
+    print("5 bpm Coverage Pino Classification: %.2f" % pino_5bpm_coverage)
     print("5 bpm Coverage Annotation: %.2f" % annotation_5bpm_coverage)
     pass

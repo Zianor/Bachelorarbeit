@@ -185,6 +185,39 @@ class DataSetBrueser(DataSet):
                     index=False)
 
 
+class DataSetPino(DataSet):
+
+    def __init(self, segment_length=5, overlap_amount=0.8, hr_threshold=10):
+        super(DataSetPino, self).__init__(segment_length, overlap_amount, hr_threshold)
+
+    def _get_segment(self, series: DataSeries, start, end, informative, ecg_hr, ecg_hr_std, brueser_sqi, bcg_hr):
+        return SegmentPino(
+            raw_data=series.bcg.raw_data[start: end],
+            patient_id=series.patient_id,
+            ecg_hr=ecg_hr,
+            ecg_hr_std=ecg_hr_std,
+            bcg_hr=bcg_hr,
+            brueser_sqi=brueser_sqi,
+            sample_rate=series.bcg_sample_rate,
+            informative=informative,
+        )
+
+    def save_csv(self):
+        if not os.path.isdir(utils.get_data_set_folder(self.segment_length, self.overlap_amount)):
+            os.mkdir(utils.get_data_set_folder(self.segment_length, self.overlap_amount))
+        path = utils.get_pino_features_csv_path(self.segment_length, self.overlap_amount, self.hr_threshold)
+        with open(path, 'w') as file:
+            writer = csv.writer(file)
+            writer.writerow(SegmentPino.get_feature_name_array())
+            for segment in self.segments:
+                writer.writerow(segment.get_feature_array())
+            file.flush()
+        data = pd.read_csv(path, index_col=False)
+        data = data.drop(labels='informative', axis='columns')
+        data.to_csv(utils.get_pino_features_csv_path(self.segment_length, self.overlap_amount),
+                    index=False)
+
+
 class Segment:
     """A segment of bcg data without any features yet
     """
@@ -226,6 +259,36 @@ class Segment:
             self.abs_err,
             self.rel_err,
         ])
+
+
+class SegmentPino(Segment):
+
+    def __init__(self, raw_data, patient_id, ecg_hr, ecg_hr_std, bcg_hr, brueser_sqi, sample_rate, informative):
+        super().__init__(patient_id, ecg_hr, ecg_hr_std, bcg_hr, brueser_sqi, informative)
+        self.bcg = raw_data
+        minimum = np.min(self.bcg)
+        maximum = np.max(self.bcg)
+        self.t1 = (maximum + minimum) / 2
+        mean = np.mean(self.bcg)
+        std = np.std(self.bcg)
+        self.t2 = mean + 1.1 * std
+
+    @staticmethod
+    def get_feature_name_array():
+        segment_array = Segment.get_feature_name_array()
+        own_array = np.array([
+            'T1',
+            'T2'
+        ])
+        return np.concatenate((segment_array, own_array), axis=0)
+
+    def get_feature_array(self):
+        segment_array = super().get_feature_array()
+        own_array = np.array([
+            self.t1,
+            self.t2
+        ])
+        return np.concatenate((segment_array, own_array), axis=0)
 
 
 class SegmentStatistical(Segment):
