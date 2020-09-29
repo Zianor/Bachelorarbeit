@@ -13,12 +13,17 @@ from numba import jit
 
 
 def interval_probabilities(data, win, estimate_lengths=True):
+    """
+    Processes the whole data with given window
+    :param data: bcg data
+    :param win: window of all n for HR of 30 to 200
+    """
     corr_arr = np.zeros((data.size, win.size))
     est_len_arr = np.zeros(data.size)
     quality_arr = np.zeros(data.size)
 
     # normal range
-    for l in range(win[-1], data.size - win[-1]):
+    for l in range(win[-1], data.size - win[-1]):  # iterate over all windows
         win_sig = data[l - win[-1]:l + win[-1] + 1]
         probabilities, est_len, quality = prob_estimator(win_sig, win, estimate_lengths)
         corr_arr[l, :] = probabilities
@@ -30,24 +35,30 @@ def interval_probabilities(data, win, estimate_lengths=True):
 
 @jit(nopython=True, fastmath=True)
 def calc_all_coeffs(signal, signal_length, min_lag, min_window_size):
+    """
+    :param min_lag: minimal interval length in samples
+    :param signal: signal without mean, starting at k in window
+    :param signal_length: size of window
+    :param min_window_size: is 0, does nothing?
+    """
     coeffs = np.zeros((signal_length // 2 - min_lag + 1, 3))
     mid = signal_length // 2
 
-    for i in range(min_lag, mid + 1):
+    for i in range(min_lag, mid + 1):  # N_min to N_max + 1, i is equivalent to N
         win_len = max(i, min_window_size)
-        b_start = mid - i
+        b_start = mid - i  # equivalent to v-N if v = 0
         w = 1.0
 
         cov = 0.0
         diff = 0.0
         max_val = -np.inf
-        for j in range(win_len):
+        for j in range(win_len):  # for each j in range 0 to i, equivalent to v in the sum
             cov += signal[mid + j] * signal[b_start + j]
             diff += abs(signal[mid + j] - signal[b_start + j])
-            if j < i:
-                max_val = max(signal[mid - i + j] + signal[mid + j], max_val)
+            max_val = max(signal[mid + j] + signal[b_start + j])
 
         coeffs[i - min_lag, :] = np.array([cov * (w / win_len), max_val / 2, diff * (w / win_len)])
+        # TODO: warum max_val/2
 
     return coeffs
 
@@ -113,6 +124,10 @@ def rr_intervals_from_est_len(est_len, peaks, data, quality, min_win):
 
 
 def prob_estimator(win_sig, win, estimate_lengths=True):
+    """
+    :param win_sig: signal in the given window
+    :param win: win = np.arange(0.3 * FS, 2 * FS + 1, dtype=np.int32)
+    """
     # Expand to make Matlab transition easier
     win_sig = win_sig[np.newaxis, :]
 
@@ -126,12 +141,14 @@ def prob_estimator(win_sig, win, estimate_lengths=True):
     est_len = np.zeros(win_sig.shape[0])
 
     min_window_size = 0
-    for k in range(win_sig.shape[0]):
-        signal_length = win_sig.shape[1] - (win_sig.shape[1] % 2)  # Signal length must be even
-        min_lag = win[0]
 
-        # Make sure minlag is valid
-        assert min_lag <= signal_length // 2
+    signal_length = win_sig.shape[1] - (win_sig.shape[1] % 2)  # Signal length must be even
+    min_lag = win[0]
+
+    # Make sure minlag is valid
+    assert min_lag <= signal_length // 2
+
+    for k in range(win_sig.shape[0]):
 
         # xc = calc_coeffs(win_sig[:,k],signal_length, min_lag, min_window_size)
         # ms = calc_max_spectrum(win_sig[:, k], signal_length, min_lag)
@@ -141,7 +158,8 @@ def prob_estimator(win_sig, win, estimate_lengths=True):
         eps = np.spacing(1)
 
         # coeffs = [xc, ms, ad]
-        coeffs[2, :] = 1 / (coeffs[2, :] + eps)
+        # TODO: Warum Inverses von Maximalen Amplituden und nicht AMDF?
+        coeffs[2, :] = 1 / (coeffs[2, :] + eps)  # Inverses von AMDF
 
         coeffs -= np.min(coeffs, axis=1, keepdims=True)
         coeffs *= 0.9 / np.sum(coeffs, axis=1, keepdims=True) + eps
