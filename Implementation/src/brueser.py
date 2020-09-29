@@ -11,6 +11,13 @@ from numba import jit
 # rr_baseline = medians[qualities > np.max(qualities) / 5]
 # unique_peaks = unique_peaks[qualities > np.max(qualities) / 5]
 
+def filter_brueser(data):
+    """Filters signal
+    """
+    return data
+    # FIR Filter 0.5 und 20 Hz
+    # erste Ableitung mit Savitzky-Golay filter
+
 
 def interval_probabilities(data, win, estimate_lengths=True):
     """
@@ -41,8 +48,8 @@ def calc_all_coeffs(signal, signal_length, min_lag, min_window_size):
     :param signal_length: size of window
     :param min_window_size: is 0, does nothing?
     """
-    coeffs = np.zeros((signal_length // 2 - min_lag + 1, 3))
     mid = signal_length // 2
+    coeffs = np.zeros(mid + 1 - min_lag, 3)
 
     for i in range(min_lag, mid + 1):  # N_min to N_max + 1, i is equivalent to N
         win_len = max(i, min_window_size)
@@ -58,20 +65,20 @@ def calc_all_coeffs(signal, signal_length, min_lag, min_window_size):
             max_val = max(signal[mid + j] + signal[b_start + j])
 
         coeffs[i - min_lag, :] = np.array([cov * (w / win_len), max_val / 2, diff * (w / win_len)])
-        # TODO: warum max_val/2
+        # second is mean of max values
 
     return coeffs
 
 
 @jit(nopython=True, fastmath=True)
-def find_largest_peak(array, min_win):
+def find_largest_peak(signal, min_win):
     extrs = []
-    for i in range(1, array.shape[0] - 1):
-        if array[i] > array[i - 1] and array[i] > array[i + 1]:
+    for i in range(1, signal.shape[0] - 1):
+        if signal[i] > signal[i - 1] and signal[i] > signal[i + 1]:
             extrs.append(i)
 
-    extrs = np.array(extrs)
-    ampls = array[extrs]
+    extrs = np.array(extrs)  # indices of peaks
+    ampls = signal[extrs]  # amplitudes
     if ampls.size == 0:
         max_ampl = 0
         idx = 0
@@ -80,7 +87,7 @@ def find_largest_peak(array, min_win):
         max_ampl = np.max(ampls)
 
     if ampls.size > 1:
-        sort_idx = np.argsort(ampls)
+        sort_idx = np.argsort(ampls)  # small to large
         ampls_sorted = ampls[sort_idx]
         extrs_sorted = extrs[sort_idx]
         if (ampls_sorted[-1] - ampls_sorted[-2]) / ampls_sorted[-1] < 0.999 \
@@ -104,10 +111,12 @@ def rr_intervals_from_est_len(est_len, peaks, data, quality, min_win):
     est_len_adj = est_len.astype(np.int32)
     corresponding_peaks = np.zeros((data.shape[0]), dtype=np.int32)
 
-    for data_idx in range(min_win, data.shape[0] - min_win):
+    for data_idx in range(min_win, data.shape[0] - min_win):  # iterate over whole signal again
         estimated_interval = est_len_adj[data_idx]
         max_sum = -np.inf
         for peak in peaks[np.searchsorted(peaks, data_idx):np.searchsorted(peaks, data_idx + estimated_interval) + 1]:
+            # all peaks between data_idx and data_idx + estimated_interval
+            # search peak with largest combined amplitude of data at peak and data at (peak - estimated_interval)
             if max_sum < data[peak] + data[peak - estimated_interval]:
                 max_sum = data[peak] + data[peak - estimated_interval]
                 corresponding_peaks[data_idx] = peak
@@ -117,8 +126,11 @@ def rr_intervals_from_est_len(est_len, peaks, data, quality, min_win):
     qualities = np.zeros(unique_peaks.shape[0])
 
     for idx, peak in enumerate(unique_peaks):
+        # calculate median of all lengths associated with this peak
         medians[idx] = np.median(est_len_adj[corresponding_peaks == peak])
-        qualities[idx] = np.sum(quality[corresponding_peaks == peak])
+        # calculate sum of all qualities associated with this peak
+        # qualities[idx] = np.sum(quality[corresponding_peaks == peak])
+        qualities[idx] = np.median(quality[corresponding_peaks == peak]) * 10
 
     return unique_peaks, medians, qualities
 
@@ -148,25 +160,23 @@ def prob_estimator(win_sig, win, estimate_lengths=True):
     # Make sure minlag is valid
     assert min_lag <= signal_length // 2
 
-    for k in range(win_sig.shape[0]):
+    for k in range(win_sig.shape[0]):  # only one runthrough with a single channel signal
 
-        # xc = calc_coeffs(win_sig[:,k],signal_length, min_lag, min_window_size)
-        # ms = calc_max_spectrum(win_sig[:, k], signal_length, min_lag)
-        # ad = calc_admf(win_sig[:,k],signal_length, min_lag, min_window_size)
         coeffs = calc_all_coeffs(win_sig_modified[k, :], signal_length, min_lag, min_window_size).T
 
         eps = np.spacing(1)
 
         # coeffs = [xc, ms, ad]
-        # TODO: Warum Inverses von Maximalen Amplituden und nicht AMDF?
         coeffs[2, :] = 1 / (coeffs[2, :] + eps)  # Inverses von AMDF
 
+        # aus Matlab so von Brueser uebernommen
         coeffs -= np.min(coeffs, axis=1, keepdims=True)
         coeffs *= 0.9 / np.sum(coeffs, axis=1, keepdims=True) + eps
         coeffs += 0.1 / coeffs.shape[1]
 
+        # erweiterter Brueser?
         probabilities[k, :] = coeffs[0, :] * coeffs[1, :] * coeffs[2, :]
-        combined *= probabilities[k, :]
+        # combined *= probabilities[k, :]  # not needed for single channel
 
         if estimate_lengths:
             max_ampl, _, est_len_peak = find_largest_peak(probabilities[k, :], win[0])
