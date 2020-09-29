@@ -97,32 +97,30 @@ Die vorliegende Arbeit beschäftigt sich mit der Beurteilung der Signalqualität
 	\begin{itemize}
 		\item „künstliche“ Generierung von Wissen auf Basis von Erfahrung: Lernen aus Beispielen -> verallgemeinern (Erkennung von Mustern, statistisches Modell basierend auf Daten mit denen trainiert wurde)
 		\item 3 Arten: supervised, unsupervised, reinforcement
-		\item Trainingsdaten X: Merkmale in Vektoren $x \in X \subseteq \mathbb{R}^n$
+		\item Trainingsdaten $X$: Merkmale in Vektoren $x \in X \subseteq \mathbb{R}^n$
 		\item supervised, zB für Klassifizierung von Daten
-		\item Ziel Y bekannt
-		\item Daten sind Eingabe-Ausgabe-Paare (x1, y1),…,(xn, yn), xi element X
-		\item nur Funktion f: X -> Y unbekannt
-		\item gesucht: g dass f approximiert
-		\item Abbildung Supervised Learning
-		\item Entscheidungsfunktion
-		\item Unterscheidung zwischen Regression und Klassifikation
-		\item einfachstes Modell für linear separierbare Daten: Perzeptron
-		\item Komponenten Merkmalsvektor x unterschiedlich gewicheten
-		\item mit Gewichtungsvektor w element Rn
-		\item Ausgabe binärer Klassifikator y element Y {-1, 1}
-		\item Ermittlung schwellwert b mit \[
-\begin{gathered}
-	y = +1, \text{ falls } \sum_{i=1}^{n} w_i \cdot x_i > b \\
-	y = -1, \text{ falls } \sum_{i=1}^{n} w_i \cdot x_i < b
-\end{gathered}
-\]
-		\item wenn w0 = b und x0 =1 durch Umformen Perzeptron Gleichung h(x) = sign(wTx)
-		\item w so gewählt, dass Daten korrekt klassifiziert
-		\item Bild lineare Seperierung
+		\item Ziel $Y$ bekannt
+		\item Daten sind Eingabe-Ausgabe-Paare $(x_1, y_1), ...,(x_n, y_n), x_i \in X$
+		\item nur Funktion $f: X \to Y$ unbekannt
+		\item gesucht: $g$ dass $f$ approximiert
+	\end{itemize}
+	
+	\begin{figure}[H]
+	\centering
+		\includegraphics[width=0.7\textwidth]{pic/SupervisedLearning.png}
+	\caption[Darstellung von Supervised Learning]{Darstellung von Supervised Learning}
+	\label{fig:supervisedLearning}
+	\end{figure}
+
+	\begin{itemize}
+		\item Unterscheidung zwischen Regression, Klassifikation
+		\item Klassifikation: unterteilt Daten in Klassen
+		\item Regression: beschreibt Verteilung der Daten, kann z.B. genutzt um Verkaufszahlen von Büchern vorauszusagen
+		\item logistische Regression: Wahrscheinlichkeit Angehörigkeit Klasse
 		\item unsupervised, Beschreibung von Daten
 		\item keine Labels -> Form der Eingabedaten (x1,….,xn)
-		\item f: X -> Y
-		\item gesucht: f, das Daten gut beschreibt
+		\item $f: X \to Y$
+		\item gesucht: $f$, das Daten gut beschreibt
 		\item -> erstellt selbstständig Klassifikationen
 		\item Beispiel: Clustering zur Einteilung der Daten in Kategorien
 		\item reinforcement: Strategie gesucht, die eine Belohnung maximiert
@@ -132,9 +130,40 @@ Die vorliegende Arbeit beschäftigt sich mit der Beurteilung der Signalqualität
 	\subsection{Mathematischer Hintergrund}
 	
 	\begin{itemize}
-		\item Minimierungsproblem?
-		\item Kerneltrick bei nicht linear separierbaren Daten
-	\end{itemize}
+		\item auch hier nur supervised betrachtet
+		\item Verteilung der Daten
+		\item linear separierbar oder nicht: 3 Fälle (linear, linear mit Rauschen, nicht linear)
+		\item Abbildung dazu?
+		\item Ziel ist, eine Funktion zu finden, die die verschiedenen Klassen voneinander möglichst genau separiert, wodurch $y$ ermittelt werden kann bzw. bei einer Regression den Wert möglichst genau vorhersagt, Entscheidungsfunktion genannt
+		\item Lineare Modelle kombinieren Merkmale linear miteinander
+		\item einfachstes Modell für Klassifikation von linear separierbare Daten: Perzeptron
+		\item Komponenten Merkmalsvektor x unterschiedlich gewicheten
+		\item mit Gewichtungsvektor $w \in \mathbb{R}^n$
+		\item Ausgabe binärer Klassifikator $y \in Y = \{-1, 1\}$
+		\item Ermittlung Schwellwert \textit{Bias} $b$ mit \[
+\begin{gathered}
+	y = +1, \text{ falls } \sum_{i=1}^{n} w_i \cdot x_i > b \\
+	y = -1, \text{ falls } \sum_{i=1}^{n} w_i \cdot x_i < b
+\end{gathered}
+\]
+		\item wenn $w_0 = b$ und $x_0 =1$ durch Umformen Perzeptron Entscheidungsfunktion $h(x) = sign(w^Tx)$
+		\item $w$ so gewählt, dass Daten korrekt klassifiziert
+		\item wenn Perzeptron künstliches Neuron in Neuronalem Netz wird diese Funktion auch Aktivierungsfunktion genannt und kann variiert werden
+		\item Signum Funktion hat Nachteil des "harten" Schwellwerts, oft Funktionen wie logistische Funktion mit "weichem" Schwellwert besser
+		\item Lineare Regression: Gerade $h(x)$ finden, die Datenpunkte beschreibt
+		\item Methode der kleinsten Quadrate, also quadratische Abweichungen zwischen Gerade und Punkten minimieren
+		\item gesucht sind Koeffizienten $w$, \[\argmin_w \sum_{i=1}^{n} (w^T x_i - y_i)^2\]
+		\item durch Auflösen $w = (X^T X)^{-1} X^T$
+		\item bis jetzt nur lineare einfache Modelle betracht
+		\item bei komplexeren Minimierungsproblemen Methode kleinster Quadrate nicht ausreichend, andere Methoden zur Fehlerminimierung -> Gradientenabstiegsverfahren
+		\item graphische Vorstellung als Hügellandschaft
+		\item In jedem Schritt Ableitung der Kostenfunktion nach jedem Gewicht und Bias berechnet -> Schritt wählen, der Kostenfunktion am stärksten minimiert
+		\item wenn Daten nicht linear separierbar: Kerneltrick möglich
+		\item Transformation (Ersetzten) des Skalarprodukts transformiert implizit den Variablenraum
+		\item Beispiel Gaußscher RBF-Kernel \[K_{RBF} (x, x\prime) := exp(-\gamma \|x - x\prime\|^2) \text{ mit } \gamma > 0\]
+		\item lineare Trennung in höher-dimensionalem Variablenraum
+		\item Berücksichtigung aller Nicht-Linearitäten in der Transformation -> Trennfläche kann wiederum linear sein
+	\end{itemize} 
 	
 	\subsection{Evaluation und Validierung}
 	
@@ -186,28 +215,64 @@ Die vorliegende Arbeit beschäftigt sich mit der Beurteilung der Signalqualität
 			\item Regularisierung gegen Overvitting: TODO näher nachlesen
 			\item Stichprobenverzerrung
 		\end{itemize}
+
+	\subsection{Weitere Lernmodelle des Überwachten Lernens}
 	
-	\subsection{Lernmodelle überwachten Lernens}
-
-	
-	
-
-
-% Beispiele Formeln
-
-
-\[
-qSQI = \begin{cases}
-	\text{excellent (E)} & \text{wenn alle 4 } SQI_i \geq 0,9\\
-	\text{acceptable (A)} & \begin{cases}
-		& \text{wenn 3 der 4 } SQI_i \geq 0,9 \text{ oder}\\
-		& \text{wenn alle 4 } SQI_i \geq 0,7 \text{ oder}\\
-		& \text{wenn median}(SQI_1, SQI_2, SQI_3) \geq 0,8\\&\text{ }\text{	und } SQI_1 \geq 0,5 \text{ und } SQI_4 \geq 0,7
-		\end{cases}\\
-	\text{untrustworthy (U)} & \text{sonst}\\
-\end{cases}
-\]
-
-% Beispiel figure
+		\subsubsection{Entscheidungsbäume}
+		
+		\begin{itemize}
+			\item Bild mit Thresholds und Features
+			\item an jedem Knoten Entscheidung ob bestimmtes Feature über Threshold liegt
+			\item generiert z.B. durch rekursives binäres Teilen
+			\item bei Regression mittlere quadratische Abweichung $MSE$ minimieren, bei Klassifikationsbäumen Messung der "Unreinheit" der Blätter (Fehler = 0 wenn Blatt nur Punkte derselben Klasse, Fehler maximal wenn keine Klasse Mehrheit)
+			\item Optimierung rechnerisch nicht effizient lösbar
+			\item greedy den Schritt, also die Kombination aus Feature und Threshold wählen, der den Fehler am Stärksten reduziert
+			\item Abbruchkriterien: maximal erlaubte Tiefe, Mindestanzahl Datenpunkte in einem Blatt
+			\item keine Featureskalierung nötig
+		\end{itemize}
+		
+		\subsubsection{Random Forest}
+		
+		\begin{itemize}
+			\item besteht aus mehreren unkorrelierten Entscheidungsbäumen
+			\item Randomisierung bei Erstellung der Bäume
+			\item Mehrheitsentscheidung aller Bäume
+			\item Nach Breiman für jeden Baum im Wald
+			\item n Bootstrap Samples ziehen, also mit Zurücklegen aus dem Trainings-Datensatz gezogen
+			\item von $M$ Merkmalen $m \ll M$ Merkmale zufällig gewählt, die als Kriterium für Split infrage kommen
+			\item voller Ausbau des Baums
+		\end{itemize}
+		
+		
+		\subsubsection{Nächste Nachbarn Modelle}
+		
+		\begin{itemize}
+			\item sehr einfache Modelle, öfters zur Schätzung einer Baseline im Einsatz
+			\item Klassifikation anhand der Datenpunkte, die zu klassifierenden Datenpunkt am nächsten liegen
+			\item dafür Ähnlichkeit quantifizieren
+			\item kein Training, Modell direkt durch Trainingsdaten definiert
+			\item Voronoi-Regionen werden erzeugt: Menge aller Punkte die näher an einem Zentrum liegen als an allen anderen Zentren
+			\item daraus Voronoi-Diagramm (gesammelte Grenzen)
+			\item k-Nächste Nachbarn: das Label der Mehrheit der k nächsten Punkte wird zurückgegeben
+			\item Regression: Mittelwert-Bildung über die Label der k nächsten Nachbarn
+		\end{itemize}
+		
+		\subsubsection{Support Vector Machines}
+		
+		\begin{itemize}
+			\item Rauschen in Daten
+			\item statt einfache Gerade wie bei Perzeptron wird Hyperebene mit maximalem Rand gesucht, die Daten korrekt klassifiziert
+			\item TODO: Bild von Gerade mit Rand
+			\item Ausgangspunkt Perzeptron, Umformulierung in Optimierung mit Nebenbedingung, dass Hyperebene größten Rand besitzt
+			\item bei SVMs oft oben schon erwähnter Kernel-Trick, also Transformation des Skalarprodukts, damit nicht-lineare Separierung möglich
+		\end{itemize}
+		
+		\subsubsection{Mehrlagiges Perzeptron}
+		
+		\begin{itemize}
+			\item Klasse von künstlichen neuronalen Netzwerken
+			\item 3 Schichten: Eingabe-Schicht, Versteckte Schicht, Ausgabe-Schicht
+			\item außer den Eingabeneuronen wird nicht-lineare Aktivierungsfunktion verwendet
+		\end{itemize}
 
 
