@@ -12,6 +12,9 @@ from scipy.io import loadmat
 import src.brueser as brueser
 import src.utils as utils
 
+from multiprocessing import Pool
+import multiprocessing as mp
+
 
 def get_brueser_hr(unique_peaks, medians, segment_length, sample_rate):
     unique_peaks = unique_peaks.to_numpy()
@@ -37,10 +40,13 @@ def get_brueser_segment_hr(start, end, unique_peaks, medians, sample_rate):
 def brueser_csv_all(fs, use_existing=True):
     paths = [path for path in os.listdir(utils.get_bcg_data_path()) if
              path.lower().endswith(".mat")]
+    # pool = Pool(10)
     for path in paths:
-        if use_existing:
-            path = os.path.join(utils.get_bcg_data_path(), path)
-            brueser_csv(fs=fs, path=path, use_existing=use_existing)
+        path = os.path.join(utils.get_bcg_data_path(), path)
+        # pool.apply_async(brueser_csv, kwds={'fs': fs, 'path': path, 'use_existing': use_existing})
+        brueser_csv(fs=fs, path=path, use_existing=use_existing)
+    # pool.close()
+    # pool.join()
 
 
 def brueser_csv(fs, path, use_existing=True):
@@ -53,10 +59,12 @@ def brueser_csv(fs, path, use_existing=True):
     number = number.replace("mat", "")
     filename = 'brueser' + str(number) + 'csv'
     path_csv = os.path.join(utils.get_brueser_path(), filename)
+    print(path_csv)
 
     if not use_existing or not os.path.isfile(path_csv):
         win = np.arange(0.3 * fs, 2 * fs + 1, dtype=np.int32)
         result, est_len, quality_arr = brueser.interval_probabilities(data, win, estimate_lengths=True)
+        print(result)
         peaks, _ = scipy.signal.find_peaks(data, distance=win[0])
         unique_peaks, medians, qualities = brueser.rr_intervals_from_est_len(est_len, peaks, data, quality_arr,
                                                                              win[0])
@@ -65,7 +73,7 @@ def brueser_csv(fs, path, use_existing=True):
             writer.writerow(["unique_peaks", "medians", "qualities"])
             for i, peak in enumerate(unique_peaks):
                 writer.writerow([peak, medians[i], qualities[i]])
-
+        print("Wrote " + path_csv)
     return pd.read_csv(path_csv)
 
 
@@ -223,4 +231,6 @@ def compare_ecg_hr_methods():
 
 
 if __name__ == "__main__":
+    mp.set_start_method("spawn", force=True)
+    brueser_csv_all(fs=100, use_existing=False)
     pass

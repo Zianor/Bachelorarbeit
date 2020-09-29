@@ -49,7 +49,7 @@ def calc_all_coeffs(signal, signal_length, min_lag, min_window_size):
     :param min_window_size: is 0, does nothing?
     """
     mid = signal_length // 2
-    coeffs = np.zeros(mid + 1 - min_lag, 3)
+    coeffs = np.zeros((mid + 1 - min_lag, 3))
 
     for i in range(min_lag, mid + 1):  # N_min to N_max + 1, i is equivalent to N
         win_len = max(i, min_window_size)
@@ -62,7 +62,7 @@ def calc_all_coeffs(signal, signal_length, min_lag, min_window_size):
         for j in range(win_len):  # for each j in range 0 to i, equivalent to v in the sum
             cov += signal[mid + j] * signal[b_start + j]
             diff += abs(signal[mid + j] - signal[b_start + j])
-            max_val = max(signal[mid + j] + signal[b_start + j])
+            max_val = max(max_val, (signal[mid + j] + signal[b_start + j]))
 
         coeffs[i - min_lag, :] = np.array([cov * (w / win_len), max_val / 2, diff * (w / win_len)])
         # second is mean of max values
@@ -130,7 +130,8 @@ def rr_intervals_from_est_len(est_len, peaks, data, quality, min_win):
         medians[idx] = np.median(est_len_adj[corresponding_peaks == peak])
         # calculate sum of all qualities associated with this peak
         # qualities[idx] = np.sum(quality[corresponding_peaks == peak])
-        qualities[idx] = np.median(quality[corresponding_peaks == peak]) * 10
+        print(quality[corresponding_peaks == peak])
+        qualities[idx] = np.median(quality[corresponding_peaks == peak]) #  * 10
 
     return unique_peaks, medians, qualities
 
@@ -147,7 +148,7 @@ def prob_estimator(win_sig, win, estimate_lengths=True):
     win_sig_modified = win_sig - np.mean(win_sig, axis=1, keepdims=True)
 
     # Compute Scores
-    combined = np.ones(win.size)
+    # combined = np.ones(win.size)
     probabilities = np.zeros((win_sig.shape[0], win.size))
     quality = np.zeros(win_sig.shape[0])
     est_len = np.zeros(win_sig.shape[0])
