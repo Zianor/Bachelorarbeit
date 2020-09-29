@@ -67,36 +67,65 @@
 
 \section{Artefakterkennung}
 
+	\subsection{Allgemein bei kardiorespiratorischen Signalen}
+
 	\begin{itemize}
 		\item Artefakte = irrelevante Signalteile mit variierender Amplitude, Frequenz und Dauer, die physiologiches Signal stören \footcite{Nizami2013}
 		\item Ziel Beurteilung Signalqualität: nur die Teile des Signals, die Vitalparameter enthalten verarbeiten
 		\item Bewegungsartefakte, Sensorstörungen etc nicht verarbeiten
-		\item Beispiele für Artefakte, einmal mit hoher, einmal mit niedriger Energie
+		\item Quelle Störung irrelevant, aber medizinische Abnormalitäten dürfen nicht als gestörtes Signal klassifiziert werden
+		\item Signalqualität oft mit so genannten Signal Quality Indices gemessen
+		\item je nach SQI und Anwendungsfall verschiedene Aussagen
+		\item \citeauthor{Sadek2016}: Unterscheidung in Bezug auf Signalqualität zwischen informativ und nicht informativ
+		\item informativ: \textit{noise} und Signal von guter Qualität, Features können ohne weitere Verarbeitung extrahiert werden
+		\item nicht informativ: Informationen mit Artefakten und noise vermischt, weitere Verarbeitung vor Extraktion Vitalparameter nötig oder Extraktion von physiologischen Eigenschaften unmöglich
+		\item im klinischen Kontext genutzte Artefakterkennung oft durch relativ einfaches Preprocessing \footcite[Vgl.][]{Nizami2013}
+		\item oft bestimmte Informationen direkt oder indirekt \textit{hard coded}, kann zum einen etwas wie Typ oder Frequenz der Daten sein, aber auch demographische Informationen über die Patient*innen wie Alter, Gewicht oder medizinischer Zustand\footcite[Vgl.][]{Nizami2013}
+		\item Beispiel für Beurteilung der Signalqualität von anderen kardiorespiratorischen Signalen, in diesem Fall \ac{EKG} und \ac{PPG} in Abbildung, betrachtet werden 10-Sekunden-Fenster %TODO: einfügen
 	\end{itemize}
 	
 	\begin{figure}[H]
 		\centering
-		\includegraphics[width=0.7\textwidth]{pic/high-energy-artefacts.png}
-		\caption[Intervallschätzer nach \citeauthor{Bruser2013}]{Die drei Intervallschätzer und ihre Fusionierung}
-		\label{fig:estimator-fusion}
+		\includegraphics[width=0.7\textwidth]{pic/ad_flussdiagramm}
+		\caption[Flussdiagramm eines Algorithmus zur Beurteilung der Signalqualität]{Flussdiagramm eines Algorithmus zur Beurteilung der Signalqualität\protect\footnotemark}
+		\label{fig:ecg-ad}
+		\footnotetext{Entnommen aus \cite{Orphanidou2015}.}
+	\end{figure}
+	
+	
+	\begin{itemize}
+		\item erst Segmentierung der Herzschläge und dann 4 Kriterien überprüft -> reichen jeweils um Signal als schlecht zu klassifizieren
+		\item Herzrate zwischen 40 und 180 Schlägen pro Minute? Abstand der Hochpunkte aufeinander folgender Herzschläge unter 3 Sekunden (kein Schlag fehlt?), Verhältnis maximales und minimales Schlag-zu-Schlag-Intervall kleiner als 2.2 (Begrenzung Veränderung Herzrate in untersuchtem 10-Sekunden-Fenster), Korrelation zu erstelltem Template höher als Schwellwert?
+	\end{itemize}
+	
+	\subsection{Bei ballistokardiographischen Signalen}
+	
+	\begin{itemize}
+		\item bei \ac{BKG} auch Artefakterkennung schwieriger als bei anderen kardiorespiratorischen Signalen: zusätzlich zur Variabilität bei Atmung Veränderungen bei Positionsänderungen -> vorher erstellte Templates werden obsolet
+		\item Beispiele für Artefakte, einmal mit hoher, einmal mit niedriger Energie
+		\item hohe Energie größere Bewegungen, leicht zu erkennen
+	\end{itemize}
+	
+	\begin{figure}[H]
+		\centering
+		\begin{minipage}{0.45\linewidth}
+      		\includegraphics[width=\textwidth]{pic/high-energy-artifacts.png}
+			\caption[Artefakte mit hoher Energie]{Artefakte mit hoher Energie}
+			\label{fig:high-energy-artifact}
+    	\end{minipage}
+    	\hfill
+    	\begin{minipage}{0.45\linewidth}
+      		\includegraphics[width=\textwidth]{pic/low-energy-artifacts.png}
+			\caption[Artefakte mit niedriger Energie]{Artefakte mit niedriger Energie}
+			\label{fig:low-energy-artifact}
+    \end{minipage}
+		
 	\end{figure}
 	
 	\begin{itemize}
-		\item Quelle Störung irrelevant, aben medizinische Abnormalitäten dürfen nicht als gestörtes Signal klassifiziert werden
-		\item Signalqualität oft mit so genannten Signal Quality Indices gemessen
-		\item je nach SQI und Anwendungsfall verschiedene Aussagen
-		\item \citeauthor{Sadek2016}: Unterscheidung in Bezug auf Signalqualität zwischen informativ und nicht informativ
-		\item informativ: noise und Signal von guter Qualität, Features können ohne weitere Verarbeitung extrahiert werden
-		\item nicht informativ: Informationen mit Artefakten und noise vermischt, weitere Verarbeitung vor Extraktion Vitalparameter nötig oder Extraktion von physiologischen Eigenschaften unmöglich
-		\item im klinischen Kontext genutzte Artefakterkennung oft durch relativ einfaches Preprocessing \footcite[Vgl.][]{Nizami2013}
-		\item oft bestimmte Informationen direkt oder indirekt \textit{hard coded}, kann zum einen etwas wie Typ oder Frequenz der Daten sein, aber auch demographische Informitonen über die Patient*innen wie Alter, Gewicht oder medizinischer Zustand\footcite[Vgl.][]{Nizami2013}
-		\item Beispiel für Beurteilung der Signalqualität von anderen kardiorespiratorischen Signalen, in diesem Fall \ac{EKG} und \ac{PPG} in Abbildung, betrachtet werden 10-Sekunden-Fenster %TODO: einfügen
-		\item erst Segmentierung der Herzschläge und dann 4 Kriterien überprüft -> reichen jeweils um Signal als schlecht zu klassifizieren
-		\item Herzrate zwischen 40 und 180 Schlägen pro Minute? Abstand der Hochpunkte aufeinander folgender Herzchläge unter 3 Sekunden (kein Schlag fehlt?), Verhältnis maximales und minimales Schlag-zu-Schlag-Intervall kleiner als 2.2 (Begrenzung Veränderung Herzrate in untersuchtem 10-Sekunden-Fenster), Korrelation zu erstelltem Template höher als Schwellwert?
-		\item bei \ac{BKG} auch Artefakterkennung schwieriger als bei anderen kardiorespiratorischen Signalen: zusätzlich zur Variabilität bei Atmung Veränderungen bei Positionsänderungen -> vorher erstellte Templates werden obsolet
-		\item \footcite{HoogAntink2020} festgestellt, dass bei Messsystemen in Betten besonders die Messung während des Tages große Signalteile von schlechter Qualität aufweisen, mehr als nachts, sichtbar ist z.B. auch Zeit des Mittagessens
-		\item oft genutzt, dass Bewegungen stärkere Krafteinwirkungen verursachen, als Atmung und Herzschlag
+		\item oft genutzt, dass Bewegungen stärkere Krafteinwirkungen verursachen, als Atmung und Herzschlag, das sind dann Artefakte mit hoher Energie
 		\item bei Betrachtung verschiedener Ansätze zur Signalverarbeitung: Proband*innen oft angewiesen, sich möglichst wenig zu bewegen -> nicht realistisch für BKG-Aufnahmen in Betten
+		\item \footcite{HoogAntink2020} festgestellt, dass bei Messsystemen in Betten besonders die Messung während des Tages große Signalteile von schlechter Qualität aufweisen, mehr als nachts, sichtbar ist z.B. auch Zeit des Mittagessens
 		\item teils EKG-Referenz zur Artefakterkennung genutzt -> im \textit{unobtrusive} Kontext nicht zielführend
 		\item im Folgenden ausgewählte Ansätze vorgestellt
 	\end{itemize}
