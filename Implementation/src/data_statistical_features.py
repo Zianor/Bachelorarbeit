@@ -67,8 +67,16 @@ class DataSet:
     def is_informative(self, ecg_hr, bcg_hr):
         abs_err = np.abs(ecg_hr - bcg_hr)
         rel_err = 100 / ecg_hr * abs_err
-        if np.isnan(bcg_hr) or rel_err > self.hr_threshold:
+        if np.isnan(bcg_hr):
             return False
+        if ecg_hr / 100 * self.hr_threshold > self.hr_threshold/2:
+            if rel_err > self.hr_threshold:
+                return False
+            else:
+                return True
+        else:
+            if abs_err > self.hr_threshold/2:
+                return False
         return True
 
     def save_csv(self):
