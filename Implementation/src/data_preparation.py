@@ -24,7 +24,7 @@ class BCGSeries:
         self.brueser_sqi = self.brueser_df['qualities'].to_numpy()
 
     def get_hr(self, start, end):
-        """Calculates heartrate in given interval by calculating the mean length of the detected intervals
+        """Calculates heart rate in given interval by calculating the mean length of the detected intervals
         """
         indices = np.where(np.logical_and(start <= self.unique_peaks, self.unique_peaks < end))
         if len(indices) > 0:
