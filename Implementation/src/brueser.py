@@ -1,5 +1,5 @@
 import numpy as np
-import scipy
+import utils
 from numba import jit
 
 
@@ -12,13 +12,12 @@ from numba import jit
 
 # rr_baseline = medians[qualities > np.max(qualities) / 5]
 # unique_peaks = unique_peaks[qualities > np.max(qualities) / 5]
-from data_statistical_features import SegmentStatistical
 
 
 def filter(data, sample_rate):
     """Filters signal
     """
-    return SegmentStatistical._butter_bandpass_filter(data, 1, 12, sample_rate)
+    return utils.butter_bandpass_filter(data, 1, 12, sample_rate)
 
 
 def interval_probabilities(data, win, estimate_lengths=True):

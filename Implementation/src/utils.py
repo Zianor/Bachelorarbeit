@@ -1,6 +1,8 @@
 from pathlib import Path
 import os
 
+from scipy.signal import lfilter, butter
+
 
 def get_project_root() -> Path:
     """Returns project root folder.
@@ -98,4 +100,28 @@ def seconds_to_frames(duration_seconds, frequency):
     """
     duration_frames = duration_seconds * frequency
     return int(duration_frames)
+
+
+def butter_bandpass_filter(data, lowcut, highcut, fs, order=5):
+    """
+    Butterworth Bandpass
+    :param data: data to be filtered
+    :param lowcut: lowcut frequency in Hz
+    :param highcut: highcut frequency in Hz
+    :param fs: sample rate in Hz
+    """
+    b, a = butter_bandpass(lowcut, highcut, fs, order=order)
+    y = lfilter(b, a, data)
+    return y
+
+
+def butter_bandpass(lowcut, highcut, fs, order=5):
+    """
+    Used internally for Butterworth Bandpass
+    """
+    nyq = 0.5 * fs
+    low = lowcut / nyq
+    high = highcut / nyq
+    b, a = butter(order, [low, high], btype='band')
+    return b, a
 
