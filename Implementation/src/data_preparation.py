@@ -1,6 +1,6 @@
 from scipy.io import loadmat
-import src.utils as utils
-from src.data_processing import ecg_csv, get_brueser
+import utils as utils
+from data_processing import ecg_csv, get_brueser
 import pandas as pd
 import numpy as np
 import os

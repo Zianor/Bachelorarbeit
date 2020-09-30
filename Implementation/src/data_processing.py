@@ -9,8 +9,8 @@ from pyedflib import highlevel
 from scipy import signal
 from scipy.io import loadmat
 
-import src.brueser as brueser
-import src.utils as utils
+import brueser
+import utils
 
 from multiprocessing import Pool
 import multiprocessing as mp
@@ -30,7 +30,7 @@ def get_brueser_hr(unique_peaks, medians, segment_length, sample_rate):
 
 
 def get_brueser_segment_hr(start, end, unique_peaks, medians, sample_rate):
-    """Calculates Heartrate in given interval by calculating the mean of the detected intervals
+    """Calculates heart rate in given interval by calculating the mean of the detected intervals
     """
     indices = np.where(np.logical_and(start <= unique_peaks, unique_peaks < end))
     hr = 60 / (np.mean(medians.to_numpy()[indices]) / sample_rate)

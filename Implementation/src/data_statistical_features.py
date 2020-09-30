@@ -7,8 +7,8 @@ import pandas as pd
 from scipy.signal import find_peaks, hilbert, butter, lfilter
 from scipy.stats import median_absolute_deviation, kurtosis, skew
 
-import src.utils as utils
-from src.data_preparation import Data, DataSeries
+import utils
+from data_preparation import Data, DataSeries
 
 
 class DataSet:
