@@ -195,12 +195,9 @@ def rr_intervals_from_est_len(est_len, peaks, data, quality, min_win):
     qualities = np.zeros(unique_peaks.shape[0])
 
     for idx, peak in enumerate(unique_peaks):
-        # calculate median of all lengths associated with this peak
+        # calculate median of all lengths and qualities associated with this peak
         medians[idx] = np.median(est_len_adj[corresponding_peaks == peak])
-        # calculate sum of all qualities associated with this peak
-        # qualities[idx] = np.sum(quality[corresponding_peaks == peak])
-        print(quality[corresponding_peaks == peak])
-        qualities[idx] = np.median(quality[corresponding_peaks == peak]) #  * 10
+        qualities[idx] = np.median(quality[corresponding_peaks == peak]) * 10
 
     return unique_peaks, medians, qualities
 
@@ -244,37 +241,14 @@ def prob_estimator(win_sig, win, estimate_lengths=True):
         coeffs *= 0.9 / np.sum(coeffs, axis=1, keepdims=True) + eps
         coeffs += 0.1 / coeffs.shape[1]
 
-        # erweiterter Brueser?
         probabilities[k, :] = coeffs[0, :] * coeffs[1, :] * coeffs[2, :]
         # combined *= probabilities[k, :]  # not needed for single channel
 
         if estimate_lengths:
             max_ampl, _, est_len_peak = find_largest_peak(probabilities[k, :], win[0])
             quality[k] = max_ampl / np.sum(probabilities[k, :])
+            # assert quality[k] <= 1 or np.isnan(quality[k]), f"erste Qualitaet bei {quality[k]}, array {probabilities[k, :]}"
             est_len[k] = est_len_peak
 
     return probabilities, est_len, quality
 
-
-@jit(nopython=True, fastmath=True)
-def rr_intervals_from_est_len(est_len, peaks, data, quality, min_win):
-    est_len_adj = est_len.astype(np.int32)
-    corresponding_peaks = np.zeros((data.shape[0]), dtype=np.int32)
-
-    for data_idx in range(min_win, data.shape[0] - min_win):
-        estimated_interval = est_len_adj[data_idx]
-        max_sum = -np.inf
-        for peak in peaks[np.searchsorted(peaks, data_idx):np.searchsorted(peaks, data_idx + estimated_interval) + 1]:
-            if max_sum < data[peak] + data[peak - estimated_interval]:
-                max_sum = data[peak] + data[peak - estimated_interval]
-                corresponding_peaks[data_idx] = peak
-
-    unique_peaks = np.unique(corresponding_peaks)
-    medians = np.zeros(unique_peaks.shape[0])
-    qualities = np.zeros(unique_peaks.shape[0])
-
-    for idx, peak in enumerate(unique_peaks):
-        medians[idx] = np.median(est_len_adj[corresponding_peaks == peak])
-        qualities[idx] = np.sum(quality[corresponding_peaks == peak])
-
-    return unique_peaks, medians, qualities
