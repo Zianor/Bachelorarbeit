@@ -139,3 +139,4 @@ dmypy.json
 /Implementation/data/drift_compensation/*
 /Implementation/data/grid_params/*/*.sav
 Implementation/data/data_set*
+Implementation/data/data.set
