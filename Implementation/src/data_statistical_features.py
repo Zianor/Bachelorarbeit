@@ -4,11 +4,11 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from scipy.signal import find_peaks, hilbert, butter, lfilter
+from scipy.signal import find_peaks, hilbert
 from scipy.stats import median_absolute_deviation, kurtosis, skew
 
 import utils
-from data_preparation import Data, DataSeries
+from data_preparation import DataSeries, Data
 
 
 class DataSet:
@@ -41,18 +41,16 @@ class DataSet:
                     if not series.reference_exists(start, end):  # ignore if no reference ecg
                         continue
                     ecg_hr = series.get_ecg_hr(start, end)
-                    ecg_hr_std = series.get_ecg_hr_std(start, end)
                     brueser_sqi = series.get_brueser_sqi(start, end)
                     bcg_hr = series.get_bcg_hr(start, end)
                     informative = self.is_informative(ecg_hr, bcg_hr)
                     self.segments.append(
-                        self._get_segment(series, start, end, informative, ecg_hr, ecg_hr_std, brueser_sqi, bcg_hr))
+                        self._get_segment(series, start, end, informative, ecg_hr, brueser_sqi, bcg_hr))
 
-    def _get_segment(self, series: DataSeries, start, end, informative, ecg_hr, ecg_hr_std, brueser_sqi, bcg_hr):
+    def _get_segment(self, series: DataSeries, start, end, informative, ecg_hr, brueser_sqi, bcg_hr):
         return Segment(
             patient_id=series.patient_id,
             ecg_hr=ecg_hr,
-            ecg_hr_std=ecg_hr_std,
             bcg_hr=bcg_hr,
             brueser_sqi=brueser_sqi,
             informative=informative
@@ -120,7 +118,6 @@ class DataSetStatistical(DataSet):
             raw_data=series.bcg.raw_data[start: end],
             patient_id=series.patient_id,
             ecg_hr=ecg_hr,
-            ecg_hr_std=ecg_hr_std,
             bcg_hr=bcg_hr,
             brueser_sqi=brueser_sqi,
             sample_rate=series.bcg_sample_rate,
@@ -155,7 +152,6 @@ class DataSetBrueser(DataSet):
         return SegmentBrueserSQI(
             patient_id=series.patient_id,
             ecg_hr=ecg_hr,
-            ecg_hr_std=ecg_hr_std,
             bcg_hr=bcg_hr,
             brueser_sqi=brueser_sqi,
             sample_rate=series.bcg_sample_rate,
@@ -195,7 +191,6 @@ class DataSetPino(DataSet):
             raw_data=series.bcg.raw_data[start: end],
             patient_id=series.patient_id,
             ecg_hr=ecg_hr,
-            ecg_hr_std=ecg_hr_std,
             bcg_hr=bcg_hr,
             brueser_sqi=brueser_sqi,
             sample_rate=series.bcg_sample_rate,
@@ -222,13 +217,12 @@ class Segment:
     """A segment of bcg data without any features yet
     """
 
-    def __init__(self, patient_id, ecg_hr, ecg_hr_std, bcg_hr, brueser_sqi, informative):
+    def __init__(self, patient_id, ecg_hr, bcg_hr, brueser_sqi, informative):
         self.brueser_sqi = brueser_sqi
         self.patient_id = patient_id
         self.informative = informative
         self.ecg_hr = ecg_hr
         self.bcg_hr = bcg_hr
-        self.ecg_hr_std = ecg_hr_std
         self.abs_err = np.abs(ecg_hr - bcg_hr)
         self.rel_err = 100 / ecg_hr * self.abs_err
 
@@ -240,7 +234,6 @@ class Segment:
             'informative',
             'ecg_hr',
             'bcg_hr',
-            'ecg_hr_std',
             'abs_err',
             'rel_err'
         ])
@@ -255,7 +248,6 @@ class Segment:
             self.informative,
             self.ecg_hr,
             self.bcg_hr,
-            self.ecg_hr_std,
             self.abs_err,
             self.rel_err,
         ])
@@ -263,8 +255,8 @@ class Segment:
 
 class SegmentPino(Segment):
 
-    def __init__(self, raw_data, patient_id, ecg_hr, ecg_hr_std, bcg_hr, brueser_sqi, sample_rate, informative):
-        super().__init__(patient_id, ecg_hr, ecg_hr_std, bcg_hr, brueser_sqi, informative)
+    def __init__(self, raw_data, patient_id, ecg_hr, bcg_hr, brueser_sqi, sample_rate, informative):
+        super().__init__(patient_id, ecg_hr, bcg_hr, brueser_sqi, informative)
         self.bcg = raw_data
         minimum = np.min(self.bcg)
         maximum = np.max(self.bcg)
@@ -297,7 +289,7 @@ class SegmentStatistical(Segment):
     vital signs with opportunistic ambient sensing' (https://ieeexplore.ieee.org/document/7591234)
     """
 
-    def __init__(self, raw_data, patient_id, ecg_hr, ecg_hr_std, bcg_hr, brueser_sqi, sample_rate, informative):
+    def __init__(self, raw_data, patient_id, ecg_hr, bcg_hr, brueser_sqi, sample_rate, informative):
         """
         Creates a segment and computes several statistical features
         :param raw_data: raw BCG data
@@ -305,8 +297,8 @@ class SegmentStatistical(Segment):
         :param coverage:
         :param mean_error: mean BBI error to reference
         """
-        super().__init__(patient_id, ecg_hr, ecg_hr_std, bcg_hr, brueser_sqi, informative)
-        self.bcg = SegmentStatistical._butter_bandpass_filter(raw_data, 1, 12, sample_rate)
+        super().__init__(patient_id, ecg_hr, bcg_hr, brueser_sqi, informative)
+        self.bcg = utils.butter_bandpass_filter(raw_data, 1, 12, sample_rate)
         self.minimum = np.min(self.bcg)
         self.maximum = np.max(self.bcg)
         self.mean = np.mean(self.bcg)
@@ -338,29 +330,6 @@ class SegmentStatistical(Segment):
         amplitude_envelope = np.abs(analytic_signal)
         return np.mean(amplitude_envelope)
 
-    @staticmethod
-    def _butter_bandpass_filter(data, lowcut, highcut, fs, order=5):
-        """
-        Butterworth Bandpass
-        :param data: data to be filtered
-        :param lowcut: lowcut frequency in Hz
-        :param highcut: highcut frequency in Hz
-        :param fs: sample rate in Hz
-        """
-        b, a = SegmentStatistical._butter_bandpass(lowcut, highcut, fs, order=order)
-        y = lfilter(b, a, data)
-        return y
-
-    @staticmethod
-    def _butter_bandpass(lowcut, highcut, fs, order=5):
-        """
-        Used internally for Butterworth Bandpass
-        """
-        nyq = 0.5 * fs
-        low = lowcut / nyq
-        high = highcut / nyq
-        b, a = butter(order, [low, high], btype='band')
-        return b, a
 
     @staticmethod
     def get_feature_name_array():
@@ -407,9 +376,9 @@ class SegmentStatistical(Segment):
 
 class SegmentBrueserSQI(Segment):
 
-    def __init__(self, patient_id, ecg_hr, ecg_hr_std, bcg_hr, brueser_sqi, informative, threshold, medians, qualities,
+    def __init__(self, patient_id, ecg_hr, bcg_hr, brueser_sqi, informative, threshold, medians, qualities,
                  sample_rate, length_samples):
-        super().__init__(patient_id, ecg_hr, ecg_hr_std, bcg_hr, brueser_sqi, informative)
+        super().__init__(patient_id, ecg_hr, bcg_hr, brueser_sqi, informative)
         indices = np.argwhere(qualities >= threshold)
         self.sqi_hr = np.nan
         self.sqi_coverage = np.nan

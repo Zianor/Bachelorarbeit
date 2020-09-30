@@ -118,10 +118,6 @@ class DataSeries:
         ecg_start, ecg_end = self.get_ecg_area(bcg_start=bcg_start, bcg_end=bcg_end)
         return self.ecg.get_hr(ecg_start, ecg_end)
 
-    def get_ecg_hr_std(self, bcg_start, bcg_end):
-        ecg_start, ecg_end = self.get_ecg_area(bcg_start=bcg_start, bcg_end=bcg_end)
-        return self.ecg.get_hr_std(ecg_start, ecg_end)
-
     def get_bcg_hr(self, bcg_start, bcg_end):
         return self.bcg.get_hr(bcg_start, bcg_end)
 
