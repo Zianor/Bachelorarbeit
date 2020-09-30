@@ -33,7 +33,7 @@ def get_brueser_segment_hr(start, end, unique_peaks, medians, sample_rate):
     """Calculates heart rate in given interval by calculating the mean of the detected intervals
     """
     indices = np.where(np.logical_and(start <= unique_peaks, unique_peaks < end))
-    hr = 60 / (np.mean(medians.to_numpy()[indices]) / sample_rate)
+    hr = 60 / (np.median(medians.to_numpy()[indices]) / sample_rate)
     return hr
 
 
@@ -132,16 +132,16 @@ def get_ecg_segment_hr(start, end, r_peaks, sample_rate, lower_threshold=30, upp
     curr_hr = []
     for r_peaks_single in r_peaks.transpose():
         indices = np.argwhere(np.logical_and(start <= r_peaks_single, r_peaks_single < end))
-        if len(indices) > 1:
-            hr_guess = (len(indices) - 1) / (
-                    r_peaks_single[indices[-1]] - r_peaks_single[indices[0]]) * sample_rate * 60
+        interval_lengths = [r_peaks_single[indices[i]] - r_peaks_single[indices[i - 1]] for i in range(1, len(indices))]
+        if interval_lengths:
+            hr_guess = np.median(interval_lengths) / sample_rate * 60
             lower_threshold_count = lower_threshold * (end - start) / (sample_rate * 60)
             upper_threshold_count = upper_threshold * (end - start) / (sample_rate * 60)
             if lower_threshold < hr_guess < upper_threshold and lower_threshold_count < len(
                     indices) < upper_threshold_count:
                 curr_hr.append(hr_guess)
     if curr_hr:
-        hr = np.mean(curr_hr)
+        hr = np.median(curr_hr)
     else:
         hr = 0
     return hr
