@@ -59,7 +59,6 @@ def brueser_csv(fs, path, use_existing=True):
     number = number.replace("mat", "")
     filename = 'brueser' + str(number) + 'csv'
     path_csv = os.path.join(utils.get_brueser_path(), filename)
-    print(path_csv)
 
     if not use_existing or not os.path.isfile(path_csv):
         win = np.arange(0.3 * fs, 2 * fs + 1, dtype=np.int32)
@@ -73,7 +72,6 @@ def brueser_csv(fs, path, use_existing=True):
             writer.writerow(["unique_peaks", "medians", "qualities"])
             for i, peak in enumerate(unique_peaks):
                 writer.writerow([peak, medians[i], qualities[i]])
-        print("Wrote " + path_csv)
     return pd.read_csv(path_csv)
 
 
