@@ -68,7 +68,7 @@ def brueser_csv(fs, path, use_existing=True):
         peaks, _ = scipy.signal.find_peaks(data, distance=win[0])
         unique_peaks, medians, qualities = brueser.rr_intervals_from_est_len(est_len, peaks, data, quality_arr,
                                                                              win[0])
-        with open(path_csv, 'w') as f:
+        with open(path_csv, 'w', newline='') as f:
             writer = csv.writer(f)
             writer.writerow(["unique_peaks", "medians", "qualities"])
             for i, peak in enumerate(unique_peaks):
