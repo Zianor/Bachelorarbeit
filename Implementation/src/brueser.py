@@ -141,6 +141,11 @@ def calc_all_coeffs(signal, signal_length, min_lag, min_window_size):
 
 @jit(nopython=True, fastmath=True)
 def find_largest_peak(signal, min_win):
+    """
+    :return max_ampl: value at max amplitude
+    :return idx: position of max amplitude
+    :return est_len: estimated length in samples
+    """
     extrs = []
     for i in range(1, signal.shape[0] - 1):
         if signal[i] > signal[i - 1] and signal[i] > signal[i + 1]:
