@@ -1,5 +1,6 @@
 import csv
 import os
+import pickle
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -28,7 +29,14 @@ class DataSet:
         """
         Creates segments with a given length out of given BCG Data
         """
-        data = Data()
+        if os.path.isfile(utils.get_data_object_path()):
+            with open(utils.get_data_object_path(), 'rb') as file:
+                data = pickle.load(file)
+        else:
+            data = Data()
+            with open(utils.get_data_object_path(), 'wb') as file:
+                pickle.dump(data, file)
+                file.flush()
         segment_length_frames = utils.seconds_to_frames(self.segment_length, data.sample_rate)  # in samples
         segment_distance = utils.seconds_to_frames(self.segment_length - self.segment_length * self.overlap_amount,
                                                    data.sample_rate)

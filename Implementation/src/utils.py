@@ -46,6 +46,10 @@ def get_data_path() -> Path:
     return os.path.join(get_project_root(), 'data')
 
 
+def get_data_object_path() -> Path:
+    return os.path.join(get_data_path(), 'data.set')
+
+
 def get_data_set_folder(segment_length, overlap_amount) -> Path:
     folder_name = 'data_set_l' + str(segment_length) + '_o' + str(overlap_amount)
     return os.path.join(get_data_path(), folder_name)
