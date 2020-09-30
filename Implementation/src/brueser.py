@@ -15,77 +15,10 @@ from numba import jit
 from data_statistical_features import SegmentStatistical
 
 
-def _bandpass_order(f_stop1, f_pass1, f_pass2, f_stop2, dpass_dB, dstop_dB, fsamp = 1):
-    """
-    Optimal FIR (equal ripple) Bandpass Order Determination
-
-    Text reference: Ifeachor, Digital Signal Processing a Practical Approach,
-    second edition, Prentice Hall, 2002.
-    Journal paper reference: F. Mintzer & B. Liu, Practical Design Rules for Optimum
-    FIR Bandpass Digital Filters, IEEE Transactions on Acoustics and Speech, pp.
-    204-206, April,1979.
-
-    Source: https://scikit-dsp-comm.readthedocs.io/en/latest/_modules/sk_dsp_comm/fir_design_helper.html#fir_remez_bpf
-    Basic Linear Phase Digital Filter Design Helper
-
-    Copyright (c) March 2017, Mark Wickert
-    All rights reserved.
-    """
-    dpass = 1 - 10**(-dpass_dB/20)
-    dstop = 10**(-dstop_dB/20)
-    Df1 = (f_pass1 - f_stop1)/fsamp
-    Df2 = (f_stop2 - f_pass2)/fsamp
-    b1 = 0.01201
-    b2 = 0.09664
-    b3 = -0.51325
-    b4 = 0.00203
-    b5 = -0.5705
-    b6 = -0.44314
-
-    Df = min(Df1, Df2)
-    Cinf = np.log10(dstop)*(b1*np.log10(dpass)**2 + b2*np.log10(dpass) + b3) \
-           + (b4*np.log10(dpass)**2 + b5*np.log10(dpass) + b6)
-    g = -14.6*np.log10(dpass/dstop) - 16.9
-    N = Cinf/Df + g*Df + 1
-    ff = 2*np.array([0, f_stop1, f_pass1, f_pass2, f_stop2, fsamp/2])/fsamp
-    aa = np.array([0, 0, 1, 1, 0, 0])
-    wts = np.array([dpass/dstop, 1, dpass/dstop])
-    return int(N), ff, aa, wts
-
-
-def fir_remez_bpf(f_stop1, f_pass1, f_pass2, f_stop2, d_pass, d_stop, fs, n_bump=5):
-    """
-    Design an FIR bandpass filter using remez with order
-    determination. The filter order is determined based on
-    f_stop1 Hz, f_pass1 Hz, f_pass2 Hz, f_stop2 Hz, and the
-    desired passband ripple d_pass dB and stopband attenuation
-    d_stop dB all relative to a sampling rate of fs Hz.
-
-    Mark Wickert October 2016, updated October 2018
-    Source: https://scikit-dsp-comm.readthedocs.io/en/latest/_modules/sk_dsp_comm/fir_design_helper.html#fir_remez_bpf
-
-    Basic Linear Phase Digital Filter Design Helper
-
-    Copyright (c) March 2017, Mark Wickert
-    All rights reserved.
-    """
-    n, ff, aa, wts = _bandpass_order(f_stop1, f_pass1, f_pass2, f_stop2,
-                                  d_pass, d_stop, fsamp=fs)
-    # Bump up the order by N_bump to bring down the final d_pass & d_stop
-    n_taps = n
-    n_taps += n_bump
-    b = scipy.signal.remez(n_taps, ff, aa[0::2], wts, Hz=2)
-    return b
-
-
 def filter(data, sample_rate):
     """Filters signal
     """
-    b = fir_remez_bpf(f_pass1=1, f_stop1=0.5, f_pass2=10, f_stop2=12, d_pass=0.1, d_stop=80, fs=sample_rate)
-    return scipy.signal.lfilter(b=b, a=1, x=data)
-    return data
-    # FIR Filter 0.5 und 20 Hz
-    # erste Ableitung mit Savitzky-Golay filter
+    return SegmentStatistical._butter_bandpass_filter(data, 1, 12, sample_rate)
 
 
 def interval_probabilities(data, win, estimate_lengths=True):
