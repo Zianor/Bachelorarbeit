@@ -25,36 +25,39 @@
 
 \section{Detektion von Herzschlägen}\label{CLIE}
 
-	\begin{itemize}
-		\item in dieser Arbeit Fokus auf von Brüser entwickelter Algoritmus, dem \textit{Continuous Local Interval Estimator}, kurz \textit{CLIE}
-		\item in \ref{ballistokardiographie} erwähnte Annahme: aufeinander folgende Herzschläge ähneln sich
-		\item Vorverarbeitung: Bandpass-Filter 0.5 und 20 Hz
-		\item erste Ableitung des mit Savitzky-Golay gefilterten Signals für Analyse genutzte
-		\item Algorithmus iteriert mit \textit{Moving Window} über das Signal
-		\item 2 Schwellwerte genutzt, $T_min$ und $T_max$, basierend auf bekanntem Bereich der Herzrate
-		\item Fensterlänge 2 mal maximale Intervalllänge \[w_i[v] = x[n_i + v], v \in \{ -T_{max} * f_s, ..., T_{max} * f_s\} \]
-		\item adaptives Fenster schätzt nur Intervalllänge an Mittelpunkt des Fensters
-		\item lokale Intervalllänge $T_i$ schätzen
-		\item Zentrum des Analysefensters weiter bewegen $n_{i+1} = n_i + \Delta t * f_s$
-		\item Schätzung der Intervalllänge durch drei Schätzer
-	\end{itemize}
+	In dieser Arbeit wird der von \citeauthor{Bruser2013} entwickelte Algorithmus, der \textit{Continuous Local Interval Estimator}, kurz \textit{CLIE} verwendet. Aus diesem Grund wird er hier vorgestellt. Der Algorithmus beruht auf auf der in \ref{ballistokardiographie} erwähnten Annahme, dass sich aufeinander folgenden Herzschläge ähneln und schätzt die Herzrate anhand der Selbstähnlichkeit des Signals.
+
+
+	Der Algorithmus iteriert mit einem \textit{Moving window} über das mit einem Bandpass gefilterte Signal. Es werden zwei Schwellwerte für die Intervalllänge $T$ genutzt, $T_{min}$ und $T_{max}$, basierend auf bekanntem Bereich der Herzrate von 30 bis 200. Die Länge des Analysefensters $w_i$ entspricht $2 * T_{max}$, sodass mindestens zwei vollständige Herzschläge enthalten sind.
+	\[w_i[v] = x[n_i + v], v \in \{ -T_{max} * f_s, ..., T_{max} * f_s\}\]
+	
+	In jedem Fenster wird die lokale Intervalllänge $T_i$ geschätzt und anschließend das Zentrum des Fensters $n_i$ weiterbewegt. \[ n_{i+1} = n_i + \Delta t * f_s \]
+	
+	Die Schätzung der Intervalllänge beruht auf drei Selbstähnlichkeitsmaßen, die wie folgt definiert sind:
 	
 	\begin{align*}
-		E\textsubscript{Corr}[n] &= \frac{1}{n} \sum_{v=0}^{n} w[v]w[v-n],\\
-		E\textsubscript{AMDF}[n] &= (\frac{1}{n} \sum_{v=0}^{n} |w[v]-w[v-n]|)^{-1},\\
-		E\textsubscript{MAP}[n] &= \max_{v \in \{0,...,n\}}(w[v]+w[v-n]).
+		E\textsubscript{Corr}[N] &= \frac{1}{N} \sum_{v=0}^{N} w[v]w[v-N],\\
+		E\textsubscript{AMDF}[N] &= (\frac{1}{N} \sum_{v=0}^{N} |w[v]-w[v-N]|)^{-1},\\
+		E\textsubscript{MAP}[N] &= \max_{v \in \{0,...,n\}}(w[v]+w[v-N]).
 	\end{align*}
+ 	
+ 	Dabei berechnet $E_{corr}$ eine modifizierte Autokorrelationsfunktion, mit $E_{AMDF}$ wird die Differenz des Signals zueinander miteinbezogen und mit $E_{MAP}$ werden die maximale Amplituden von beliebigen 2 Samples über das ganze Fenster berechnet. AMDF steht für \textit{modified average magnitude difference function} und MAP für \textit{maximum amplitude pairs}. Diese Schätzer entsprechen jeweils einer Wahrscheinlichkeitsfunktion, die beschreibt wie wahrscheinlich es ist, dass $n$ dem tatsächlichen Schlag-zu-Schlag-Intervall entspricht. Durch Skalierung können sie in Wahrscheinlichkeitsdichtefunktionen verwandelt werden. Durch Kombination dieser drei Funktionen wird nun der wahrscheinlichste Wert für $N$ ermittelt:
+ 	\[ N_i = \argmax_{N} p(N|E\textsubscript{Corr}, E\textsubscript{AMDF}, E\textsubscript{MAP}) \]
+ 	
+	Nach dem Satz von Bayes kann die Wahrscheinlichkeit, dass $N$ der tatsächlichen Intervalllänge entspricht auch wie folgt ausgedrückt werden:
 	
-	\begin{itemize}
-		\item $E_{corr}$ berechnet eine modifizierte Autokorrelationsfunktion, mit $E_{AMDF}$ wird die Differenz des Signals zueinander miteinbezogen, AMDF steht für Modified average magnitude difference function
-		\item mit $E_{MAP}$ werden die maximale Amplituden von beliebigen 2 Samples über das ganze Fenster berechnet, MAP steht für maximum amplitude pairs
-		\item jeweils Wahrscheinlichkeitsfunktion, wie wahrscheinlich es ist, dass n dem tatsächlichen Schlag-zu-Schlag-Intervall entspricht
-		\item Fusion dieser nach Bayes
-	\end{itemize}
+	\[
+		p(N|E\textsubscript{Corr}, E\textsubscript{AMDF}, E\textsubscript{MAP}) = \frac{p(E\textsubscript{Corr}, E\textsubscript{AMDF}, E\textsubscript{MAP} | N) p(N)}{p(E\textsubscript{Corr}, E\textsubscript{AMDF}, E\textsubscript{MAP})}
+	\]
+	
+	Durch Anwenden der Theoreme von Bayes unter der Annahme, dass die Ergebnisse der 3 Schätzer nicht voneinander, sondern nur von $n$ abhängen und dass $n$ gleichverteilt ist, erhält man folgende Wahrscheinlichkeitsfunktion, mit der man die wahrscheinlichste Intervalllänge erhalten kann. Auch diese Funktion entspricht mit Skalierung einer Wahrscheinlichkeitsdichtefunktion.
+	
 	\begin{align*}
 		E_f[n] &= E\textsubscript{Corr}[n] \cdot E\textsubscript{AMDF}[n] \cdot E\textsubscript{MAP}[n],\\
 		n_{opt} &= \argmax_{n} E_f[n]	
 	\end{align*}
+	
+	Wie die 3 einzelnen Schätzer und die fusionierte Funktion aussehen kann, ist in \ref{fig:estimator-fusion} gezeigt.
 	
 	\begin{figure}[H]
 		\centering
@@ -63,7 +66,7 @@
 		\label{fig:estimator-fusion}
 	\end{figure}
 	
-	\footcites[Vgl. zu diesem Absatz][]{Bruser2013}{Zink2017}
+	Nun gibt es für jeden Punkt im Signal eine Schätzung der Intervalllänge. Mit Hilfe der Fenstergröße und dieser Länge können die zu einem Herzschlag gehörenden Hochpunkte ermittelt werden, nämlich die, die die größte kombinierten Amplitude mit dem durch die Intervalllänge gegebenen Abstand besitzen. Für jeden dieser Punkte $P_k$ existiert nun eine Menge an Schätzungen $T_k$, mit der eine robuste Intervallschätzung $\overline{T_k} = \text{median}(T_k)$ ermittelt werden kann.\footcites[Vgl. zu diesem Kapitel][]{Bruser2013}
 
 \section{Artefakterkennung}
 
