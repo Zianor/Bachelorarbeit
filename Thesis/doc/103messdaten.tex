@@ -156,9 +156,16 @@ Im folgenden Kapitel wird eine Einführung in das Thema der Signalverarbeitung u
 	
 	Gemessen wurde mit einem EMFit QS Bettsensor, der zwischen der Matratze des Krankenhausbettes und dem Bettgestell positioniert wurde. Die Abtastrate des \ac{BKG} betrug 100 Hz. Das Referenz-\ac{EKG} wurde mit einem Faros 360 Patientenmonitor mit einer Abtastrate von 1 kHz aufgenommen und hat drei Kanäle. Durch die unterschiedlichen Systemzeiten der beiden Geräte kam es zu einem Drift zwischen den beiden Signalen. Bei den langen Messungen zeigte sich, dass dieser zeitvariant ist.
 	
-	Es liegen also \ac{BKG}-Daten und ein 3-kanaliges \ac{EKG}-Signal vor. Außerdem liegen schon detektierte und nach ihrer Qualität gefilterte Herzschläge mitsamt ihrer Qualität Länge und der Länge des Referenzsignals vor. Zusätzlich gibt es zu jedem Paar von \ac{EKG} und \ac{BKG}-Daten einen Vektor, der den zeit-varianten Drift berücksicht. Zu jeder Sekunde des \ac{BKG}-Signals wird die entsprechende Sekunde der \ac{EKG}-Referenz benannt.
+	Es liegen also \ac{BKG}-Daten und ein 3-kanaliges \ac{EKG}-Signal vor. Außerdem liegen schon detektierte und nach ihrer Qualität gefilterte Herzschläge mitsamt ihrer Qualität Länge und der Länge des Referenzsignals vor. Zusätzlich gibt es zu jedem Paar von \ac{EKG} und \ac{BKG}-Daten einen Vektor, der den zeitvarianten Drift berücksicht. Zu jeder Sekunde des \ac{BKG}-Signals wird die entsprechende Sekunde der \ac{EKG}-Referenz benannt.
 	
 	\subsection{Vorverarbeitung und Datenstruktur}
+	
+	Die verschiedenen Daten liegen in unterschiedlichen Formaten und Dateien vor, die zunächst zusammengeführt und vorverarbeitet werden müssen. Dieser Vorgang und die entwickelte Datenstruktur wird im Folgenden beschrieben.
+	
+	Für jeden Patient existiert eine .mat-Datei, die das rohe \ac{BKG}-Signal und die bereits detektierten Intervalle mit Position, Qualität und Referenzlänge enthält. Die Vektoren zum Ausgleich des Drifts liegen ebenfalls in .mat-Dateien vor. Das Referenzsignal ist im .edf-Format gespeichert. Da die Nummerierung von \ac{BKG}-Daten und \ac{EKG}-Daten variiert, existiert außerdem eine Zuordnung dieser. Das Ziel der entwickelten Datenstruktur ist es, diese Daten zusammenzuführen. Die Klassenstruktur sieht wie folgt aus:
+	
+	%TODO: Bild Klassen
+	
 	
 	\begin{itemize}
 		\item Datensatz von einem Patient besteht aus BKG Signal und EKG Referenz
