@@ -4,7 +4,7 @@ from numba import jit
 
 
 # Usage:
-# data = brueser.filter(data, FS)
+# data = brueser.preprocess(data, FS)
 # win = np.arange(0.3 * FS, 2 * FS + 1, dtype=np.int32)
 # result, est_len, quality_arr = brueser.interval_probabilities(data, win, estimate_lengths = True)
 # peaks, _ = scipy.signal.find_peaks(data, distance=win[0])
@@ -14,7 +14,7 @@ from numba import jit
 # unique_peaks = unique_peaks[qualities > np.max(qualities) / 5]
 
 
-def filter(data, sample_rate):
+def preprocess(data, sample_rate):
     """Filters signal
     """
     return utils.butter_bandpass_filter(data, 1, 12, sample_rate)
@@ -43,11 +43,13 @@ def interval_probabilities(data, win, estimate_lengths=True):
 
 @jit(nopython=True, fastmath=True)
 def calc_all_coeffs(signal, signal_length, min_lag, min_window_size):
-    """
+    """Calculates all 3 estimators for given window. More calculations need to be performed with them afterwards
+
     :param min_lag: minimal interval length in samples
     :param signal: signal without mean, starting at k in window
     :param signal_length: size of window
     :param min_window_size: is 0, does nothing?
+    :return: array of 3 interval estimation probabilities
     """
     mid = signal_length // 2
     coeffs = np.zeros((mid + 1 - min_lag, 3))
@@ -73,7 +75,8 @@ def calc_all_coeffs(signal, signal_length, min_lag, min_window_size):
 
 @jit(nopython=True, fastmath=True)
 def find_largest_peak(signal, min_win):
-    """
+    """Finds largest peak under certain circumstances in given signal. For max probability
+
     :return max_ampl: value at max amplitude
     :return idx: position of max amplitude
     :return est_len: estimated length in samples
@@ -114,6 +117,12 @@ def find_largest_peak(signal, min_win):
 
 @jit(nopython=True, fastmath=True)
 def rr_intervals_from_est_len(est_len, peaks, data, quality, min_win):
+    """Merges estimations to the unique peaks of the signal
+
+    :return unique_peaks: unique peaks where heartbeats are located
+    :return medians: estimated interval lengths
+    :return qualities: quality for estimated interval lengths
+    """
     est_len_adj = est_len.astype(np.int32)
     corresponding_peaks = np.zeros((data.shape[0]), dtype=np.int32)
 
@@ -141,6 +150,8 @@ def rr_intervals_from_est_len(est_len, peaks, data, quality, min_win):
 
 def prob_estimator(win_sig, win, estimate_lengths=True):
     """
+    Estimates interval length for given window
+
     :param win_sig: signal in the given window
     :param win: win = np.arange(0.3 * FS, 2 * FS + 1, dtype=np.int32)
     """

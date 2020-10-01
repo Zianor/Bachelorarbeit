@@ -62,7 +62,7 @@ def brueser_csv(fs, path, use_existing=True):
 
     if not use_existing or not os.path.isfile(path_csv):
         win = np.arange(0.3 * fs, 2 * fs + 1, dtype=np.int32)
-        data = brueser.filter(data, fs)
+        data = brueser.preprocess(data, fs)
         result, est_len, quality_arr = brueser.interval_probabilities(data, win, estimate_lengths=True)
         peaks, _ = scipy.signal.find_peaks(data, distance=win[0])
         unique_peaks, medians, qualities = brueser.rr_intervals_from_est_len(est_len, peaks, data, quality_arr,
