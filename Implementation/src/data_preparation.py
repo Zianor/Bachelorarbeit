@@ -52,22 +52,35 @@ class ECGSeries:
 
     def get_hr(self, start, end, lower_threshold=30, upper_threshold=200):
         """Calculates heart rate in given interval by calculating the mean length of the detected intervals.
-        It calculates the mean of all leads
+        It chooses the lead with the lowest difference to the hr of a slightly bigger area.
         """
         curr_hr = []
+        curr_hr_env = []
+        start_env = start - round(1.5 * (end - start))
+        end_env = end + round(1.5 * (end - start))
+        interval_ranges = []
         for r_peaks_single in self.r_peaks.transpose():
             indices = np.argwhere(np.logical_and(start <= r_peaks_single, r_peaks_single < end))
+            indices_env = np.argwhere(np.logical_and(start_env <= r_peaks_single, r_peaks_single < end_env))
             interval_lengths = [r_peaks_single[indices[i]] - r_peaks_single[indices[i - 1]] for i in
                                 range(1, len(indices))]
+            interval_lengths_env = [r_peaks_single[indices_env[i]] - r_peaks_single[indices_env[i - 1]] for i in
+                                    range(1, len(indices_env))]
             if interval_lengths:
                 hr_guess = np.median(interval_lengths) / self.sample_rate * 60
+                hr_guess_env = np.median(interval_lengths_env)
                 lower_threshold_count = lower_threshold * (end - start) / (self.sample_rate * 60)
                 upper_threshold_count = upper_threshold * (end - start) / (self.sample_rate * 60)
                 if lower_threshold < hr_guess < upper_threshold and lower_threshold_count < len(
                         indices) < upper_threshold_count:
                     curr_hr.append(hr_guess)
+                    curr_hr_env.append(hr_guess_env)
+                    interval_ranges.append(np.max(interval_lengths_env) - np.min(interval_lengths_env))
         if curr_hr:
-            hr = np.median(curr_hr)
+            id_min_range = np.argwhere(interval_ranges == np.min(interval_ranges))
+            hr_env = np.median(np.array(curr_hr_env)[id_min_range])
+            id_min_diff = np.argwhere(np.abs(curr_hr - hr_env) == np.min(np.abs(curr_hr - hr_env)))
+            hr = np.median(np.array(curr_hr)[id_min_diff])
         else:
             hr = 0
         return hr

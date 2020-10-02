@@ -427,4 +427,13 @@ class SegmentBrueserSQI(Segment):
 
 
 if __name__ == "__main__":
-    pass
+    DataSet(overlap_amount=0)
+    DataSet()
+    DataSet(hr_threshold=15)
+    DataSet(hr_threshold=5)
+    DataSetBrueser()
+    DataSetStatistical(overlap_amount=0)
+    DataSetStatistical()
+    DataSetPino()
+    DataSetPino(segment_length=10, overlap_amount=0.9)
+    SystemExit(0)
