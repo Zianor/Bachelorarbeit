@@ -105,8 +105,8 @@ Im folgenden Kapitel wird eine Einführung in das Thema der Signalverarbeitung u
 	
 	\begin{figure}[H]
 		\centering
-		\includegraphics[width=0.7\textwidth]{pic/bland-altman-pino.png}
-		\caption[Bland-Altman Graph zwischen von \ac{EKG} und \ac{BKG} berechneter \ac{HR}]{Bland-Altman Graph zwischen von \ac{EKG} und \ac{BKG} berechneter \ac{HR}}
+		\includegraphics[width=0.5\textwidth]{pic/bland-altman-pino.png}
+		\caption[Genauigkeit der Herzratenberechnung bei schwellwertbasierter Artefakterkennung]{Bland-Altman Graph zwischen von \ac{EKG} und \ac{BKG} berechneter \ac{HR}}
 		\label{fig:bland-altman-pino}
 	\end{figure}
 	
@@ -140,7 +140,7 @@ Im folgenden Kapitel wird eine Einführung in das Thema der Signalverarbeitung u
 	
 	Diese Ergebnisse sind sehr gut, allerdings muss bei der Einordnung beachtet werden, dass bei für die Kreuzvalidierung die Segmente zufällig verteilt wurden und nicht beachtet wurde, dass der Algorithmus für aussagekräftige Validierung einzelne Personen nicht darf. Dadurch ist die Performance auf gänzlich unbekannten Daten weiterhin nicht bekannt und vermutlich schlechter, als die Zahlen es hier vermuten lassen.
 	
-	\subsection{Ähnlichkeit der Intervallschätzer des CLIE-Algorithmus}
+	\subsection{Ähnlichkeit der Intervallschätzer des CLIE-Algorithmus}\label{brueserQI}
 	
 	Ein weiteres Maß für die Signalqualität basiert auf dem in \ref{CLIE} vorgestellten Algorithmus zur Intervallschätzung. Dieser \acl{SQI} misst, wie einig sich die drei Intervallschätzer sind. Wenn diese sich uneinig sind, ist der \ac{SQI} bei 0, je ähnlicher sich die Schätzungen sind, desto höher ist er. Für jedes Fenster $i$ wird er wie folgt berechnet: \[ q = \frac{E_f[n_{opt}, i]}{\sum E_f[n, i]} \]
 	
@@ -158,31 +158,30 @@ Im folgenden Kapitel wird eine Einführung in das Thema der Signalverarbeitung u
 	
 	Es liegen also \ac{BKG}-Daten und ein 3-kanaliges \ac{EKG}-Signal vor. Außerdem liegen schon detektierte und nach ihrer Qualität gefilterte Herzschläge mitsamt ihrer Qualität Länge und der Länge des Referenzsignals vor. Zusätzlich gibt es zu jedem Paar von \ac{EKG} und \ac{BKG}-Daten einen Vektor, der den zeitvarianten Drift berücksicht. Zu jeder Sekunde des \ac{BKG}-Signals wird die entsprechende Sekunde der \ac{EKG}-Referenz benannt.
 	
-	\subsection{Vorverarbeitung und Datenstruktur}
+	\subsection{Vorverarbeitung}
 	
 	Die verschiedenen Daten liegen in unterschiedlichen Formaten und Dateien vor, die zunächst zusammengeführt und vorverarbeitet werden müssen. Dieser Vorgang und die entwickelte Datenstruktur wird im Folgenden beschrieben.
 	
-	Für jeden Patient existiert eine .mat-Datei, die das rohe \ac{BKG}-Signal und die bereits detektierten Intervalle mit Position, Qualität und Referenzlänge enthält. Die Vektoren zum Ausgleich des Drifts liegen ebenfalls in .mat-Dateien vor. Das Referenzsignal ist im .edf-Format gespeichert. Da die Nummerierung von \ac{BKG}-Daten und \ac{EKG}-Daten variiert, existiert außerdem eine Zuordnung dieser. Das Ziel der entwickelten Datenstruktur ist es, diese Daten zusammenzuführen. Die Klassenstruktur sieht wie folgt aus:
+	Für jeden Patient existiert eine .mat-Datei, die das rohe \ac{BKG}-Signal und die bereits detektierten Intervalle mit Position, Qualität und Referenzlänge enthält. Die Vektoren zum Ausgleich des Drifts liegen ebenfalls in .mat-Dateien vor. Das Referenzsignal ist im .edf-Format gespeichert. Da die Nummerierung von \ac{BKG}-Daten und \ac{EKG}-Daten variiert, existiert außerdem eine Zuordnung dieser. Das Ziel der entwickelten Datenstruktur ist es, diese Daten zusammenzuführen. Die Klassenstruktur ist in Abbildung \ref{fig:data-prep-class} visualisiert. Die Klasse \textit{DataSeries} enthält alle Daten, die zu einer Person gehören, also das \ac{BKG}-Signal, das \ac{EKG}-Signal und Vektor, um den Drift auszugleichen. Alle Patient*innen sind in \textit{Data} gesammelt. Dort werden auch alle Daten eingelesen und zugeordnet.
 	
-	%TODO: Bild Klassen
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.9\textwidth]{pic/data-prep-class.png}
+		\caption[Klassendiagramm der Datenstruktur für die Messdaten]{Klassendiagramm der Datenstruktur für die Messdaten}
+		\label{fig:data-prep-class}
+	\end{figure}
+	
+	Um die Herzraten auf Intervallen bestimmen zu können, müssen sowohl das \ac{BKG}- als auch das \ac{EKG}-Signal vorverarbeitet werden. Da diese Vorverarbeitung durch die große Datenmenge sehr aufwändig ist, werden die Ergebnisse als .csv-Dateien serialisiert. Beim Laden der Prüfen kann so geprüft werden, ob die Berechnung wiederholt werden muss oder geladen werden kann.
+	
+	Bei der Vorverarbeitung des \ac{BKG}-Signals wird der in Kapitel \ref{CLIE} vorgestellte CLIE-Algorithmus angewendet und die ermittelten Indices der Intervalle, die geschätzte Intervallängen und der in Kapitel \ref{brueserQI} beschriebene Qualitätsindex gespeichert. Für das \ac{EKG}-Signal wird für die alle drei Kanäle eine Detektion der QRS-Komplexe durchgeführt, mit denen die Schlag-zu-Schlag Intervalle ermittelt werden können. Dafür wird die Python-Implementierung von \citeauthor{Howell2019} des von \citeauthor{Elgendi2010} beschriebenen Algorithmus\footcite[][]{Elgendi2010} genutzt. Dieser zeigt in einer Untersuchung von \citeauthor{Porr2019} gute Ergebnisse.\footcite[Vgl.][]{Porr2019}
 	
 	
-	\begin{itemize}
-		\item Datensatz von einem Patient besteht aus BKG Signal und EKG Referenz
-		\item beides wird eingelesen, geprüft ob schon Detektion von Herzschlägen (Erkennen von R-Peaks bzw. CLIE Algorithmus schon durchgeführt wurde und als csv-Datei existiert
-	\end{itemize}
-
 	\subsection{Annotation der Daten}
 	
-	Die vorliegenden Daten sind nicht annotiert. Es ist im Rahmen dieser Arbeit nicht möglich, die Annotation durch Expert*innen durchführen zu lassen, weshalb auf das parallel aufgenommene \ac{EKG} zurückgegriffen wird.
+	Die vorliegenden Daten sind nicht annotiert. Es ist im Rahmen dieser Arbeit nicht möglich, die Annotation durch Expert*innen durchführen zu lassen, weshalb auf das parallel aufgenommene \ac{EKG} zurückgegriffen wird. Aufgrund des nicht-linearen Drifts der Daten ist eine herzschlaggenaue Synchronisierung schwierig. Aus diesem Grund wurde entschieden, die Annotation bereichsweise vorzunehmen. Für jeden Bereich wird zunächst geprüft, ob aussagekräftiges Referenzsignal existiert. Falls nicht, wird der entsprechende Bereich ausgeschlossen und nicht weiter verwendet. Ansonsten wird die durchschnittliche Herzrate sowohl für BKG- als auch EKG-Signal berechnet. Für die Berechnung der Herzfrequenz im \ac{BKG} wird der Median der geschätzten Intervalllängen verwendet. So werden Ausreißer weniger stark gewichtet. Auch bei dem Referenzsignal wird die Herzrate über den Median der Intervalllängen ermittelt. Die Intervalllängen entsprechen hier den Abständen der ermittelten R-Peaks. Da drei \ac{EKG}-Kanäle vorliegen, wird die Herzrate zunächst für jeden Kanal einzeln geschätzt. Falls die geschätzte Herzrate außerhalb des erwarteten Bereichs von 30 bis 200 Schlägen pro Minute liegt, wird der Kanal verworfen. Von diesen bis zu drei einzelnen Schätzungen wird nun abermals der Median berechnet, um den Einfluss schlechte Signalqualität einzelner Kanäle gering zu halten.
 	
-	\begin{itemize}
-		\item aufgrund des nicht-linearen Drifts der Daten herzschlaggenaue Synchronisierung schwierig
-		\item Entscheidung Annotation von Bereichen von mehren Sekunden möglich zu machen
-		\item Ablauf: existiert EKG Signal zu diesem Zeitpunkt, bei dem eine Herzfrequenz ermittelt werden konnte
-		\item Berechnung dieser -> Anzahl der R-Peaks in diesem Bereich -1 geteilt durch den Abstand des letzten und des ersten Peaks
-		\item Berechnung \ac{BKG}-Herzfrequenz: Durchschnitt der geschätzten Längen der erkannten Peaks im Bereich
-		\item Annotation anhand von relativer oder absoluter Abweichung der beiden
-	\end{itemize}
+	% TODO: Scatterplott abweichung Kanäle?
+
 	
+		
 
