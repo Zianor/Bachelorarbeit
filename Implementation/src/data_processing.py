@@ -86,8 +86,7 @@ def get_ecg_processing(path, use_existing=True):
                 r_peaks[signal_headers[i]['label']] = detectors.two_average_detector(s)
         r_peaks_data = pd.DataFrame(dict([(k, pd.Series(v)) for k, v in r_peaks.items()]))
         r_peaks_data.to_csv(path_csv)
-    else:
-        r_peaks_data = pd.read_csv(path_csv)
+    r_peaks_data = pd.read_csv(path_csv)
 
     if (not sample_rate) or (not length):
         signals, signal_headers, header = highlevel.read_edf(path)
