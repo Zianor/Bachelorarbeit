@@ -1,10 +1,12 @@
+import json
+import os
+
+import numpy as np
+import pandas as pd
 from scipy.io import loadmat
+
 import utils as utils
 from data_processing import ecg_csv, get_brueser
-import pandas as pd
-import numpy as np
-import os
-import json
 
 
 class BCGSeries:
@@ -49,7 +51,7 @@ class ECGSeries:
         self.patient_id = patient_id
 
     def get_hr(self, start, end, lower_threshold=30, upper_threshold=200):
-        """Calculates heartrate in given interval by calculating the mean length of the detected intervals.
+        """Calculates heart rate in given interval by calculating the mean length of the detected intervals.
         It calculates the mean of all leads
         """
         curr_hr = []
