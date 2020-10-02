@@ -6,7 +6,7 @@ import pandas as pd
 from scipy.io import loadmat
 
 import utils as utils
-from data_processing import ecg_csv, get_brueser
+from data_processing import get_ecg_processing, get_brueser_from_id
 
 
 class BCGSeries:
@@ -20,7 +20,7 @@ class BCGSeries:
         self.indices = indices
         self.sample_rate = sample_rate
         self.length = len(raw_data) / sample_rate  # in seconds
-        self.brueser_df = get_brueser(self.sample_rate, self.bcg_id)
+        self.brueser_df = get_brueser_from_id(self.sample_rate, self.bcg_id)
         self.medians = self.brueser_df['medians'].to_numpy()
         self.unique_peaks = self.brueser_df['unique_peaks'].to_numpy()
         self.brueser_sqi = self.brueser_df['qualities'].to_numpy()
@@ -162,7 +162,7 @@ class Data:
                  path.lower().endswith(".edf")]
         for path in paths:
             path = os.path.join(utils.get_ecg_data_path(), path)
-            r_peaks, ecg_id, sample_rate, length = ecg_csv(path=path, use_existing=True)
+            r_peaks, ecg_id, sample_rate, length = get_ecg_processing(path=path, use_existing=True)
             self.data_series[ecg_id] = DataSeries(ECGSeries(
                 patient_id=ecg_id,
                 r_peaks=r_peaks.to_numpy(),
