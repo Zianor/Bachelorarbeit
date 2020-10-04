@@ -129,7 +129,7 @@ class DataSetStatistical(DataSet):
     def __init__(self, segment_length=10, overlap_amount=0.9, hr_threshold=10):
         super(DataSetStatistical, self).__init__(segment_length, overlap_amount, hr_threshold)
 
-    def _get_segment(self, series: DataSeries, start, end, informative, ecg_hr, ecg_hr_std, brueser_sqi, bcg_hr):
+    def _get_segment(self, series: DataSeries, start, end, informative, ecg_hr, brueser_sqi, bcg_hr):
         return SegmentStatistical(
             raw_data=series.bcg.raw_data[start: end],
             patient_id=series.patient_id,
@@ -163,7 +163,7 @@ class DataSetBrueser(DataSet):
         self.sqi_threshold = sqi_threshold
         super(DataSetBrueser, self).__init__(segment_length, overlap_amount, hr_threshold)
 
-    def _get_segment(self, series: DataSeries, start, end, informative, ecg_hr, ecg_hr_std, brueser_sqi, bcg_hr):
+    def _get_segment(self, series: DataSeries, start, end, informative, ecg_hr, brueser_sqi, bcg_hr):
         indices = np.where(np.logical_and(start < series.bcg.unique_peaks, series.bcg.unique_peaks < end))
         return SegmentBrueserSQI(
             patient_id=series.patient_id,
@@ -202,7 +202,7 @@ class DataSetPino(DataSet):
     def __init(self, segment_length=5, overlap_amount=0.8, hr_threshold=10):
         super(DataSetPino, self).__init__(segment_length, overlap_amount, hr_threshold)
 
-    def _get_segment(self, series: DataSeries, start, end, informative, ecg_hr, ecg_hr_std, brueser_sqi, bcg_hr):
+    def _get_segment(self, series: DataSeries, start, end, informative, ecg_hr, brueser_sqi, bcg_hr):
         return SegmentPino(
             raw_data=series.bcg.raw_data[start: end],
             patient_id=series.patient_id,
