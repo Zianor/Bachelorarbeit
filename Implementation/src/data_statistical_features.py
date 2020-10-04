@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from scipy.signal import find_peaks, hilbert
-from scipy.stats import median_absolute_deviation, kurtosis, skew
+from scipy.stats import median_abs_deviation, kurtosis, skew
 
 import utils
 from data_preparation import DataSeries, Data
@@ -321,7 +321,7 @@ class SegmentStatistical(Segment):
         self.standard_deviation = np.std(self.bcg)
         self.range = self.maximum - self.minimum
         self.iqr = np.subtract(*np.percentile(self.bcg, [75, 25]))
-        self.mad = median_absolute_deviation(self.bcg)
+        self.mad = median_abs_deviation(self.bcg)
         self.number_zero_crossings = (np.diff(np.sign(self.bcg)) != 0).sum()
         self.kurtosis = kurtosis(self.bcg)
         self.skewness = skew(self.bcg)
