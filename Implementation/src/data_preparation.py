@@ -67,7 +67,7 @@ class ECGSeries:
             interval_lengths_env = [r_peaks_single[indices_env[i]] - r_peaks_single[indices_env[i - 1]] for i in
                                     range(1, len(indices_env))]
             if interval_lengths:
-                hr_guess = np.median(interval_lengths) / self.sample_rate * 60
+                hr_guess = 60 / (np.median(interval_lengths) / self.sample_rate)
                 hr_guess_env = np.median(interval_lengths_env)
                 lower_threshold_count = lower_threshold * (end - start) / (self.sample_rate * 60)
                 upper_threshold_count = upper_threshold * (end - start) / (self.sample_rate * 60)
