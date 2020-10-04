@@ -16,8 +16,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 
-from src.data_statistical_features import DataSet, Segment, DataSetStatistical
-import src.utils as utils
+from data_statistical_features import DataSet, Segment, DataSetStatistical
+import utils as utils
 
 
 def load_data(segment_length=10, overlap_amount=0.9, hr_threshold=10):
