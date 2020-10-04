@@ -118,7 +118,7 @@ Im folgenden Kapitel wird eine Einführung in das Thema der Signalverarbeitung u
 	Ein Algorithmus zur Beurteilung der Signalqualität mittels maschinellen Lernens wird von \citeauthor{Sadek2016} im Paper \citetitle{Sadek2016} beschrieben. Betrachtet werden \ac{BKG}-Signale, die in einem Massagesessel aufgenommen werden, also ebenfalls im Sitzen aufgenommenes Signal, bei dem eine geringere Variabilität als in unserem Anwendungsfall erwartet wird.
 	
 	Die vorliegenden Daten wurden manuell von Expert*innen als informativ oder nicht informativ klassifiziert und in 10-Sekunden-Segmente, die sich nicht überlappen, aufgeteilt, die sich nicht überlappen. Insgesamt waren 58 \% der Daten als informativ und 42 \% als nicht-informativ gelabelt. Von diesen Segmenten wurden nach einer Bandpass-Filterung auf 1 bis 12 Hz 13 statistische Merkmale berechnet:
-	\begin{multicols}{2}
+	%\begin{multicols}{2}
 	\begin{itemize}
 		\item Minimun
 		\item Maximum
@@ -134,7 +134,7 @@ Im folgenden Kapitel wird eine Einführung in das Thema der Signalverarbeitung u
 		\item Varianz der lokalen Maxima
 		\item Mittelwerte der Signalhüllkurve\footnote{Die Signalhüllkurve ist eine glatte Kurve, die die Extrema des Signals umreißt.}
 	\end{itemize}
-	\end{multicols}
+	%\end{multicols}
 	
 	Für fünf verschiedene Modelle des maschinellen Lernens wurden jeweils die besten Hyperparameter über Kreuzvalidierung auf den Trainingsdaten ermittelt und die Modelle anschließend mit diesen Hyperparametern trainiert. Anschließend wurden die Modelle auf unbekannten Daten getestet. Das Training und Testen wurde mit getauschten Gruppen wiederholt. Das beste Ergebnis wurde mit einem Random Forest erreicht: Die durchschnittliche Genauigkeit der Kreuzvalidierung betrug $98,13 \% $ bzw. $100 \%$ bei getauschten Gruppen. Auf dem Testset wurde eine Genauigkeit von $92,3 \%$ bzw. $97,99 \%$ erreicht. Weitere Evaluationsmetriken außer eine \textit{Confusion Matrix} für den besten Klassifikator sind nicht gegeben.
 	
@@ -184,14 +184,30 @@ Im folgenden Kapitel wird eine Einführung in das Thema der Signalverarbeitung u
 	
 	\begin{figure}[H]
 		\centering
-		\includegraphics[width=1\textwidth]{pic/ecg-patient-26.png}
+		\includegraphics[width=0.95\textwidth]{pic/ecg-patient-26.png}
 		\caption[\ac{EKG}-Herzratenschätzungen auf sich überlappenden 10-Sekunden-Segmenten für Patient 26]{\ac{EKG}-Herzratenschätzungen auf sich überlappenden 10-Sekunden-Segmenten für Patient 26. Fusioniert lokal zeigt die Fusionierung ohne Miteinbeziehung der Umgebung, Fusioniert Umgebung die oben beschriebene Fusionierung}
 		\label{fig:ecg-patient-26}
 	\end{figure}
 
 
 	% TODO: Referenz Norm
-	Auf Basis dieser beiden Herzraten wird nun die Annotation vorgenommen. Dabei wurde sich an der Norm für \ac{EKG}-Patientenmonitoren orientiert. Diese schreibt vor, dass die Abweichung der Herzrate maximal 10 \% oder 5 Schläge pro Minute betragen darf, je nachdem welcher der beiden Werte größer ist und wurde hier so übernommen.\footcite[]{} Wenn eine höhere oder niedrigere Genauigkeit gefordert ist, kann dies auch auf 15 \% und 7.5 Schläge pro Minute oder 5 \% und 2.5 Schläge pro Minute angepasst werden.
+	Auf Basis dieser beiden Herzraten wird nun die Annotation vorgenommen. Dabei wurde sich an der Norm für \ac{EKG}-Patientenmonitoren orientiert. Diese schreibt vor, dass die Abweichung der Herzrate maximal 10 \% oder 5 Schläge pro Minute betragen darf, je nachdem welcher der beiden Werte größer ist\footcite[]{} und wurde hier so übernommen. Wenn eine höhere oder niedrigere Genauigkeit gefordert ist, kann dies auch auf 15 \% und 7.5 Schläge pro Minute oder 5 \% und 2.5 Schläge pro Minute angepasst werden. Die entsprechenden Verteilungen der Labels für 10 Sekunden lange Segmente mit 90 \% Überlappung für 5, 10 und 15 \% maximale Abweichung sind in Abbildung \ref{fig:label-distribution} zu sehen.
 	
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.55\textwidth]{pic/label-distribution.png}
+		\caption[Verteilung der Label je nach maximal zulässiger Abweichung]{Verteilung der Label je nach maximal zulässiger Abweichung}
+		\label{fig:label-distribution}
+	\end{figure}
+	
+	Es ist auffällig, dass die Anteile des informativen Segments stark patient*innenabhängig sind. In Abbildung \ref{fig:data-stats-15} wird dies für 10 \% maximale Abweichung visualisiert.
+	
+	
+	\begin{figure}[H]
+		\centering
+		\includegraphics[width=0.9\textwidth]{pic/data-stats-10.png}
+		\caption[Verteilung der Label pro Patient*in]{Verteilung der Label pro Patient*in}
+		\label{fig:data-stats-15}
+	\end{figure}
 		
 
