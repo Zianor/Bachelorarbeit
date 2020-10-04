@@ -82,7 +82,7 @@ class ECGSeries:
             id_min_diff = np.argwhere(np.abs(curr_hr - hr_env) == np.min(np.abs(curr_hr - hr_env)))
             hr = np.median(np.array(curr_hr)[id_min_diff])
         else:
-            hr = 0
+            hr = np.nan
         return hr
 
 
@@ -104,7 +104,7 @@ class DataSeries:
         area = self.drift.loc[start_second:end_second]
         if len(area.index.values) == 0 or 100 / len(area.index.values) * area.count() < self.reference_threshold:
             return False
-        if self.get_ecg_hr(bcg_start, bcg_end) == 0:
+        if self.get_ecg_hr(bcg_start, bcg_end) == np.nan:
             return False
         return True
 
