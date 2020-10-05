@@ -128,7 +128,7 @@ def get_dt_grid_params():
     }
 
     # create pipeline for standardization
-    pipe = Pipeline([('scaler', StandardScaler()), ('clf', DecisionTreeClassifier(random_state=1))])
+    pipe = Pipeline([('clf', DecisionTreeClassifier(random_state=1))])
 
     return pipe, parameters
 
@@ -145,7 +145,7 @@ def get_rf_grid_params():
     }
 
     # create pipeline for standardization
-    pipe = Pipeline([('scaler', StandardScaler()), ('clf', RandomForestClassifier(random_state=1, n_jobs=-2))])
+    pipe = Pipeline([('clf', RandomForestClassifier(random_state=1, n_jobs=-2))])
 
     return pipe, parameters
 
