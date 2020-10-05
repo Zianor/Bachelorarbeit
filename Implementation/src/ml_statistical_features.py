@@ -339,7 +339,7 @@ def eval_classifier(features, target, patient_id, pipe, grid_folder_name, test_s
 
 
 def eval_classifier_paper(features, target, patient_id, clf, grid_folder_name, patient_cv=False, grid_params=None):
-    return eval_classifier(features, target, patient_id, clf, grid_folder_name, test_size=0.43,
+    return eval_classifier(features, target, patient_id, clf, grid_folder_name, test_size=0.33,
                            grid_params=grid_params, patient_cv=patient_cv)
 
 
