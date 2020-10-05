@@ -9,7 +9,8 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.kernel_approximation import Nystroem
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
-from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV, KFold, LeaveOneGroupOut
+from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV, KFold, LeaveOneGroupOut, \
+    RandomizedSearchCV
 from sklearn.neural_network import MLPClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
@@ -292,8 +293,8 @@ def eval_classifier(features, target, patient_id, pipe, grid_folder_name, test_s
 
     if not grid_search:  # either not loaded or didn't performed yet
         scores = ['accuracy', 'balanced_accuracy', 'f1', 'roc_auc', 'f1_weighted', 'precision', 'recall']
-        grid_search = GridSearchCV(estimator=pipe, param_grid=grid_params, scoring=scores, cv=cv, n_jobs=-2, verbose=2,
-                                   refit=scoring)
+        grid_search = RandomizedSearchCV(estimator=pipe, param_grid=grid_params, scoring=scores, cv=cv, n_jobs=-2,
+                                         verbose=2, refit=scoring)
         grid_search.fit(x_g1, y_g1, groups=groups1)
         # save fitted model
         with open(os.path.join(path, model_filename), 'wb') as file:
