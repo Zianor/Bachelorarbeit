@@ -84,11 +84,12 @@ def get_svm_grid_params():
     """
     parameters = {
         'clf__kernel': ('linear', 'rbf', 'poly', 'sigmoid'),
-        'clf__C': [1, 10],
+        'clf__gamma': np.logspace(-9, 3, 5),
+        'clf__C': np.logspace(-2, 3, 5),
         'clf__class_weight': (None, 'balanced')
     }
     # create pipeline for standardization
-    pipe = Pipeline([('scaler', StandardScaler()), ('clf', SVC(random_state=1))])
+    pipe = Pipeline([('scaler', StandardScaler()), ('clf', SVC(random_state=1, cache_size=400))])
 
     return pipe, parameters
 
@@ -99,7 +100,8 @@ def get_linear_svc_grid_params():
         'clf__C': [1, 10],
         'clf__class_weight': [None, 'balanced']
     }
-    pipe = Pipeline(steps=[('scaler', StandardScaler()), ('trans', Nystroem(random_state=1)), ('clf', SVC(random_state=1))])
+    pipe = Pipeline(
+        steps=[('scaler', StandardScaler()), ('trans', Nystroem(random_state=1)), ('clf', SVC(random_state=1))])
     return pipe, parameters
 
 
@@ -108,7 +110,8 @@ def get_lda_grid_params():
     :return: base estimator and dict of parameters for grid search
     """
     parameters = {
-        'clf__solver': ('svd', 'lsqr', 'eigen')
+        'clf__solver': ('svd', 'lsqr', 'eigen'),
+        'clf__shrinkage': ('auto', None)
     }
     # create pipeline for standardization
     pipe = Pipeline([('scaler', StandardScaler()), ('clf', LinearDiscriminantAnalysis())])
@@ -139,7 +142,7 @@ def get_rf_grid_params():
     :return: base estimator and dict of parameters for grid search
     """
     parameters = {
-        'clf__n_estimators': [10, 30, 50, 75, 100],
+        'clf__n_estimators': [10, 30, 50, 75, 100, 150],
         'clf__criterion': ("gini", "entropy"),
         'clf__class_weight': ("balanced", None)
     }
@@ -158,7 +161,7 @@ def get_mlp_grid_params():
     parameters = {
         'clf__hidden_layer_sizes': [(10,), (20,), (30,), (40,), (50,), (60,), (70,), (80,), (90,), (100,)],
         'clf__activation': ('identity', 'logistic', 'tanh', 'relu'),
-        'clf__alpha': [0.0001],
+        'clf__alpha': 10.0 ** -np.arange(1, 7),
         'clf__learning_rate': ('constant', 'invscaling', 'adaptive'),
         'clf__learning_rate_init': [0.0001]
     }
@@ -341,7 +344,7 @@ def eval_classifier_paper(features, target, patient_id, clf, grid_folder_name, p
 
 def reconstruct_models_paper(paths, grid_search: bool, patient_cv: bool, hr_threshold=10):
     functions = (get_lda_grid_params, get_dt_grid_params, get_rf_grid_params, get_mlp_grid_params,
-                 get_linear_svc_grid_params)
+                 get_svm_grid_params)
 
     x, y, mean_error, coverage, patient_id = load_data(segment_length=10, overlap_amount=0, hr_threshold=hr_threshold)
 
@@ -349,8 +352,8 @@ def reconstruct_models_paper(paths, grid_search: bool, patient_cv: bool, hr_thre
         clf, params = function()
         if not grid_search:
             params = None
-        eval_classifier_paper(x, y, patient_id, clf=clf, grid_folder_name=path, grid_params=params,
-                              patient_cv=patient_cv)
+        _, _, y_predicted, y_actual, _, _, _ = eval_classifier_paper(x, y, patient_id, clf=clf, grid_folder_name=path,
+                                                                     grid_params=params, patient_cv=patient_cv)
 
 
 def get_all_scores(reconstruct: bool, paths):
@@ -372,8 +375,6 @@ def get_all_scores(reconstruct: bool, paths):
 
 
 if __name__ == "__main__":
-    # paths_paper = ['LDA_paper_hr15', 'DT_paper_hr15', 'RF_paper_hr15', 'MLP_paper_hr15', 'SVC_paper_hr15']
-    # paths_patient_cv = ['LDA_patient_hr15', 'DT_patient_hr15', 'RF_patient_hr15', 'MLP_patient_hr15', 'SVC_patient_hr15']
-    # reconstruct_models_paper(paths=paths_paper, grid_search=True, patient_cv=False, hr_threshold=15)
-    # reconstruct_models_paper(paths=paths_patient_cv, grid_search=True, patient_cv=True, hr_threshold=15)
-    pass
+    paths_patient_cv = ['LDA_hr10', 'DT_hr10', 'RF_hr10', 'MLP_hr10', 'SVC_hr10']
+    reconstruct_models_paper(paths=paths_patient_cv, grid_search=True, patient_cv=True, hr_threshold=10)
+    SystemExit(0)
