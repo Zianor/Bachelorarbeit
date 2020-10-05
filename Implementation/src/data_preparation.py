@@ -14,6 +14,7 @@ class BCGSeries:
     def __init__(self, bcg_id, raw_data, sqi, bbi_bcg, bbi_ecg, indices, sample_rate=100):
         self.bcg_id = bcg_id
         self.raw_data = raw_data
+        self.filtered_data = utils.butter_bandpass_filter(raw_data, 1, 12, sample_rate)
         self.sqi = sqi
         self.bbi_bcg = bbi_bcg
         self.bbi_ecg = bbi_ecg
@@ -35,11 +36,45 @@ class BCGSeries:
             hr = np.nan
         return hr
 
-    def get_sqi(self, start, end):
-        """Returns mean brueser sqi in given interval"""
+    def get_mean_sqi(self, start, end):
+        """Returns mean brueser sqi in given interval
+        """
+        return np.mean(self.get_sqi_array(start, end))
+
+    def get_sqi_array(self, start, end):
+        """Returns brueser sqis in given interval
+        """
         indices = np.where(np.logical_and(start <= self.unique_peaks, self.unique_peaks < end))
-        sqi = np.mean(self.brueser_sqi[indices])
-        return sqi
+        return self.brueser_sqi[indices]
+
+    def get_unique_peak_locations(self, start, end):
+        """Returns the locations of the unique peaks in the given interval
+        """
+        indices = np.where(np.logical_and(start <= self.unique_peaks, self.unique_peaks < end))
+        return self.unique_peaks[indices]
+
+    def get_unique_peak_values(self, start, end):
+        """Returns the values at the unique peaks in the given window"""
+        return self.filtered_data[self.get_unique_peak_locations(start, end)]
+
+    def get_filtered_signal(self, start, end):
+        """Returns filtered bcg in given window"""
+        return self.filtered_data[start:end]
+
+    def get_interval_lengths(self, start, end):
+        """Returns estimated interval lengths in given window"""
+        indices = np.where(np.logical_and(start <= self.unique_peaks, self.unique_peaks < end))
+        return self.medians[indices]
+
+    def get_coverage(self, start, end):
+        """Returns coverage on given interval
+        """
+        est_lengths = self.get_interval_lengths(start, end)
+        coverage = np.sum(est_lengths)/(end-start)
+        if coverage >= 1:
+            return 100
+        else:
+            return coverage * 100
 
 
 class ECGSeries:
@@ -137,7 +172,29 @@ class DataSeries:
         return self.bcg.get_hr(bcg_start, bcg_end)
 
     def get_brueser_sqi(self, bcg_start, bcg_end):
-        return self.bcg.get_sqi(bcg_start, bcg_end)
+        return self.bcg.get_mean_sqi(bcg_start, bcg_end)
+
+    def is_informative(self, bcg_start, bcg_end, threshold):
+        """Returns if signal is informative on given window depending on threshold
+        :param bcg_start: sample of bcg signal where window starts
+        :param bcg_end: sample of bcg signal where window ends
+        :param threshold: threshold for relative error in percent, abs threshold is threshold/2
+        """
+        bcg_hr = self.get_bcg_hr(bcg_start, bcg_end)
+        ecg_hr = self.get_ecg_hr(bcg_start, bcg_end)
+        abs_err = np.abs(ecg_hr - bcg_hr)
+        rel_err = 100 / ecg_hr * abs_err
+        if np.isnan(bcg_hr):
+            return False
+        if ecg_hr / 100 * threshold > threshold / 2:
+            if rel_err > threshold:
+                return False
+            else:
+                return True
+        else:
+            if abs_err > threshold / 2:
+                return False
+        return True
 
 
 class Data:
