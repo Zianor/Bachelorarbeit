@@ -171,7 +171,7 @@ class DataSeries:
     def get_bcg_hr(self, bcg_start, bcg_end):
         return self.bcg.get_hr(bcg_start, bcg_end)
 
-    def get_brueser_sqi(self, bcg_start, bcg_end):
+    def get_mean_brueser_sqi(self, bcg_start, bcg_end):
         return self.bcg.get_mean_sqi(bcg_start, bcg_end)
 
     def is_informative(self, bcg_start, bcg_end, threshold):

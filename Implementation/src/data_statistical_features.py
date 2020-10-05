@@ -49,9 +49,9 @@ class DataSet:
                     if not series.reference_exists(start, end):  # ignore if no reference ecg
                         continue
                     ecg_hr = series.get_ecg_hr(start, end)
-                    brueser_sqi = series.get_brueser_sqi(start, end)
+                    brueser_sqi = series.get_mean_brueser_sqi(start, end)
                     bcg_hr = series.get_bcg_hr(start, end)
-                    informative = self.is_informative(ecg_hr, bcg_hr)
+                    informative = series.is_informative(start, end)
                     self.segments.append(
                         self._get_segment(series, start, end, informative, ecg_hr, brueser_sqi, bcg_hr))
 
