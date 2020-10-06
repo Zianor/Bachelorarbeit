@@ -68,13 +68,13 @@ def evaluate_model(y_actual, y_pred):
                              str(classification_report(y_actual, y_pred, target_names=['non-informative',
                                                                                        'informative']))]
 
-    _, _, mean_error, coverage, _ = load_data()
+    # _, _, mean_error, coverage, _ = load_data()
 
-    avg_mean_error = calc_avg_mean_error(mean_error, y_pred, y_actual)
-    string_representation.extend(["Average mean error: ", str(avg_mean_error), os.linesep])
+    # avg_mean_error = calc_avg_mean_error(mean_error, y_pred, y_actual)
+    # string_representation.extend(["Average mean error: ", str(avg_mean_error), os.linesep])
 
-    coverage = calc_coverage(coverage, y_pred, y_actual)
-    string_representation.extend(["Coverage: ", str(coverage), os.linesep])
+    # coverage = calc_coverage(coverage, y_pred, y_actual)
+    # string_representation.extend(["Coverage: ", str(coverage), os.linesep])
 
     return ''.join(string_representation)
 

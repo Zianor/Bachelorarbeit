@@ -51,7 +51,7 @@ class DataSet:
                     ecg_hr = series.get_ecg_hr(start, end)
                     brueser_sqi = series.get_mean_brueser_sqi(start, end)
                     bcg_hr = series.get_bcg_hr(start, end)
-                    informative = series.is_informative(start, end)
+                    informative = series.is_informative(start, end, self.hr_threshold)
                     self.segments.append(
                         self._get_segment(series, start, end, informative, ecg_hr, brueser_sqi, bcg_hr))
 
@@ -401,7 +401,7 @@ class SegmentBrueserSQI(Segment):
         if len(indices) > 0:
             mean_interval_length = np.mean(medians[indices])
             self.sqi_hr = 60 / (mean_interval_length / sample_rate)
-            self.sqi_coverage = 100 / length_samples * mean_interval_length * len(indices)
+            self.sqi_coverage = 100 / length_samples * np.sum(medians[indices])
             if self.sqi_coverage > 100:
                 self.sqi_coverage = 100
 
