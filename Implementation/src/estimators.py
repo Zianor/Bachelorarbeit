@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
 
-import src.utils as utils
+import utils as utils
 from data_statistical_features import DataSet, Segment, DataSetBrueser, DataSetStatistical, DataSetPino
 
 
@@ -57,6 +57,20 @@ class QualityEstimator:
     def predict_all_labels(self):
         raise Exception("Not implemented in base class")
 
+    def get_mean_error_abs(self, indices, labels):
+        data_subset = self.informative_info.loc[indices]
+        if labels is not None:
+            data_subset = data_subset[labels]
+            data_subset['abs_err'] = data_subset['abs_err'].replace(np.inf, np.nan)
+        return np.nanmean(data_subset['abs_err'])
+
+    def get_mean_error_rel(self, indices, labels):
+        data_subset = self.informative_info.loc[indices]
+        if labels is not None:
+            data_subset = data_subset[labels]
+        data_subset['rel_err'] = data_subset['rel_err'].replace(np.inf, np.nan)
+        return np.nanmean(data_subset['rel_err'])
+
 
 class BrueserSingleSQI(QualityEstimator):
 
@@ -94,8 +108,8 @@ class BrueserSingleSQI(QualityEstimator):
         return self.data[features].copy()
 
     def predict_all_labels(self):
-        labels = (self.features['sqi_hr_diff_rel'] < self.hr_threshold) & (
-                self.features['sqi_coverage'] >= self.coverage_threshold)
+        labels = ((self.features['sqi_hr_diff_rel'] < self.hr_threshold) | (self.features['sqi_hr_diff_abs'] <
+                  self.hr_threshold/2)) & (self.features['sqi_coverage'] >= self.coverage_threshold)
         return labels
 
     def predict(self, X):
