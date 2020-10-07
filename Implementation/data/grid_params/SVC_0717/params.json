@@ -1,5 +1,0 @@
-{
-  "kernel": "rbf",
-  "C": 10,
-  "class_weight": null
-}
