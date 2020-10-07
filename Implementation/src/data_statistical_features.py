@@ -25,6 +25,12 @@ class DataSet:
         self._create_segments()
         self.save_csv()
 
+    def _get_path(self):
+        return utils.get_features_csv_path(self.segment_length, self.overlap_amount)
+
+    def _get_path_hr(self):
+        return utils.get_features_csv_path(self.segment_length, self.overlap_amount, self.hr_threshold)
+
     def _create_segments(self):
         """
         Creates segments with a given length out of given BCG Data
@@ -64,37 +70,21 @@ class DataSet:
             informative=informative
         )
 
-    def is_informative(self, ecg_hr, bcg_hr):
-        abs_err = np.abs(ecg_hr - bcg_hr)
-        rel_err = 100 / ecg_hr * abs_err
-        if np.isnan(bcg_hr):
-            return False
-        if ecg_hr / 100 * self.hr_threshold > self.hr_threshold/2:
-            if rel_err > self.hr_threshold:
-                return False
-            else:
-                return True
-        else:
-            if abs_err > self.hr_threshold/2:
-                return False
-        return True
-
     def save_csv(self):
         """
         Saves all segments as csv
         """
         if not os.path.isdir(utils.get_data_set_folder(self.segment_length, self.overlap_amount)):
             os.mkdir(utils.get_data_set_folder(self.segment_length, self.overlap_amount))
-        path = utils.get_features_csv_path(self.segment_length, self.overlap_amount, self.hr_threshold)
-        with open(path, 'w') as f:
+        with open(self._get_path_hr(), 'w') as f:
             writer = csv.writer(f)
-            writer.writerow(Segment.get_feature_name_array())
+            writer.writerow(self.segments[0].get_feature_name_array())
             for segment in self.segments:
                 writer.writerow(segment.get_feature_array())
             f.flush()
-        data = pd.read_csv(path, index_col=False)
+        data = pd.read_csv(self._get_path_hr(), index_col=False)
         data = data.drop(labels='informative', axis='columns')
-        data.to_csv(utils.get_features_csv_path(self.segment_length, self.overlap_amount), index=False)
+        data.to_csv(self._get_path(), index=False)
 
     def save_images(self, count=50):
         """
@@ -129,6 +119,12 @@ class DataSetStatistical(DataSet):
     def __init__(self, segment_length=10, overlap_amount=0.9, hr_threshold=10):
         super(DataSetStatistical, self).__init__(segment_length, overlap_amount, hr_threshold)
 
+    def _get_path(self):
+        return utils.get_statistical_features_csv_path(self.segment_length, self.overlap_amount)
+
+    def _get_path_hr(self):
+        return utils.get_statistical_features_csv_path(self.segment_length, self.overlap_amount, self.hr_threshold)
+
     def _get_segment(self, series: DataSeries, start, end, informative, ecg_hr, brueser_sqi, bcg_hr):
         return SegmentStatistical(
             raw_data=series.bcg.raw_data[start: end],
@@ -140,28 +136,18 @@ class DataSetStatistical(DataSet):
             informative=informative
         )
 
-    def save_csv(self):
-        """Saves all segments as csv
-        """
-        if not os.path.isdir(utils.get_data_set_folder(self.segment_length, self.overlap_amount)):
-            os.mkdir(utils.get_data_set_folder(self.segment_length, self.overlap_amount))
-        path = utils.get_statistical_features_csv_path(self.segment_length, self.overlap_amount, self.hr_threshold)
-        with open(path, 'w') as f:
-            writer = csv.writer(f)
-            writer.writerow(SegmentStatistical.get_feature_name_array())
-            for segment in self.segments:
-                writer.writerow(segment.get_feature_array())
-            f.flush()
-        data = pd.read_csv(path, index_col=False)
-        data = data.drop(labels='informative', axis='columns')
-        data.to_csv(utils.get_statistical_features_csv_path(self.segment_length, self.overlap_amount), index=False)
-
 
 class DataSetBrueser(DataSet):
 
     def __init__(self, segment_length=10, overlap_amount=0.9, hr_threshold=10, sqi_threshold=0.4):
         self.sqi_threshold = sqi_threshold
         super(DataSetBrueser, self).__init__(segment_length, overlap_amount, hr_threshold)
+
+    def _get_path(self):
+        return utils.get_brueser_features_csv_path(self.segment_length, self.overlap_amount)
+
+    def _get_path_hr(self):
+        return utils.get_brueser_features_csv_path(self.segment_length, self.overlap_amount, self.hr_threshold)
 
     def _get_segment(self, series: DataSeries, start, end, informative, ecg_hr, brueser_sqi, bcg_hr):
         indices = np.where(np.logical_and(start < series.bcg.unique_peaks, series.bcg.unique_peaks < end))
@@ -178,29 +164,17 @@ class DataSetBrueser(DataSet):
             length_samples=utils.seconds_to_frames(self.segment_length, series.bcg_sample_rate)
         )
 
-    def save_csv(self):
-        """Saves all segments as csv
-        """
-        if not os.path.isdir(utils.get_data_set_folder(self.segment_length, self.overlap_amount)):
-            os.mkdir(utils.get_data_set_folder(self.segment_length, self.overlap_amount))
-        path = utils.get_brueser_features_csv_path(self.segment_length, self.overlap_amount, self.sqi_threshold,
-                                                   self.hr_threshold)
-        with open(path, 'w') as file:
-            writer = csv.writer(file)
-            writer.writerow(SegmentBrueserSQI.get_feature_name_array())
-            for segment in self.segments:
-                writer.writerow(segment.get_feature_array())
-            file.flush()
-        data = pd.read_csv(path, index_col=False)
-        data = data.drop(labels='informative', axis='columns')
-        data.to_csv(utils.get_brueser_features_csv_path(self.segment_length, self.overlap_amount, self.sqi_threshold),
-                    index=False)
-
 
 class DataSetPino(DataSet):
 
     def __init(self, segment_length=5, overlap_amount=0.8, hr_threshold=10):
         super(DataSetPino, self).__init__(segment_length, overlap_amount, hr_threshold)
+
+    def _get_path(self):
+        return utils.get_pino_features_csv_path(self.segment_length, self.overlap_amount)
+
+    def _get_path_hr(self):
+        return utils.get_pino_features_csv_path(self.segment_length, self.overlap_amount, self.hr_threshold)
 
     def _get_segment(self, series: DataSeries, start, end, informative, ecg_hr, brueser_sqi, bcg_hr):
         return SegmentPino(
