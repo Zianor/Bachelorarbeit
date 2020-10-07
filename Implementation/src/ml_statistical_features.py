@@ -85,9 +85,8 @@ def get_svm_grid_params():
     :return: base estimator and dict of parameters for grid search
     """
     parameters = {
-        'clf__kernel': ('linear', 'rbf', 'poly', 'sigmoid'),
-        'clf__gamma': np.logspace(-9, 3, 5),
-        'clf__C': np.logspace(-2, 3, 5),
+        'clf__kernel': ('linear', 'rbf', 'sigmoid'),
+        'clf__C': np.logspace(0.1, 1, 10),
         'clf__class_weight': (None, 'balanced')
     }
     # create pipeline for standardization
@@ -98,8 +97,9 @@ def get_svm_grid_params():
 
 def get_linear_svc_grid_params():
     parameters = {
-        'trans__kernel': ['linear', 'rbf', 'sigmoid', 'poly'],
-        'clf__C': [1, 10],
+        'trans__kernel': ['linear', 'rbf', 'sigmoid', 'cosine'],
+        'trans__gamma': [0.1, 1],
+        'clf__C': [0.1, 1, 10],
         'clf__class_weight': [None, 'balanced']
     }
     pipe = Pipeline(
@@ -346,7 +346,7 @@ def eval_classifier_paper(features, target, patient_id, clf, grid_folder_name, p
 
 def reconstruct_models_paper(paths, grid_search: bool, patient_cv: bool, hr_threshold=10):
     functions = (get_lda_grid_params, get_dt_grid_params, get_rf_grid_params, get_mlp_grid_params,
-                 get_svm_grid_params)
+                 get_linear_svc_grid_params)
 
     x, y, patient_id, _ = load_data(segment_length=10, overlap_amount=0, hr_threshold=hr_threshold)
 
