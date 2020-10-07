@@ -30,7 +30,8 @@ def load_data(segment_length=10, overlap_amount=0.9, hr_threshold=10):
     features = df.drop(Segment.get_feature_name_array(), axis='columns')
     target = df['informative']
     patient_id = df['patient_id']
-    return features, target, patient_id
+    informative_info = df[Segment.get_feature_name_array()]
+    return features, target, patient_id, informative_info
 
 
 def load_data_as_dataframe(segment_length=10, overlap_amount=0.9, hr_threshold=10):
@@ -347,7 +348,7 @@ def reconstruct_models_paper(paths, grid_search: bool, patient_cv: bool, hr_thre
     functions = (get_lda_grid_params, get_dt_grid_params, get_rf_grid_params, get_mlp_grid_params,
                  get_svm_grid_params)
 
-    x, y, patient_id = load_data(segment_length=10, overlap_amount=0, hr_threshold=hr_threshold)
+    x, y, patient_id, _ = load_data(segment_length=10, overlap_amount=0, hr_threshold=hr_threshold)
 
     for path, function in zip(paths, functions):
         clf, params = function()
