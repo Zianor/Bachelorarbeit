@@ -35,7 +35,8 @@ def get_md_mean_accuracy_grid(scores: dict):
         acc2 = value['mean_score_g2'] * 100
         g1 += " %.2f  | " % acc1
         g2 += " %.2f  | " % acc2
-    header += "\n|:--|:--:|:--:|:--:|:--:|:--:|\n"
+    header += "\n|:--|:--:|:--:|:--:|:--:|\n"
+    # header += "\n|:--|:--:|:--:|:--:|:--:|:--:|\n"
     return header + g1 + "\n" + g2
 
 
@@ -54,7 +55,8 @@ def get_md_test_accuracy_grid(scores: dict):
         g1 += " %.2f  | " % acc1
         g2 += " %.2f  | " % acc2
         avg += " %.2f | " % curr_avg
-    header += "\n|:--|:--:|:--:|:--:|:--:|:--:|\n"
+    header += "\n|:--|:--:|:--:|:--:|:--:|\n"
+    # header += "\n|:--|:--:|:--:|:--:|:--:|:--:|\n"
     return header + g1 + "\n" + g2 + "\n" + avg
 
 

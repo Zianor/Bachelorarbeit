@@ -363,7 +363,7 @@ def get_all_scores(reconstruct: bool, paths):
         reconstruct_models_paper(grid_search=False)
     score_dict = {}
     filename = 'score.json'
-    clf_names = ['LDA', 'DT', 'RF', 'MLP', 'SVM']
+    clf_names = ['LDA', 'DT', 'RF', 'MLP']  # , 'SVM']
     for clf_name, folder in zip(clf_names, paths):
         location = folder + '/' + filename
         path = os.path.join(utils.get_grid_params_path(), location)
@@ -377,6 +377,6 @@ def get_all_scores(reconstruct: bool, paths):
 
 
 if __name__ == "__main__":
-    paths_patient_cv = ['LDA_hr10', 'DT_hr10', 'RF_hr10', 'MLP_hr10', 'SVC_hr10']
-    reconstruct_models_paper(paths=paths_patient_cv, grid_search=True, patient_cv=True, hr_threshold=10)
+    paths_patient_cv = ['LDA_hr10', 'DT_hr10', 'RF_hr10', 'MLP_hr10']  #, 'SVC_hr10']
+    # reconstruct_models_paper(paths=paths_patient_cv, grid_search=True, patient_cv=True, hr_threshold=10)
     SystemExit(0)
