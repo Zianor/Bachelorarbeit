@@ -63,6 +63,14 @@ def get_features_csv_path(segment_length, overlap_amount, hr_threshold=None):
     return os.path.join(get_data_set_folder(segment_length, overlap_amount), filename)
 
 
+def get_own_features_csv_path(segment_length, overlap_amount, hr_threshold=None):
+    if hr_threshold:
+        filename = 'data_own_features_hr' + str(hr_threshold) + '.csv'
+    else:
+        filename = 'data_own_features.csv'
+    return os.path.join(get_data_set_folder(segment_length, overlap_amount), filename)
+
+
 def get_statistical_features_csv_path(segment_length, overlap_amount, hr_threshold=None) -> Path:
     if hr_threshold:
         filename = 'data_statistical_features_hr' + str(hr_threshold) + '.csv'

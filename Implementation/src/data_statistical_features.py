@@ -5,8 +5,9 @@ import pickle
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from scipy.signal import find_peaks, hilbert
+from scipy.signal import find_peaks, hilbert, welch
 from scipy.stats import median_abs_deviation, kurtosis, skew
+import statsmodels.api as sm
 
 import utils
 from data_preparation import DataSeries, Data
@@ -187,20 +188,28 @@ class DataSetPino(DataSet):
             informative=informative,
         )
 
-    def save_csv(self):
-        if not os.path.isdir(utils.get_data_set_folder(self.segment_length, self.overlap_amount)):
-            os.mkdir(utils.get_data_set_folder(self.segment_length, self.overlap_amount))
-        path = utils.get_pino_features_csv_path(self.segment_length, self.overlap_amount, self.hr_threshold)
-        with open(path, 'w') as file:
-            writer = csv.writer(file)
-            writer.writerow(SegmentPino.get_feature_name_array())
-            for segment in self.segments:
-                writer.writerow(segment.get_feature_array())
-            file.flush()
-        data = pd.read_csv(path, index_col=False)
-        data = data.drop(labels='informative', axis='columns')
-        data.to_csv(utils.get_pino_features_csv_path(self.segment_length, self.overlap_amount),
-                    index=False)
+
+class DataSetOwn(DataSet):
+
+    def __init__(self, segment_length=10, overlap_amount=0.9, hr_threshold=10):
+        super(DataSetOwn, self).__init__(segment_length, overlap_amount, hr_threshold)
+
+    def _get_path(self):
+        return utils.get_own_features_csv_path(self.segment_length, self.overlap_amount)
+
+    def _get_path_hr(self):
+        return utils.get_own_features_csv_path(self.segment_length, self.overlap_amount, self.hr_threshold)
+
+    def _get_segment(self, series: DataSeries, start, end, informative, ecg_hr, brueser_sqi, bcg_hr):
+        return SegmentOwn(
+            series=series,
+            start=start,
+            end=end,
+            ecg_hr=ecg_hr,
+            bcg_hr=bcg_hr,
+            brueser_sqi=brueser_sqi,
+            informative=informative
+        )
 
 
 class Segment:
@@ -320,7 +329,6 @@ class SegmentStatistical(Segment):
         amplitude_envelope = np.abs(analytic_signal)
         return np.mean(amplitude_envelope)
 
-
     @staticmethod
     def get_feature_name_array():
         segment_array = Segment.get_feature_name_array()
@@ -400,14 +408,79 @@ class SegmentBrueserSQI(Segment):
         return np.concatenate((segment_array, own_array), axis=0)
 
 
+class SegmentOwn(SegmentStatistical):
+
+    def __init__(self, series: DataSeries, start, end, informative, ecg_hr, brueser_sqi, bcg_hr):
+        print(informative)
+        self.filtered_data = series.bcg.filtered_data[start: end]
+        super(SegmentOwn, self).__init__(series.bcg.raw_data[start: end], series.patient_id, ecg_hr, bcg_hr, brueser_sqi,
+                                         series.bcg_sample_rate, informative)
+        self.brueser_coverage = series.bcg.get_coverage(start, end)
+        self.interval_lengths = series.bcg.get_interval_lengths(start, end)  # in samples
+        self.sqi_array = series.bcg.get_sqi_array(start, end)
+        self.peak_values = series.bcg.get_unique_peak_values(start, end)
+        self.acf = sm.tsa.acf(self.filtered_data, nlags=(end-start)//2, fft=True)
+        f, den = welch(self.filtered_data, fs=series.bcg_sample_rate)
+        self.peak_frequency_acf = f[np.argmax(den)]
+        self.hf_ratio_acf = self.bcg_hr / self.peak_frequency_acf
+        self.abs_energy = np.sum(self.filtered_data * self.filtered_data)
+        self.interval_lengths_std = np.std(self.interval_lengths)
+        self.interval_lengths_range = np.max(self.interval_lengths) - np.min(self.interval_lengths)
+        self.interval_lengths_mean = np.mean(self.interval_lengths)
+        self.sqi_std = np.std(self.sqi_array)
+        self.sqi_max = np.max(self.sqi_array)
+        self.sqi_min = np.min(self.sqi_array)
+        self.peak_max = np.max(self.peak_values)
+        self.peak_min = np.max(self.peak_values)
+        self.peak_std = np.std(self.peak_values)
+        self.peak_mean = np.mean(self.peak_values)
+
+
+    @staticmethod
+    def get_feature_name_array():
+        segment_array = SegmentStatistical.get_feature_name_array()
+        own_array = np.array([
+            'hf_ratio_acf',
+            'peak_frequency_acf',
+            'brueser_coverage',
+            'abs_energy',
+            'interval_lengths_std',
+            'interval_lengths_range',
+            'interval_lengths_mean',
+            'sqi_std',
+            'sqi_min',
+            'sqi_max',
+            'peak_max',
+            'peak_min',
+            'peak_mean',
+            'peak_min'
+        ])
+        return np.concatenate((segment_array, own_array), axis=0)
+
+    def get_feature_array(self):
+        """
+        :return: array representation of the segment
+        """
+        segment_array = super().get_feature_array()
+        own_array = np.array([
+            self.hf_ratio_acf,
+            self.peak_frequency_acf,
+            self.brueser_coverage,
+            self.abs_energy,
+            self.interval_lengths_std,
+            self.interval_lengths_range,
+            self.interval_lengths_mean,
+            self.sqi_std,
+            self.sqi_min,
+            self.sqi_max,
+            self.peak_max,
+            self.peak_min,
+            self.peak_mean,
+            self.peak_min
+        ])
+        return np.concatenate((segment_array, own_array), axis=0)
+
+
 if __name__ == "__main__":
-    DataSet(overlap_amount=0)
-    DataSet()
-    DataSet(hr_threshold=15)
-    DataSet(hr_threshold=5)
-    DataSetBrueser()
-    DataSetStatistical(overlap_amount=0)
-    DataSetStatistical()
-    DataSetPino()
-    DataSetPino(segment_length=10, overlap_amount=0.9)
-    SystemExit(0)
+    DataSetOwn()
+    pass
