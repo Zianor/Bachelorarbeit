@@ -411,7 +411,6 @@ class SegmentBrueserSQI(Segment):
 class SegmentOwn(SegmentStatistical):
 
     def __init__(self, series: DataSeries, start, end, informative, ecg_hr, brueser_sqi, bcg_hr):
-        print(informative)
         self.filtered_data = series.bcg.filtered_data[start: end]
         super(SegmentOwn, self).__init__(series.bcg.raw_data[start: end], series.patient_id, ecg_hr, bcg_hr, brueser_sqi,
                                          series.bcg_sample_rate, informative)
@@ -434,7 +433,6 @@ class SegmentOwn(SegmentStatistical):
         self.peak_min = np.max(self.peak_values)
         self.peak_std = np.std(self.peak_values)
         self.peak_mean = np.mean(self.peak_values)
-
 
     @staticmethod
     def get_feature_name_array():
