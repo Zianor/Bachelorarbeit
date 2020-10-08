@@ -181,22 +181,32 @@ Im folgenden Kapitel wird eine Einführung in das Thema der Signalverarbeitung u
 	
 	Die vorliegenden Daten sind nicht annotiert. Es ist im Rahmen dieser Arbeit nicht möglich, die Annotation durch Expert*innen durchführen zu lassen, weshalb auf das parallel aufgenommene \ac{EKG} zurückgegriffen wird. Aufgrund des nicht-linearen Drifts der Daten ist eine herzschlaggenaue Synchronisierung schwierig. Aus diesem Grund wurde entschieden, die Annotation bereichsweise vorzunehmen. Für jeden Bereich wird zunächst geprüft, ob ein aussagekräftiges Referenzsignal existiert. Falls nicht, wird der entsprechende Bereich ausgeschlossen und nicht weiter verwendet. Ansonsten wird die durchschnittliche Herzrate sowohl für BKG- als auch EKG-Signal berechnet. Für die Berechnung der Herzfrequenz im \ac{BKG} wird der Median der geschätzten Intervalllängen verwendet. So werden Ausreißer weniger stark gewichtet.
 	
-	Auch bei dem Referenzsignal wird die Herzrate über den Median der Intervalllängen ermittelt. Die Intervalllängen entsprechen hier den Abständen der ermittelten R-Peaks. Da drei \ac{EKG}-Kanäle vorliegen, wird die Herzrate zunächst für jeden Kanal einzeln geschätzt. Falls die geschätzte Herzrate außerhalb des erwarteten Bereichs von 30 bis 200 Schlägen pro Minute liegt, wird der Kanal verworfen. Die Auswahl des Kanals gestaltet sich schwieriger, da auch im Referenzsignal teilweise schlechtes Signal vorliegt. Um dies auszugleichen, wird zur Auswahl des Kanals die Herzrate ebenfalls auf einem doppelt so großem Fenster berechnet. Von diesen drei Herzraten wird die ausgewählt, deren Kanal die geringste Spannweite an Intervalllängen aufweist. Mit Hilfe der geschätzten Herzrate des größeren Fensters wird nun der Kanal für die endgültige Schätzung ausgewählt, der die geringste Abweichung zu der Schätzung des größeren Fensters hat. Die Auswirkungen dieses Verfahrens sind in Abbildung \ref{fig:ecg-patient-26} sichtbar. Eine Fusionierung nur auf dem aktuellen Bereich führt zu einigen Fehlern in der Herzratenschätzung, die die Umgebung einbeziehende Fusionierung führt zu deutlich besseren Ergebnissen. Auch ist hier sichtbar, wie groß die Abweichung einzelner Kanäle ist.
+	Auch bei dem Referenzsignal wird die Herzrate über den Median der Intervalllängen ermittelt. Die Intervalllängen entsprechen hier den Abständen der ermittelten R-Peaks. Da drei \ac{EKG}-Kanäle vorliegen, wird die Herzrate zunächst für jeden Kanal einzeln geschätzt. Falls die geschätzte Herzrate außerhalb des erwarteten Bereichs von 30 bis 200 Schlägen pro Minute liegt, wird der Kanal verworfen. Die Auswahl des Kanals gestaltet sich schwieriger, da auch im Referenzsignal teilweise schlechtes Signal vorliegt. Um dies auszugleichen, wird zur Auswahl des Kanals die Herzrate ebenfalls auf einem doppelt so großem Fenster berechnet. Von diesen drei Herzraten wird die ausgewählt, deren Kanal die geringste Spannweite an Intervalllängen aufweist. Mit Hilfe der geschätzten Herzrate des größeren Fensters wird nun der Kanal für die endgültige Schätzung ausgewählt, der die geringste Abweichung zu der Schätzung des größeren Fensters hat. Der Ablauf ist in Abbildung \ref{fig:ecg-hr-estimation} visualisiert.
 	
 	\begin{figure}[H]
 		\centering
-		\includegraphics[width=0.95\textwidth]{pic/ecg-patient-26.png}
+		\includegraphics[width=0.9\textwidth]{pic/ecg-hr-estimation.png}
+		\caption[Aktivitätsdiagramm der Herzratenschätzung auf dem EKG-Referenzsignal]{Aktivitätsdiagramm der Herzratenschätzung auf dem EKG-Referenzsignal}
+		\label{fig:ecg-hr-estimation}
+	\end{figure}
+
+	
+	Die Auswirkungen dieses Verfahrens sind in Abbildung \ref{fig:ecg-patient-26} sichtbar. Eine Fusionierung nur auf dem aktuellen Bereich führt zu einigen Fehlern in der Herzratenschätzung, die die Umgebung einbeziehende Fusionierung führt zu deutlich besseren Ergebnissen. Auch ist hier sichtbar, wie groß die Abweichung einzelner Kanäle ist.
+
+	\begin{figure}[H]
+		\centering
+		\includegraphics{pic/ecg-patient-26.pdf}
 		\caption[\ac{EKG}-Herzratenschätzungen auf sich überlappenden 10-Sekunden-Segmenten für Patient 26]{\ac{EKG}-Herzratenschätzungen auf sich überlappenden 10-Sekunden-Segmenten für Patient 26. Fusioniert lokal zeigt die Fusionierung ohne Miteinbeziehung der Umgebung, Fusioniert Umgebung die oben beschriebene Fusionierung}
 		\label{fig:ecg-patient-26}
 	\end{figure}
 
 
 	% TODO: Referenz Norm
-	Auf Basis dieser beiden Herzraten wird nun die Annotation vorgenommen. Dabei wurde sich an der Norm für \ac{EKG}-Patientenmonitoren orientiert. Diese schreibt vor, dass die Abweichung der Herzrate maximal 10 \% oder 5 Schläge pro Minute betragen darf, je nachdem welcher der beiden Werte größer ist\footcite[]{} und wurde hier so übernommen. Wenn eine höhere oder niedrigere Genauigkeit gefordert ist, kann dies auch auf 15 \% und 7.5 Schläge pro Minute oder 5 \% und 2.5 Schläge pro Minute angepasst werden. Die entsprechenden Verteilungen der Labels für 10 Sekunden lange Segmente mit 90 \% Überlappung für 5, 10 und 15 \% maximale Abweichung sind in Abbildung \ref{fig:label-distribution} zu sehen.
+	Auf Basis dieser beiden Herzraten wird nun die Annotation vorgenommen. Dabei wurde sich an der Norm für \ac{EKG}-Patientenmonitoren orientiert. Diese schreibt vor, dass die Abweichung der Herzrate maximal 10\,\% oder 5 Schläge pro Minute betragen darf, je nachdem welcher der beiden Werte größer ist\footcite[]{} und wurde hier so übernommen. Wenn eine höhere oder niedrigere Genauigkeit gefordert ist, kann dies auch auf 15\,\% und 7{,}5 Schläge pro Minute oder 5\,\% und 2{,}5 Schläge pro Minute angepasst werden. Die entsprechenden Verteilungen der Labels für 10 Sekunden lange Segmente mit 90 \% Überlappung für 5, 10 und 15\,\% maximale Abweichung sind in Abbildung \ref{fig:label-distribution} zu sehen.
 	
 	\begin{figure}[H]
 		\centering
-		\includegraphics[width=0.55\textwidth]{pic/label-distribution.png}
+		\includegraphics{pic/label-distribution.pdf}
 		\caption[Verteilung der Label je nach maximal zulässiger Abweichung]{Verteilung der Label je nach maximal zulässiger Abweichung}
 		\label{fig:label-distribution}
 	\end{figure}
@@ -206,8 +216,8 @@ Im folgenden Kapitel wird eine Einführung in das Thema der Signalverarbeitung u
 	
 	\begin{figure}[H]
 		\centering
-		\includegraphics[width=0.9\textwidth]{pic/data-stats-10.png}
-		\caption[Verteilung der Label pro Patient*in]{Verteilung der Label pro Patient*in}
+		\includegraphics{pic/data-stats-10.pdf}
+		\caption[Verteilung der Label pro Patient*in]{Verteilung der Label pro Patient*in für maximal 10\,\% Abweichung}
 		\label{fig:data-stats-15}
 	\end{figure}
 		
