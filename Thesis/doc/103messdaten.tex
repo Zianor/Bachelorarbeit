@@ -41,10 +41,10 @@ Im folgenden Kapitel wird eine Einführung in das Thema der Signalverarbeitung u
 	
 	\begin{align*}
 		E_f[N] &= E\textsubscript{Corr}[N] \cdot E\textsubscript{AMDF}[N] \cdot E\textsubscript{MAP}[N],\\
-		N_{opt} &= \argmax_{n} E_f[N]	
+		N\textsubscript{opt} &= \argmax_{n} E_f[N]	
 	\end{align*}
 	
-	Durch lineare Skalierung erhält man auch hier eine Dichtefunktion. Abbildung \ref{fig:estimator-fusion} zeigt die 3 einzelnen Dichtefunktionen und die fusionierte Fusion. In letzterer zeigt ein deutlicher Hochpunkt $N_{opt}$.
+	Durch lineare Skalierung erhält man auch hier eine Dichtefunktion. Abbildung \ref{fig:estimator-fusion} zeigt die 3 einzelnen Dichtefunktionen und die fusionierte Fusion. In letzterer zeigt ein deutlicher Hochpunkt $N\textsubscript{opt}$.
 	
 	 \begin{figure}[H]
 		\centering
@@ -56,7 +56,7 @@ Im folgenden Kapitel wird eine Einführung in das Thema der Signalverarbeitung u
 	
 	Nun gibt es für jeden Punkt im Signal eine Schätzung der Intervalllänge. Mit Hilfe der Fenstergröße und dieser Länge können die zu einem Herzschlag gehörenden Hochpunkte ermittelt werden, nämlich die, die die größte kombinierten Amplitude mit dem durch die Intervalllänge gegebenen Abstand besitzen. Für jeden dieser Punkte $P_k$ existiert nun eine Menge an Schätzungen $T_k$, mit der eine robuste Intervallschätzung $\overline{T_k} = \text{median}(T_k)$ ermittelt werden kann.\footcites[Vgl. zu diesem Kapitel][]{Bruser2013}
 
-\section{Artefakterkennung}
+\section{Artefakterkennung}\label{artefakterkennung}
 	
 	Artefakte bzw. Signal von geringer Qualität sind irrelevante Signalteile mit variierender Amplitude, Frequenz und Dauer, die das physiologische Signal stören\footcite[Vgl.][]{Nizami2013}. Das Ziel der Artefakterkennung ist es, nur die Teile des Signals zu verarbeiten, die Vitalparameter enthalten. Bewegungsartefakte, Sensorstörungen und ähnliches, die diese Parameter überlagern, sollen die Verarbeitung nicht beeinflussen. Dabei ist die Quelle der Störung selbst irrelevant, allerdings sollten keine medizinisch induzierten Abnormalitäten als gestörtes Signal klassifiziert werden. \citeauthor{Sadek2016} unterscheidet zwischen informativem und nicht-informativem Signal. Informatives Signal enthält \textit{noise} und Signal von guter Qualität und Vitalparameter können ohne weiteres extrahiert werden. Im Gegensatz dazu sind die Informationen bei nicht-informativem Signal so mit Artefakten und \textit{noise} vermischt, dass vor Extraktion der Vitalparameter weitere individuelle Verarbeitung nötig ist oder die Extraktion von physiologischen Eigenschaften gar unmöglich ist. Teils wird die Signalqualität auch mit so genannten \acp{SQI} gemessen, die je nach \ac{SQI} und Anwendungsfall verschiedene Aussagen haben. Im klinischen Kontext genutzte Artefakterkennung verwendet oft relativ einfaches Preprocessing.\footcite[Vgl.][]{Nizami2013} Außerdem sind in den meisten Algorithmen bestimmte Informationen direkt oder indirekt \textit{hard coded}. Das kann zum einen etwas wie Typ oder Frequenz der Daten sein, aber auch demographische Informationen über die Patient*innen wie Alter, Gewicht oder medizinischer Zustand.\footcite[Vgl.][]{Nizami2013}
 		
@@ -102,7 +102,7 @@ Im folgenden Kapitel wird eine Einführung in das Thema der Signalverarbeitung u
 		&T_2 &= \text{mean} + 1{,}1 * \text{std}.\notag
 	\end{eqnarray*}
 	
-	Die Länge des \textit{moving window} ist mit 200 Samples bei einer Abtastrate von 200 Hz benannt. Untersucht wurden sowohl Freiwillige im Labor, als auch im Krankenhauswartezimmer für eine sehr kurze Messdauer von ein bis zwei Minuten. Mit diesem Ansatz wurde bei mehr als 50 \% der Laborgruppe eine \textit{Coverage} zwischen 87 \% und 95 \% erreicht. Die \textit{Coverage} der im Krankenhaus aufgenommenen Gruppe war bedeutend niedriger; hier lagen 50 \% der Messungen zwischen 48 \% und 95 \% \textit{Coverage} erreicht. Zu der Genauigkeit der Herzschlagdetektion auf den akzeptierten Signalteilen wird keine Aussage in Zahlen getroffen, sondern nur der folgende Bland-Altman Graph gezeigt.
+	Die Länge des \textit{moving window} ist mit 200 Samples bei einer Abtastrate von 200 Hz benannt. Untersucht wurden sowohl Freiwillige im Labor, als auch im Krankenhauswartezimmer für eine sehr kurze Messdauer von ein bis zwei Minuten. Mit diesem Ansatz wurde bei mehr als 50\,\% der Laborgruppe eine \textit{Coverage} zwischen 87\,\% und 95\,\% erreicht. Die \textit{Coverage} der im Krankenhaus aufgenommenen Gruppe war bedeutend niedriger; hier lagen 50 \% der Messungen zwischen 48\,\% und 95\,\% \textit{Coverage} erreicht. Zu der Genauigkeit der Herzschlagdetektion auf den akzeptierten Signalteilen wird keine Aussage in Zahlen getroffen, sondern nur der folgende Bland-Altman Graph gezeigt.
 	
 	\begin{figure}[H]
 		\centering
@@ -118,7 +118,7 @@ Im folgenden Kapitel wird eine Einführung in das Thema der Signalverarbeitung u
 	
 	Ein Algorithmus zur Beurteilung der Signalqualität mittels maschinellen Lernens wird von \citeauthor{Sadek2016} im Paper \citetitle{Sadek2016} beschrieben. Betrachtet werden \ac{BKG}-Signale, die in einem Massagesessel aufgenommen werden, also ebenfalls im Sitzen aufgenommenes Signal, bei dem eine geringere Variabilität als in unserem Anwendungsfall erwartet wird.
 	
-	Die vorliegenden Daten wurden manuell von Expert*innen als informativ oder nicht informativ klassifiziert und in 10-Sekunden-Segmente, die sich nicht überlappen, aufgeteilt, die sich nicht überlappen. Insgesamt waren 58 \% der Daten als informativ und 42 \% als nicht-informativ gelabelt. Von diesen Segmenten wurden nach einer Bandpass-Filterung auf 1 bis 12 Hz 13 statistische Merkmale berechnet:
+	Die vorliegenden Daten wurden manuell von Expert*innen als informativ oder nicht informativ klassifiziert und in 10-Sekunden-Segmente, die sich nicht überlappen, aufgeteilt, die sich nicht überlappen. Insgesamt waren 58\,\% der Daten als informativ und 42\,\% als nicht-informativ gelabelt. Von diesen Segmenten wurden nach einer Bandpass-Filterung auf 1 bis 12\,Hz 13 statistische Merkmale berechnet:
 	%\begin{multicols}{2}
 	\begin{itemize}
 		\item Minimun
@@ -137,17 +137,17 @@ Im folgenden Kapitel wird eine Einführung in das Thema der Signalverarbeitung u
 	\end{itemize}
 	%\end{multicols}
 	
-	Für fünf verschiedene Modelle des maschinellen Lernens wurden jeweils die besten Hyperparameter über Kreuzvalidierung auf den Trainingsdaten ermittelt und die Modelle anschließend mit diesen Hyperparametern trainiert. Anschließend wurden die Modelle auf unbekannten Daten getestet. Das Training und Testen wurde mit getauschten Gruppen wiederholt. Das beste Ergebnis wurde mit einem Random Forest erreicht: Die durchschnittliche Genauigkeit der Kreuzvalidierung betrug $98{,}13 \% $ bzw. $100 \%$ bei getauschten Gruppen. Auf dem Testset wurde eine Genauigkeit von $92{,}3 \%$ bzw. $97{,}99 \%$ erreicht. Weitere Evaluationsmetriken außer eine \textit{Confusion Matrix} für den besten Klassifikator sind nicht gegeben.
+	Für fünf verschiedene Modelle des maschinellen Lernens wurden jeweils die besten Hyperparameter über Kreuzvalidierung auf den Trainingsdaten ermittelt und die Modelle anschließend mit diesen Hyperparametern trainiert. Anschließend wurden die Modelle auf unbekannten Daten getestet. Das Training und Testen wurde mit getauschten Gruppen wiederholt. Das beste Ergebnis wurde mit einem Random Forest erreicht: Die durchschnittliche Genauigkeit der Kreuzvalidierung betrug $98{,}13\,\% $ bzw. $100\,\%$ bei getauschten Gruppen. Auf dem Testset wurde eine Genauigkeit von $92{,}3\,\%$ bzw. $97{,}99\,\%$ erreicht. Weitere Evaluationsmetriken außer eine \textit{Confusion Matrix} für den besten Klassifikator sind nicht gegeben.
 	
 	Diese Ergebnisse sind sehr gut, allerdings muss bei der Einordnung beachtet werden, dass bei für die Kreuzvalidierung die Segmente zufällig verteilt wurden und nicht beachtet wurde, dass der Algorithmus für aussagekräftige Validierung einzelne Personen nicht kennen sollte. Dadurch ist die Performance auf gänzlich unbekannten Daten weiterhin nicht bekannt und vermutlich schlechter, als die Zahlen es hier vermuten lassen.
 	
 	\subsection{Ähnlichkeit der Intervallschätzer des CLIE-Algorithmus}\label{brueserQI}
 	
-	Ein weiteres Maß für die Signalqualität basiert auf dem in Kapitel \ref{CLIE} vorgestellten Algorithmus zur Intervallschätzung. Dieser \acl{SQI} misst, wie einig sich die drei Intervallschätzer sind. Wenn diese sich uneinig sind, ist der \ac{SQI} bei 0, je ähnlicher sich die Schätzungen sind, desto höher ist er. Für jedes Fenster $i$ wird er wie folgt berechnet: \[ q = \frac{E_f[n_{opt}, i]}{\sum E_f[n, i]} \]
+	Ein weiteres Maß für die Signalqualität basiert auf dem in Kapitel \ref{CLIE} vorgestellten Algorithmus zur Intervallschätzung. Dieser \acl{SQI} misst, wie einig sich die drei Intervallschätzer sind. Wenn diese sich uneinig sind, ist der \ac{SQI} bei 0, je ähnlicher sich die Schätzungen sind, desto höher ist er. Für jedes Fenster $i$ wird er wie folgt berechnet: \[ q = \frac{E_f[n\textsubscript{opt}, i]}{\sum E_f[n, i]} \]
 	
 	Bei der Ermittlung der konkreten Schlag-zu-Schlag Intervalle wird von $q$ äquivalent zu den geschätzten Intervalllängen der Median berechnet. Schätzungen dessen Qualität unter einem Schwellwert $q_{th}$ werden verworfen. Die Wahl von $q_{th}$ hängt von der gewünschten Genauigkeit und \textit{Coverage} ab, je höher die gewünschte Genauigkeit, desto niedriger die \textit{Coverage}.
 	
-	Dieser \ac{SQI} wird in verschiedenen Papern mit unterschiedlich gewähltem $q_{th}$ genutzt und erreicht damit bei der \ac{BKG}-Messung in Betten während der Nacht bei gesunden Patient*innen gute Ergebnisse. \citeauthor{Bruser2013} erreicht zum Beispiel bei 8 gesunden Proband*innen durchschnittlich eine \textit{Coverage} von $85 \%$ bei einem Fehler zur \ac{EKG}-Referenz von $0{,}61 \%$ Schlägen pro Minute.\footcite[Vgl.][]{Bruser2013} Bei Patient*innen im Krankenhaus zeigte sich, dass sowohl die Ergebnisse bezüglich der \textit{Coverage} als auch der Genauigkeit bedeutend schlechter sind. So erreichte \citeauthor{HoogAntink2020} bei 14 Patient*innen durchschnittlich $40 \%$ \textit{Coverage} bei einem Fehler von $2{,}16 \%$ Schlägen pro Minute. Werden nur die nächtlichen Aufnahmen betrachtet, wird eine \textit{Coverage} von $52 \%$ bei einem Fehler von $1{,}29 \%$ Schlägen pro Minute erreicht. Bei der Berechnung letztere Ergebnisse wurden zusätzlich Intervallschätzungen verworfen, deren relative Abweichung vom Median der anderen Schätzungen einen bestimmten Schwellwert überschreitet.\footcite[Vgl.][]{HoogAntink2020}
+	Dieser \ac{SQI} wird in verschiedenen Papern mit unterschiedlich gewähltem $q_{th}$ genutzt und erreicht damit bei der \ac{BKG}-Messung in Betten während der Nacht bei gesunden Patient*innen gute Ergebnisse. \citeauthor{Bruser2013} erreicht zum Beispiel bei 8 gesunden Proband*innen durchschnittlich eine \textit{Coverage} von $85\,\%$ bei einem Fehler zur \ac{EKG}-Referenz von $0{,}61\,\%$ Schlägen pro Minute.\footcite[Vgl.][]{Bruser2013} Bei Patient*innen im Krankenhaus zeigte sich, dass sowohl die Ergebnisse bezüglich der \textit{Coverage} als auch der Genauigkeit bedeutend schlechter sind. So erreichte \citeauthor{HoogAntink2020} bei 14 Patient*innen durchschnittlich $40 \%$ \textit{Coverage} bei einem Fehler von $2{,}16\,\%$ Schlägen pro Minute. Werden nur die nächtlichen Aufnahmen betrachtet, wird eine \textit{Coverage} von $52\,\%$ bei einem Fehler von $1{,}29\,\%$ Schlägen pro Minute erreicht. Bei der Berechnung letztere Ergebnisse wurden zusätzlich Intervallschätzungen verworfen, deren relative Abweichung vom Median der anderen Schätzungen einen bestimmten Schwellwert überschreitet.\footcite[Vgl.][]{HoogAntink2020}
 	
 	Dieser Algorithmus ist der einzige der drei betrachteten, der im Bett aufgenommenes \ac{BKG}-Signal untersucht. Die Ergebnisse sind bei gesunden, schlafenden Patient*innen sehr gut, im tatsächlichen Einsatz im Krankenhaus wird allerdings eine deutlich geringere \textit{Coverage} bei höherem Fehler erreicht.
 	
@@ -211,7 +211,7 @@ Im folgenden Kapitel wird eine Einführung in das Thema der Signalverarbeitung u
 		\label{fig:label-distribution}
 	\end{figure}
 	
-	Es ist auffällig, dass die Anteile des informativen Segments stark patient*innenabhängig sind. In Abbildung \ref{fig:data-stats-15} wird dies für 10 \% maximale Abweichung visualisiert.
+	Es ist auffällig, dass die Anteile des informativen Segments stark patient*innenabhängig sind. In Abbildung \ref{fig:data-stats-15} wird dies für 10\,\% maximale Abweichung visualisiert.
 	
 	
 	\begin{figure}[H]
