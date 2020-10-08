@@ -10,6 +10,10 @@ def get_project_root() -> Path:
     return Path(__file__).parent.parent
 
 
+def get_thesis_pic_path() -> Path:
+    return os.path.join(get_project_root().parent, 'Thesis/pic')
+
+
 def get_bcg_data_path() -> Path:
     return os.path.join(get_bcg_path(), 'ml_data')
 
@@ -136,4 +140,34 @@ def butter_bandpass(lowcut, highcut, fs, order=5):
     high = highcut / nyq
     b, a = butter(order, [low, high], btype='band')
     return b, a
+
+
+def get_plt_settings():
+    tex_fonts = {
+        # Use LaTeX to write all text
+        "text.usetex": True,
+        "font.serif": "Times",
+        "font.family": "serif",
+        # Use 12pt font in plots, to match 12pt font in document
+        "axes.labelsize": 12,
+        "font.size": 12,
+        # Make the legend/label fonts a little smaller
+        "legend.fontsize": 10,
+        "xtick.labelsize": 10,
+        "ytick.labelsize": 10,
+        "legend.loc": 'upper right'
+    }
+    return tex_fonts
+
+
+def get_plt_normal_size():
+    width = 298.76 / 72.27
+    height = width / 1.618
+    return width, height
+
+
+def get_plt_big_size():
+    width = 426.8 / 72.27
+    height = width / 1.618
+    return width, height
 
