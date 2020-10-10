@@ -451,7 +451,7 @@ class SegmentOwn(SegmentStatistical):
             'peak_max',
             'peak_min',
             'peak_mean',
-            'peak_min'
+            'peak_std'
         ])
         return np.concatenate((segment_array, own_array), axis=0)
 
@@ -474,7 +474,7 @@ class SegmentOwn(SegmentStatistical):
             self.peak_max,
             self.peak_min,
             self.peak_mean,
-            self.peak_min
+            self.peak_std
         ])
         return np.concatenate((segment_array, own_array), axis=0)
 
