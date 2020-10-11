@@ -457,7 +457,7 @@ class SegmentOwn(SegmentStatistical):
         self.template_correlations = self.get_template_correlations(series.get_best_est_int(start, end),
                                                                     series.bcg.get_unique_peak_locations(start, end),
                                                                     series)
-        if self.template_correlations:
+        if self.template_correlations is None:
             self.template_correlation_mean = np.mean(self.template_correlations)
             self.template_correlation_std = np.std(self.template_correlations)
         else:
@@ -468,8 +468,9 @@ class SegmentOwn(SegmentStatistical):
         if template is None:
             return None
         correlations = np.zeros(len(self.interval_lengths))
-        for i, peak_loaction, interval_length in enumerate(zip(peak_loactions, self.interval_lengths)):
-            heartbeat = series.bcg.filtered_data[peak_loaction: peak_loaction + interval_length]
+        for i, peak_loaction in enumerate(peak_loactions):
+            interval_length = self.interval_lengths[i]
+            heartbeat = series.bcg.filtered_data[peak_loaction: int(peak_loaction + interval_length)]
             curr_corr = correlate(template, heartbeat, method='auto')
             correlations[i] = np.sum(curr_corr)/len(curr_corr)
         return correlations
@@ -528,4 +529,8 @@ class SegmentOwn(SegmentStatistical):
 
 if __name__ == "__main__":
     DataSetOwn()
+    DataSetBrueser()
+    DataSetStatistical()
+    DataSetPino()
+    DataSetPino(4, 0.75)
     pass

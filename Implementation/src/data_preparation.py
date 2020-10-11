@@ -197,13 +197,13 @@ class DataSeries:
         return True
 
     def get_best_est_int(self, bcg_start, bcg_end):
-        idx = self.bcg.get_unique_peak_locatios(bcg_start, bcg_end)
+        idx = self.bcg.get_unique_peak_locations(bcg_start, bcg_end)
         if len(idx) == 0:
             return None
         sqis = self.bcg.get_sqi_array(bcg_start, bcg_end)
         interval_lengths = self.bcg.get_interval_lengths(bcg_start, bcg_end)
         max_id = np.argmax(sqis)
-        return self.bcg.filtered_data[idx[max_id]:idx[max_id]+interval_lengths[max_id]]
+        return self.bcg.filtered_data[idx[max_id]:int(idx[max_id]+interval_lengths[max_id])]
 
 
 
