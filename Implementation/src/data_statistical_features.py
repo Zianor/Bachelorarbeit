@@ -5,7 +5,7 @@ import pickle
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from scipy.signal import find_peaks, hilbert, welch
+from scipy.signal import find_peaks, hilbert, welch, correlate
 from scipy.stats import median_abs_deviation, kurtosis, skew
 import statsmodels.api as sm
 
@@ -433,6 +433,28 @@ class SegmentOwn(SegmentStatistical):
         self.peak_min = np.max(self.peak_values)
         self.peak_std = np.std(self.peak_values)
         self.peak_mean = np.mean(self.peak_values)
+        self.template_correlations = self.get_template_correlations(series.get_best_est_int(start, end),
+                                                                    series.bcg.get_unique_peak_locations(start, end),
+                                                                    series)
+        if self.template_correlations:
+            self.template_correlation_mean = np.mean(self.template_correlations)
+            self.template_correlation_std = np.std(self.template_correlations)
+        else:
+            self.template_correlation_mean = 0
+            self.template_correlation_std = 0
+
+    def get_template_correlations(self, template, peak_loactions, series):
+        if template is None:
+            return None
+        correlations = np.zeros(len(self.interval_lengths))
+        for i, peak_loaction, interval_length in enumerate(zip(peak_loactions, self.interval_lengths)):
+            heartbeat = series.bcg.filtered_data[peak_loaction: peak_loaction + interval_length]
+            curr_corr = correlate(template, heartbeat, method='auto')
+            correlations[i] = np.sum(curr_corr)/len(curr_corr)
+        return correlations
+
+
+
 
     @staticmethod
     def get_feature_name_array():
@@ -451,7 +473,9 @@ class SegmentOwn(SegmentStatistical):
             'peak_max',
             'peak_min',
             'peak_mean',
-            'peak_std'
+            'peak_std',
+            'template_corr_mean',
+            'template_corr_std'
         ])
         return np.concatenate((segment_array, own_array), axis=0)
 
@@ -474,7 +498,9 @@ class SegmentOwn(SegmentStatistical):
             self.peak_max,
             self.peak_min,
             self.peak_mean,
-            self.peak_std
+            self.peak_std,
+            self.template_correlation_mean,
+            self.template_correlation_std
         ])
         return np.concatenate((segment_array, own_array), axis=0)
 
