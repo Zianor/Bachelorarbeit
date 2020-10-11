@@ -139,7 +139,7 @@ class DataSeries:
         area = self.drift.loc[start_second:end_second]
         if len(area.index.values) == 0 or 100 / len(area.index.values) * area.count() < self.reference_threshold:
             return False
-        if self.get_ecg_hr(bcg_start, bcg_end) == np.nan:
+        if np.isnan(self.get_ecg_hr(bcg_start, bcg_end)):
             return False
         return True
 
