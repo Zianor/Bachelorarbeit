@@ -224,6 +224,23 @@ class Segment:
         self.bcg_hr = bcg_hr
         self.abs_err = np.abs(ecg_hr - bcg_hr)
         self.rel_err = 100 / ecg_hr * self.abs_err
+        self.quality_class = self.get_quality_class()
+
+    def get_quality_class(self):
+        if self.rel_err < 5 or self.abs_err < 2.5:
+            return 5
+        elif self.rel_err < 10 or self.abs_err < 5:
+            return 4
+        elif self.rel_err < 15 or self.abs_err < 7.5:
+            return 3
+        elif self.rel_err < 20 or self.abs_err < 10:
+            return 2
+        elif self.rel_err == np.inf:
+            return 0
+        else:
+            return 1
+
+
 
     @staticmethod
     def get_feature_name_array():
@@ -234,7 +251,8 @@ class Segment:
             'ecg_hr',
             'bcg_hr',
             'abs_err',
-            'rel_err'
+            'rel_err',
+            'quality_class'
         ])
 
     def get_feature_array(self):
@@ -249,6 +267,7 @@ class Segment:
             self.bcg_hr,
             self.abs_err,
             self.rel_err,
+            self.quality_class
         ])
 
 
