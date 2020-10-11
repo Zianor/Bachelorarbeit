@@ -441,6 +441,8 @@ class SegmentOwn(SegmentStatistical):
         f, den = welch(self.filtered_data, fs=series.bcg_sample_rate)
         self.peak_frequency_acf = f[np.argmax(den)]
         self.hf_ratio_acf = self.bcg_hr / self.peak_frequency_acf
+        if self.hf_ratio_acf == np.inf:
+            self.hf_ratio_acf = 0
         self.abs_energy = np.sum(self.filtered_data * self.filtered_data)
         self.interval_lengths_std = np.std(self.interval_lengths)
         self.interval_lengths_range = np.max(self.interval_lengths) - np.min(self.interval_lengths)
