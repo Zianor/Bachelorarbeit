@@ -185,7 +185,7 @@ Im folgenden Kapitel wird eine Einführung in das Thema der Signalverarbeitung u
 	
 	\begin{figure}[H]
 		\centering
-		\includegraphics[width=0.9\textwidth]{pic/ecg-hr-estimation.png}
+		\includegraphics[width=\textwidth]{pic/ecg-hr-estimation.png}
 		\caption[Aktivitätsdiagramm der Herzratenschätzung auf dem EKG-Referenzsignal]{Aktivitätsdiagramm der Herzratenschätzung auf dem EKG-Referenzsignal}
 		\label{fig:ecg-hr-estimation}
 	\end{figure}
@@ -201,8 +201,8 @@ Im folgenden Kapitel wird eine Einführung in das Thema der Signalverarbeitung u
 	\end{figure}
 
 
-	% TODO: Referenz Norm
-	Auf Basis dieser beiden Herzraten wird nun die Annotation vorgenommen. Dabei wurde sich an der Norm für \ac{EKG}-Patientenmonitoren orientiert. Diese schreibt vor, dass die Abweichung der Herzrate maximal 10\,\% oder 5 Schläge pro Minute betragen darf, je nachdem welcher der beiden Werte größer ist\footcite[]{} und wurde hier so übernommen. Wenn eine höhere oder niedrigere Genauigkeit gefordert ist, kann dies auch auf 15\,\% und 7{,}5 Schläge pro Minute oder 5\,\% und 2{,}5 Schläge pro Minute angepasst werden. Die entsprechenden Verteilungen der Labels für 10 Sekunden lange Segmente mit 90 \% Überlappung für 5, 10 und 15\,\% maximale Abweichung sind in Abbildung \ref{fig:label-distribution} zu sehen.
+	% TODO: Referenz Norm hübscher
+	Auf Basis dieser beiden Herzraten wird nun die Annotation vorgenommen. Dabei wurde sich an der Norm für \ac{EKG}-Patientenmonitoren orientiert. Diese schreibt vor, dass die Abweichung der Herzrate maximal 10\,\% oder 5 Schläge pro Minute betragen darf, je nachdem welcher der beiden Werte größer ist\footcite[]{DIN} und wurde hier so übernommen. Wenn eine höhere oder niedrigere Genauigkeit gefordert ist, kann dies auch auf 15\,\% und 7{,}5 Schläge pro Minute oder 5\,\% und 2{,}5 Schläge pro Minute angepasst werden. Die entsprechenden Verteilungen der Labels bei einer binären Klassifikation für 10 Sekunden lange Segmente mit 90 \% Überlappung für 5, 10 und 15\,\% maximale Abweichung sind in Abbildung \ref{fig:label-distribution} zu sehen.
 	
 	\begin{figure}[H]
 		\centering
@@ -211,8 +211,7 @@ Im folgenden Kapitel wird eine Einführung in das Thema der Signalverarbeitung u
 		\label{fig:label-distribution}
 	\end{figure}
 	
-	Es ist auffällig, dass die Anteile des informativen Segments stark patient*innenabhängig sind. In Abbildung \ref{fig:data-stats-15} wird dies für 10\,\% maximale Abweichung visualisiert.
-	
+	Es ist auffällig, dass die Anteile der informativen Segmente stark patient*innenabhängig sind. In Abbildung \ref{fig:data-stats-15} wird dies für 10\,\% maximale Abweichung visualisiert.
 	
 	\begin{figure}[H]
 		\centering
@@ -220,5 +219,15 @@ Im folgenden Kapitel wird eine Einführung in das Thema der Signalverarbeitung u
 		\caption[Verteilung der Label pro Patient*in]{Verteilung der Label pro Patient*in für maximal 10\,\% Abweichung}
 		\label{fig:data-stats-15}
 	\end{figure}
-		
-
+	
+	Neben einer binären Klassifikation ist es auch möglich mit Hilfe dieses Fehlermaßes, im Folgenden $E\textsubscript{HR}$ genannt, einen Wertebereich für eine Regression zu erzeugen. Dafür ist es nötig, ein einheitliches Maß für die Unterscheidung von relativer und absoluter Abweichung zu finden, das heißt den absoluten Fehler so umzurechnen, dass er mit der relativen Abweichung vergleichbar ist. Bei Herzraten über 50 Schlägen pro Minute entspricht $E\textsubscript{HR}$ dem relativen Fehler $\Delta\text{HR}\textsubscript{relativ}$, bei Herzraten darunter ermöglicht die absolute Abweichung den größeren Spielraum und wird daher für die Annotation verwendet. Eine Umrechnung dieser erfolgt auf Basis der Überlegung, dass der Schwellwert von 10\,\% relativer Abweichung einer absoluten Abweichung von 5 Schlägen die Minute entspricht. Daraus lässt sich folgern, dass eine Abweichung von 1 Schlag pro Minute einer relativen Abweichung von 2\,\% entspräche. Analog lässt sich $E\textsubscript{HR}$ bei Herzraten unter 50 Schlägen pro Minute durch die folgende Formel berechnen:
+	
+	\begin{align*}
+		E\textsubscript{HR} \hat{=} \Delta\text{HR}\textsubscript{abs} \cdot 2.
+	\end{align*}
+	
+	Wenn keine Herzrate auf dem \ac{BKG}-Signal ermittelt werden konnte, wird $E\textsubscript{HR}$ auf den maximalen Wert eines \textit{floats} gesetzt.
+	
+	
+	
+	
