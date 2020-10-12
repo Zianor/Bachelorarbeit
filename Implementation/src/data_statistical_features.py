@@ -223,7 +223,11 @@ class Segment:
         self.ecg_hr = ecg_hr
         self.bcg_hr = bcg_hr
         self.abs_err = np.abs(ecg_hr - bcg_hr)
-        self.rel_err = 100 / ecg_hr * self.abs_err
+        if not np.isfinite(self.abs_err):
+            self.abs_err = np.finfo(np.float32).max
+            self.rel_err = np.finfo(np.float32).max
+        else:
+            self.rel_err = 100 / ecg_hr * self.abs_err
         self.quality_class = self.get_quality_class()
 
     def get_quality_class(self):
@@ -235,7 +239,7 @@ class Segment:
             return 3
         elif self.rel_err < 20 or self.abs_err < 10:
             return 2
-        elif self.rel_err == np.inf:
+        elif self.rel_err == np.finfo(np.float32).max:
             return 0
         else:
             return 1
@@ -439,30 +443,40 @@ class SegmentOwn(SegmentStatistical):
         self.peak_values = series.bcg.get_unique_peak_values(start, end)
         self.acf = sm.tsa.acf(self.filtered_data, nlags=(end-start)//2, fft=True)
         f, den = welch(self.filtered_data, fs=series.bcg_sample_rate)
-        self.peak_frequency_acf = f[np.argmax(den)]
+        self.peak_frequency_acf = f[np.nanargmax(den)]
         self.hf_ratio_acf = self.bcg_hr / self.peak_frequency_acf
         if self.hf_ratio_acf == np.inf:
             self.hf_ratio_acf = 0
         self.abs_energy = np.sum(self.filtered_data * self.filtered_data)
-        self.interval_lengths_std = np.std(self.interval_lengths)
-        self.interval_lengths_range = np.max(self.interval_lengths) - np.min(self.interval_lengths)
-        self.interval_lengths_mean = np.mean(self.interval_lengths)
-        self.sqi_std = np.std(self.sqi_array)
-        self.sqi_max = np.max(self.sqi_array)
-        self.sqi_min = np.min(self.sqi_array)
-        self.peak_max = np.max(self.peak_values)
-        self.peak_min = np.max(self.peak_values)
-        self.peak_std = np.std(self.peak_values)
-        self.peak_mean = np.mean(self.peak_values)
-        self.template_correlations = self.get_template_correlations(series.get_best_est_int(start, end),
-                                                                    series.bcg.get_unique_peak_locations(start, end),
-                                                                    series)
-        if self.template_correlations is None:
+        if len(self.interval_lengths) > 0:
+            self.interval_lengths_std = np.std(self.interval_lengths)
+            self.interval_lengths_range = np.max(self.interval_lengths) - np.min(self.interval_lengths)
+            self.interval_lengths_mean = np.mean(self.interval_lengths)
+            self.sqi_std = np.std(self.sqi_array)
+            self.sqi_max = np.max(self.sqi_array)
+            self.sqi_min = np.min(self.sqi_array)
+            self.peak_max = np.max(self.peak_values)
+            self.peak_min = np.max(self.peak_values)
+            self.peak_std = np.std(self.peak_values)
+            self.peak_mean = np.mean(self.peak_values)
+            self.template_correlations = self.get_template_correlations(series.get_best_est_int(start, end),
+                                                                        series.bcg.get_unique_peak_locations(start,end),
+                                                                        series)
+        else:
+            self.sqi_std = np.finfo(np.float32).max
+            self.sqi_max = np.finfo(np.float32).max
+            self.sqi_min = np.finfo(np.float32).max
+            self.peak_max = np.finfo(np.float32).max
+            self.peak_min = np.finfo(np.float32).max
+            self.peak_std = np.finfo(np.float32).max
+            self.peak_mean = np.finfo(np.float32).max
+            self.template_correlations = None
+        if self.template_correlations is not None:
             self.template_correlation_mean = np.mean(self.template_correlations)
             self.template_correlation_std = np.std(self.template_correlations)
         else:
             self.template_correlation_mean = 0
-            self.template_correlation_std = 0
+            self.template_correlation_std = np.finfo(np.float32).max
 
     def get_template_correlations(self, template, peak_loactions, series):
         if template is None:
@@ -470,9 +484,18 @@ class SegmentOwn(SegmentStatistical):
         correlations = np.zeros(len(self.interval_lengths))
         for i, peak_loaction in enumerate(peak_loactions):
             interval_length = self.interval_lengths[i]
-            heartbeat = series.bcg.filtered_data[peak_loaction: int(peak_loaction + interval_length)]
-            curr_corr = correlate(template, heartbeat, method='auto')
-            correlations[i] = np.sum(curr_corr)/len(curr_corr)
+            if interval_length == 0:
+                correlations[i] = 0
+            else:
+                heartbeat = series.bcg.filtered_data[peak_loaction: int(peak_loaction + interval_length)]
+                try:
+                    curr_corr = correlate(template, heartbeat, method='auto')
+                except:
+                    import traceback
+                    traceback.print_stack()
+                    print(peak_loaction)
+                    return None
+                correlations[i] = np.sum(curr_corr)/len(curr_corr)
         return correlations
 
 
