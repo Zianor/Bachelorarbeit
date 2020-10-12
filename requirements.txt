@@ -10,3 +10,4 @@ jsonplus~=0.8.0
 py-ecg-detectors~=1.0.2
 jupyter
 seaborn
+statsmodels~=0.12.0
