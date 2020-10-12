@@ -1,4 +1,5 @@
 import os
+import pickle
 import warnings
 
 import pandas as pd
@@ -6,7 +7,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 
 import utils as utils
-from data_statistical_features import DataSet, Segment, DataSetBrueser, DataSetStatistical, DataSetPino
+from data_statistical_features import Segment, DataSetBrueser, DataSetStatistical, DataSetPino, SegmentStatistical
 
 
 class QualityEstimator:
@@ -32,17 +33,45 @@ class QualityEstimator:
     def _load_segments(self):
         raise Exception("Not implemented in base class")
 
-    def get_3bpm_coverage(self, indices, labels=None):
-        return self.get_bpm_coverage(self, 3, indices, labels)
+    def get_5percent_coverage(self, indices, labels=None):
+        return self.get_percent_coverage(5, indices, labels)
 
-    def get_5bpm_coverage(self, indices, labels=None):
-        return self.get_bpm_coverage(5, indices, labels)
+    def get_10percent_coverage(self, indices, labels=None):
+        return self.get_percent_coverage(10, indices, labels)
 
-    def get_bpm_coverage(self, threshold, indices, labels=None):
+    def get_15percent_coverage(self, indices, labels=None):
+        return self.get_percent_coverage(15, indices, labels)
+
+    def get_20percent_coverage(self, indices, labels=None):
+        return self.get_percent_coverage(20, indices, labels)
+
+    def get_unusable_percentage(self, indices, labels=None):
         data_subset = self.informative_info.loc[indices]
         if labels is not None:
             data_subset = data_subset[labels]
-        return 100 / len(data_subset.index) * len(data_subset[data_subset['abs_err'] < threshold])
+        return 100 / len(data_subset.index) * len(data_subset[data_subset['rel_error'] == np.finfo(np.float32).max])
+
+    def get_percent_coverage(self, threshold, indices, labels=None):
+        data_subset = self.informative_info.loc[indices]
+        if labels is not None:
+            data_subset = data_subset[labels]
+        covered = data_subset[np.logical_or(data_subset['rel_err'] < threshold, data_subset['abs_err'] < threshold/2)]
+        return 100 / len(data_subset.index) * len(covered)
+
+    def print_model_test_report(self):
+        y_pred = self.predict_test_set()
+        _, x2, _, y2, _, _ = self._get_patient_split()
+        test_indices = x2.indices
+        print(f"Fehler < 5 Prozent/2.5bpm insgesamt: {self.get_5percent_coverage(test_indices):.2f}")
+        print("Fehler < 5 Prozent/2.5bpm klassifiziert: %.2f" % self.get_5percent_coverage(test_indices, y_pred))
+        print("Fehler < 10 Prozent/5bpm insgesamt: %.2f" % self.get_10percent_coverage(test_indices))
+        print("Fehler < 10 Prozent/5bpm klassifiziert: %.2f" % self.get_10percent_coverage(test_indices, y_pred))
+        print("Fehler < 15 Prozent/7.5bpm insgesamt: %.2f" % self.get_15percent_coverage(test_indices))
+        print("Fehler < 15 Prozent/7.5bpm klassifiziert: %.2f" % self.get_15percent_coverage(test_indices, y_pred))
+        print("Fehler < 20 Prozent/10bpm insgesamt: %.2f" % self.get_20percent_coverage(test_indices))
+        print("Fehler < 20 Prozent/10bpm klassifiziert: %.2f" % self.get_20percent_coverage(test_indices, y_pred))
+        print("Keine Schaetzung insgesamt: %.2f" % self.get_unusable_percentage(test_indices))
+        print("Keine Schaetzung klassifiziert: %.2f" % self.get_unusable_percentage(test_indices, y_pred))
 
     def _get_patient_split(self, test_size=0.33):
         patient_ids_1, patient_ids_2 = train_test_split(self.patient_id.unique(), random_state=1, test_size=test_size)
@@ -55,6 +84,13 @@ class QualityEstimator:
         return x1, x2, y1, y2, groups1, groups2
 
     def predict_all_labels(self):
+        raise Exception("Not implemented in base class")
+
+    def predict_test_set(self):
+        x1, x2, y1, y2, groups1, groups2 = self._get_patient_split()
+        return self.predict(x2)
+
+    def predict(self, x):
         raise Exception("Not implemented in base class")
 
     def get_mean_error_abs(self, indices, labels):
@@ -108,14 +144,11 @@ class BrueserSingleSQI(QualityEstimator):
         return self.data[features].copy()
 
     def predict_all_labels(self):
-        labels = ((self.features['sqi_hr_diff_rel'] < self.hr_threshold) | (self.features['sqi_hr_diff_abs'] <
-                  self.hr_threshold/2)) & (self.features['sqi_coverage'] >= self.coverage_threshold)
-        return labels
+        return self.predict(self.features)
 
-    def predict(self, X):
-        data_subset = self.features[X.indices]
-        labels = (data_subset['sqi_hr_diff_rel'] < self.hr_threshold) & (
-                data_subset['sqi_coverage'] >= self.coverage_threshold)
+    def predict(self, x):
+        data_subset = self.features[x.indices]
+        labels = data_subset['sqi_coverage'] >= self.coverage_threshold
         return labels
 
 
@@ -147,26 +180,15 @@ class PinoMinMaxStd(QualityEstimator):
         labels = self.features['T1'] <= self.features['T2']
         return labels
 
-    def predict(self, X):
-        data_subset = self.features[X.indices]
+    def predict_test_set(self):
+        x1, x2, y1, y2, groups1, groups2 = self._get_patient_split()
+        return self.predict(x2)
+
+    def predict(self, x):
+        data_subset = self.features[x.indices]
         labels = data_subset['T1'] <= data_subset['T2']
         return labels
 
 
 if __name__ == "__main__":
-    brueser = BrueserSingleSQI()
-    pred_labels = brueser.predict_all_labels()
-    indices = brueser.informative_info.index
-    brueser_5bpm_coverage = brueser.get_5bpm_coverage(indices, pred_labels)
-    annotation_5bpm_coverage = brueser.get_5bpm_coverage(indices, brueser.informative_info['informative'])
-    print("5 bpm Coverage Brueser Classification: %.2f" % brueser_5bpm_coverage)
-    print("5 bpm Coverage Annotation: %.2f" % annotation_5bpm_coverage)
-
-    pino = PinoMinMaxStd()
-    pred_labels = pino.predict_all_labels()
-    indices = pino.informative_info.index
-    pino_5bpm_coverage = pino.get_5bpm_coverage(indices, pred_labels)
-    annotation_5bpm_coverage = pino.get_5bpm_coverage(indices, pino.informative_info['informative'])
-    print("5 bpm Coverage Pino Classification: %.2f" % pino_5bpm_coverage)
-    print("5 bpm Coverage Annotation: %.2f" % annotation_5bpm_coverage)
     pass
