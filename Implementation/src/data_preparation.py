@@ -21,7 +21,7 @@ class BCGSeries:
         self.indices = indices
         self.sample_rate = sample_rate
         self.length = len(raw_data) / sample_rate  # in seconds
-        self.brueser_df = get_brueser_from_id(self.sample_rate, self.bcg_id)
+        self.brueser_df = get_brueser_from_id(self.sample_rate, self.bcg_id).dropna()
         self.medians = self.brueser_df['medians'].to_numpy()
         self.unique_peaks = self.brueser_df['unique_peaks'].to_numpy()
         self.brueser_sqi = self.brueser_df['qualities'].to_numpy()
@@ -39,6 +39,9 @@ class BCGSeries:
     def get_mean_sqi(self, start, end):
         """Returns mean brueser sqi in given interval
         """
+        sqi_array = self.get_sqi_array(start, end)
+        if len(sqi_array[np.isfinite(sqi_array)]) == 0:
+            return 0
         return np.mean(self.get_sqi_array(start, end))
 
     def get_sqi_array(self, start, end):
@@ -202,9 +205,10 @@ class DataSeries:
             return None
         sqis = self.bcg.get_sqi_array(bcg_start, bcg_end)
         interval_lengths = self.bcg.get_interval_lengths(bcg_start, bcg_end)
-        max_id = np.argmax(sqis)
-        return self.bcg.filtered_data[idx[max_id]:int(idx[max_id]+interval_lengths[max_id])]
-
+        if len(np.isfinite(sqis) > 0):
+            max_id = np.argmax(sqis)
+            return self.bcg.filtered_data[idx[max_id]:int(idx[max_id]+interval_lengths[max_id])]
+        return None
 
 
 class Data:
