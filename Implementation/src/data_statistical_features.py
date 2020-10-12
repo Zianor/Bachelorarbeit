@@ -226,25 +226,28 @@ class Segment:
         if not np.isfinite(self.abs_err):
             self.abs_err = np.finfo(np.float32).max
             self.rel_err = np.finfo(np.float32).max
+            self.error = np.finfo(np.float32).max
         else:
             self.rel_err = 100 / ecg_hr * self.abs_err
+            if self.ecg_hr > 50:
+                self.error = self.rel_err
+            else:
+                self.error = self.abs_err/2
         self.quality_class = self.get_quality_class()
 
     def get_quality_class(self):
-        if self.rel_err < 5 or self.abs_err < 2.5:
+        if self.error < 5:
             return 5
-        elif self.rel_err < 10 or self.abs_err < 5:
+        elif self.error < 10:
             return 4
-        elif self.rel_err < 15 or self.abs_err < 7.5:
+        elif self.error < 15:
             return 3
-        elif self.rel_err < 20 or self.abs_err < 10:
+        elif self.error < 20:
             return 2
-        elif self.rel_err == np.finfo(np.float32).max:
+        elif self.error == np.finfo(np.float32).max:
             return 0
         else:
             return 1
-
-
 
     @staticmethod
     def get_feature_name_array():
@@ -256,7 +259,8 @@ class Segment:
             'bcg_hr',
             'abs_err',
             'rel_err',
-            'quality_class'
+            'quality_class',
+            'error'
         ])
 
     def get_feature_array(self):
@@ -271,7 +275,8 @@ class Segment:
             self.bcg_hr,
             self.abs_err,
             self.rel_err,
-            self.quality_class
+            self.quality_class,
+            self.error
         ])
 
 

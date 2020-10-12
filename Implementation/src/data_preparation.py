@@ -183,21 +183,24 @@ class DataSeries:
         :param bcg_end: sample of bcg signal where window ends
         :param threshold: threshold for relative error in percent, abs threshold is threshold/2
         """
+        if self.get_error(bcg_start, bcg_end) > threshold:
+            return False
+        return True
+
+    def get_error(self, bcg_start, bcg_end):
+        """Returns relative error in given window.
+
+        If heart rate is under 50, relative error is abs_err/2"""
         bcg_hr = self.get_bcg_hr(bcg_start, bcg_end)
         ecg_hr = self.get_ecg_hr(bcg_start, bcg_end)
         abs_err = np.abs(ecg_hr - bcg_hr)
         rel_err = 100 / ecg_hr * abs_err
         if np.isnan(bcg_hr):
-            return False
-        if ecg_hr / 100 * threshold > threshold / 2:
-            if rel_err > threshold:
-                return False
-            else:
-                return True
+            return np.finfo(np.float32).max
+        if ecg_hr > 50:  # if error in percentage is larger
+            return rel_err
         else:
-            if abs_err > threshold / 2:
-                return False
-        return True
+            return abs_err/0.5
 
     def get_best_est_int(self, bcg_start, bcg_end):
         idx = self.bcg.get_unique_peak_locations(bcg_start, bcg_end)
