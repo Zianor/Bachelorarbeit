@@ -22,7 +22,6 @@ class DataSet:
         self.hr_threshold = hr_threshold
         self.segment_length = segment_length
         self.overlap_amount = overlap_amount
-        self.segments = []
         self._create_segments()
         self.save_csv()
 
@@ -34,7 +33,7 @@ class DataSet:
 
     def _create_segments(self):
         """
-        Creates segments with a given length out of given BCG Data
+        Creates segments with a given length out of given BCG Data and writes them to csv
         """
         if os.path.isfile(utils.get_data_object_path()):
             with open(utils.get_data_object_path(), 'rb') as file:
@@ -47,6 +46,13 @@ class DataSet:
         segment_length_frames = utils.seconds_to_frames(self.segment_length, data.sample_rate)  # in samples
         segment_distance = utils.seconds_to_frames(self.segment_length - self.segment_length * self.overlap_amount,
                                                    data.sample_rate)
+        if not os.path.isdir(utils.get_data_set_folder(self.segment_length, self.overlap_amount)):
+            os.mkdir(utils.get_data_set_folder(self.segment_length, self.overlap_amount))
+        with open(self._get_path_hr(), 'w') as f:
+            writer = csv.writer(f)
+            writer.writerow(self._get_feature_name_array())
+            f.flush()
+
         for series in data.data_series.values():
             for i in range(0, len(series.bcg.raw_data), segment_distance):
                 if i + self.segment_length < len(
@@ -59,8 +65,11 @@ class DataSet:
                     brueser_sqi = series.get_mean_brueser_sqi(start, end)
                     bcg_hr = series.get_bcg_hr(start, end)
                     informative = series.is_informative(start, end, self.hr_threshold)
-                    self.segments.append(
-                        self._get_segment(series, start, end, informative, ecg_hr, brueser_sqi, bcg_hr))
+                    segment = self._get_segment(series, start, end, informative, ecg_hr, brueser_sqi, bcg_hr)
+                    with open(self._get_path_hr(), 'a') as f:
+                        writer = csv.writer(f)
+                        writer.writerow(segment.get_feature_array())
+                        f.flush()
 
     def _get_segment(self, series: DataSeries, start, end, informative, ecg_hr, brueser_sqi, bcg_hr):
         return Segment(
@@ -71,18 +80,14 @@ class DataSet:
             informative=informative
         )
 
+    @staticmethod
+    def _get_feature_name_array():
+        return Segment.get_feature_name_array()
+
     def save_csv(self):
         """
-        Saves all segments as csv
+        Saves all segments as csv without informative label
         """
-        if not os.path.isdir(utils.get_data_set_folder(self.segment_length, self.overlap_amount)):
-            os.mkdir(utils.get_data_set_folder(self.segment_length, self.overlap_amount))
-        with open(self._get_path_hr(), 'w') as f:
-            writer = csv.writer(f)
-            writer.writerow(self.segments[0].get_feature_name_array())
-            for segment in self.segments:
-                writer.writerow(segment.get_feature_array())
-            f.flush()
         data = pd.read_csv(self._get_path_hr(), index_col=False)
         data = data.drop(labels='informative', axis='columns')
         data.to_csv(self._get_path(), index=False)
@@ -126,6 +131,10 @@ class DataSetStatistical(DataSet):
     def _get_path_hr(self):
         return utils.get_statistical_features_csv_path(self.segment_length, self.overlap_amount, self.hr_threshold)
 
+    @staticmethod
+    def _get_feature_name_array():
+        return SegmentStatistical.get_feature_name_array()
+
     def _get_segment(self, series: DataSeries, start, end, informative, ecg_hr, brueser_sqi, bcg_hr):
         return SegmentStatistical(
             raw_data=series.bcg.raw_data[start: end],
@@ -165,6 +174,10 @@ class DataSetBrueser(DataSet):
             length_samples=utils.seconds_to_frames(self.segment_length, series.bcg_sample_rate)
         )
 
+    @staticmethod
+    def _get_feature_name_array():
+        return SegmentBrueserSQI.get_feature_name_array()
+
 
 class DataSetPino(DataSet):
 
@@ -188,6 +201,10 @@ class DataSetPino(DataSet):
             informative=informative,
         )
 
+    @staticmethod
+    def _get_feature_name_array():
+        return SegmentPino.get_feature_name_array()
+
 
 class DataSetOwn(DataSet):
 
@@ -210,6 +227,10 @@ class DataSetOwn(DataSet):
             brueser_sqi=brueser_sqi,
             informative=informative
         )
+
+    @staticmethod
+    def _get_feature_name_array():
+        return SegmentOwn.get_feature_name_array()
 
 
 class Segment:
@@ -503,9 +524,6 @@ class SegmentOwn(SegmentStatistical):
                 correlations[i] = np.sum(curr_corr)/len(curr_corr)
         return correlations
 
-
-
-
     @staticmethod
     def get_feature_name_array():
         segment_array = SegmentStatistical.get_feature_name_array()
@@ -556,6 +574,7 @@ class SegmentOwn(SegmentStatistical):
 
 
 if __name__ == "__main__":
+    DataSet()
     DataSetOwn()
     DataSetBrueser()
     DataSetStatistical()
