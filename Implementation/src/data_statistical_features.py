@@ -48,7 +48,7 @@ class DataSet:
                                                    data.sample_rate)
         if not os.path.isdir(utils.get_data_set_folder(self.segment_length, self.overlap_amount)):
             os.mkdir(utils.get_data_set_folder(self.segment_length, self.overlap_amount))
-        with open(self._get_path_hr(), 'w') as f:
+        with open(self._get_path_hr(), 'w', newline='') as f:
             writer = csv.writer(f)
             writer.writerow(self._get_feature_name_array())
             f.flush()
@@ -66,7 +66,7 @@ class DataSet:
                     bcg_hr = series.get_bcg_hr(start, end)
                     informative = series.is_informative(start, end, self.hr_threshold)
                     segment = self._get_segment(series, start, end, informative, ecg_hr, brueser_sqi, bcg_hr)
-                    with open(self._get_path_hr(), 'a') as f:
+                    with open(self._get_path_hr(), 'a', newline='') as f:
                         writer = csv.writer(f)
                         writer.writerow(segment.get_feature_array())
                         f.flush()
@@ -489,6 +489,9 @@ class SegmentOwn(SegmentStatistical):
                                                                         series.bcg.get_unique_peak_locations(start,end),
                                                                         series)
         else:
+            self.interval_lengths_std = np.finfo(np.float32).max
+            self.interval_lengths_range = np.finfo(np.float32).max
+            self.interval_lengths_mean = np.finfo(np.float32).max
             self.sqi_std = np.finfo(np.float32).max
             self.sqi_max = np.finfo(np.float32).max
             self.sqi_min = np.finfo(np.float32).max
