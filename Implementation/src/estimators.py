@@ -84,7 +84,7 @@ class QualityEstimator:
         return x1, x2, y1, y2, groups1, groups2
 
     def predict_all_labels(self):
-        raise Exception("Not implemented in base class")
+        return self.predict(self.features)
 
     def predict_test_set(self):
         x1, x2, y1, y2, groups1, groups2 = self._get_patient_split()
@@ -187,6 +187,42 @@ class PinoMinMaxStd(QualityEstimator):
     def predict(self, x):
         data_subset = self.features[x.indices]
         labels = data_subset['T1'] <= data_subset['T2']
+        return labels
+
+
+class MLStatisticalEstimator(QualityEstimator):
+
+    def __init__(self, path, segment_length=10, overlap_amount=0.9, hr_threshold=10):
+        super(MLStatisticalEstimator, self).__init__(segment_length, overlap_amount, hr_threshold)
+        if os.path.isfile(os.path.join(path, 'fitted_model.sav')):
+            with open(os.path.join(path, 'fitted_model.sav'), 'rb') as file:
+                grid_search = pickle.load(file)
+                self.model = grid_search.best_estimator_
+        else:
+            raise Exception("No model found at given path")
+
+    def _load_segments(self):
+        path_hr = utils.get_statistical_features_csv_path(self.segment_length, self.overlap_amount, self.hr_threshold)
+        if not os.path.isfile(path_hr):
+            path = utils.get_statistical_features_csv_path(self.segment_length, self.overlap_amount)  # other threshold?
+            if os.path.isfile(path):
+                data = pd.read_csv(path, index_col=False)
+                warnings.warn('Labels are recalculated')
+                data['informative'] = data['rel_err'] < self.hr_threshold
+                data.to_csv(path_hr, index=False)
+            else:
+                warnings.warn('No csv, data needs to be reproduced. This may take some time')
+                DataSetStatistical(segment_length=self.segment_length, overlap_amount=self.overlap_amount,
+                                   hr_threshold=self.hr_threshold)
+        return pd.read_csv(path_hr, index_col=False)
+
+    def _get_features(self):
+        features = np.delete(SegmentStatistical.get_feature_name_array(), Segment.get_feature_name_array())
+        return features
+
+    def predict(self, x):
+        data_subset = self.features[x.indices]
+        labels = self.model.predict(data_subset)
         return labels
 
 
