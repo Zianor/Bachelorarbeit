@@ -154,10 +154,11 @@ class DataSetBrueser(DataSet):
         super(DataSetBrueser, self).__init__(segment_length, overlap_amount, hr_threshold)
 
     def _get_path(self):
-        return utils.get_brueser_features_csv_path(self.segment_length, self.overlap_amount)
+        return utils.get_brueser_features_csv_path(self.segment_length, self.overlap_amount, self.sqi_threshold)
 
     def _get_path_hr(self):
-        return utils.get_brueser_features_csv_path(self.segment_length, self.overlap_amount, self.hr_threshold)
+        return utils.get_brueser_features_csv_path(self.segment_length, self.overlap_amount, self.sqi_threshold,
+                                                   self.hr_threshold)
 
     def _get_segment(self, series: DataSeries, start, end, informative, ecg_hr, brueser_sqi, bcg_hr):
         indices = np.where(np.logical_and(start < series.bcg.unique_peaks, series.bcg.unique_peaks < end))
