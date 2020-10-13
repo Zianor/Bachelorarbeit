@@ -17,10 +17,10 @@ class QualityEstimator:
         self.overlap_amount = overlap_amount
         self.hr_threshold = hr_threshold
         self.data = self._load_segments()
-        self.informative_info = self.data[QualityEstimator._get_informative_names()]
-        self.features = self._get_features()
-        self.target = self.data['informative']
-        self.patient_id = self.data['patient_id']
+        self.informative_info = self.data[QualityEstimator._get_informative_names()].copy()
+        self.features = self._get_features().copy()
+        self.target = self.data['informative'].copy()
+        self.patient_id = self.data['patient_id'].copy()
 
     @staticmethod
     def _get_informative_names():
@@ -49,7 +49,7 @@ class QualityEstimator:
         data_subset = self.informative_info.loc[indices]
         if labels is not None:
             data_subset = data_subset[labels]
-        return 100 / len(data_subset.index) * len(data_subset[data_subset['rel_error'] == np.finfo(np.float32).max])
+        return 100 / len(data_subset.index) * len(data_subset[data_subset['quality_class'] == 0])
 
     def get_percent_coverage(self, threshold, indices, labels=None):
         data_subset = self.informative_info.loc[indices]
@@ -59,9 +59,9 @@ class QualityEstimator:
         return 100 / len(data_subset.index) * len(covered)
 
     def print_model_test_report(self):
-        y_pred = self.predict_test_set()
+        y_pred, y_true = self.predict_test_set()
         _, x2, _, y2, _, _ = self._get_patient_split()
-        test_indices = x2.indices
+        test_indices = x2.index
         print(f"Fehler < 5 Prozent/2.5bpm insgesamt: {self.get_5percent_coverage(test_indices):.2f}")
         print("Fehler < 5 Prozent/2.5bpm klassifiziert: %.2f" % self.get_5percent_coverage(test_indices, y_pred))
         print("Fehler < 10 Prozent/5bpm insgesamt: %.2f" % self.get_10percent_coverage(test_indices))
@@ -70,8 +70,8 @@ class QualityEstimator:
         print("Fehler < 15 Prozent/7.5bpm klassifiziert: %.2f" % self.get_15percent_coverage(test_indices, y_pred))
         print("Fehler < 20 Prozent/10bpm insgesamt: %.2f" % self.get_20percent_coverage(test_indices))
         print("Fehler < 20 Prozent/10bpm klassifiziert: %.2f" % self.get_20percent_coverage(test_indices, y_pred))
-        print("Keine Schaetzung insgesamt: %.2f" % self.get_unusable_percentage(test_indices))
-        print("Keine Schaetzung klassifiziert: %.2f" % self.get_unusable_percentage(test_indices, y_pred))
+        print("Keine Schaetzung insgesamt: %.5f" % self.get_unusable_percentage(test_indices))
+        print("Keine Schaetzung klassifiziert: %.5f" % self.get_unusable_percentage(test_indices, y_pred))
 
     def _get_patient_split(self, test_size=0.33):
         patient_ids_1, patient_ids_2 = train_test_split(self.patient_id.unique(), random_state=1, test_size=test_size)
@@ -88,23 +88,25 @@ class QualityEstimator:
 
     def predict_test_set(self):
         x1, x2, y1, y2, groups1, groups2 = self._get_patient_split()
-        return self.predict(x2)
+        return self.predict(x2), y2
 
     def predict(self, x):
         raise Exception("Not implemented in base class")
 
-    def get_mean_error_abs(self, indices, labels):
+    def get_mean_error_abs(self, indices, labels=None):
         data_subset = self.informative_info.loc[indices]
         if labels is not None:
             data_subset = data_subset[labels]
-            data_subset['abs_err'] = data_subset['abs_err'].replace(np.inf, np.nan)
+        data_subset = data_subset[data_subset['informative']]
+        data_subset = data_subset[data_subset['quality_class'] != 0]
         return np.nanmean(data_subset['abs_err'])
 
-    def get_mean_error_rel(self, indices, labels):
+    def get_mean_error_rel(self, indices, labels=None):
         data_subset = self.informative_info.loc[indices]
         if labels is not None:
             data_subset = data_subset[labels]
-        data_subset['rel_err'] = data_subset['rel_err'].replace(np.inf, np.nan)
+        data_subset = data_subset[data_subset['quality_class'] != 0]
+        data_subset = data_subset[data_subset['informative']]
         return np.nanmean(data_subset['rel_err'])
 
 
@@ -114,8 +116,10 @@ class BrueserSingleSQI(QualityEstimator):
                  coverage_threshold=85):
         self.sqi_threshold = sqi_threshold
         super(BrueserSingleSQI, self).__init__(segment_length, overlap_amount, hr_threshold)
-        self.features['sqi_hr_diff_abs'] = np.abs(self.informative_info['ecg_hr'] - self.features['sqi_hr'])
-        self.features['sqi_hr_diff_rel'] = 100 / self.informative_info['ecg_hr'] * self.features['sqi_hr_diff_abs']
+        self.informative_info['sqi_hr_diff_abs'] = np.abs(self.informative_info['ecg_hr'] - self.features['sqi_hr'])
+        self.informative_info['sqi_hr_diff_abs'] = self.informative_info['sqi_hr_diff_abs'].replace(np.nan, np.finfo(np.float32).max)
+        self.informative_info['sqi_hr_diff_rel'] = 100 / self.informative_info['ecg_hr'] * self.informative_info['sqi_hr_diff_abs']
+        self.informative_info['sqi_hr_diff_rel'] = self.informative_info['sqi_hr_diff_rel'].replace(np.nan, np.finfo(np.float32).max)
         self.coverage_threshold = coverage_threshold
 
     def _load_segments(self):
@@ -147,9 +151,47 @@ class BrueserSingleSQI(QualityEstimator):
         return self.predict(self.features)
 
     def predict(self, x):
-        data_subset = self.features[x.indices]
+        data_subset = self.features.loc[x.index]
         labels = data_subset['sqi_coverage'] >= self.coverage_threshold
         return labels
+
+    def get_mean_error_abs(self, indices, labels=None):
+        data_subset = self.informative_info.loc[indices]
+        if labels is not None:
+            data_subset = data_subset[labels]
+            return np.nanmean(data_subset['sqi_hr_diff_abs'])
+        data_subset = data_subset[data_subset['quality_class'] != 0]
+        data_subset = data_subset[data_subset['informative']]
+        return np.nanmean(data_subset['abs_err'])
+
+    def get_mean_error_rel(self, indices, labels=None):
+        data_subset = self.informative_info.loc[indices]
+        if labels is not None:
+            data_subset = data_subset[labels]
+            return np.nanmean(data_subset['sqi_hr_diff_rel'])
+        data_subset = data_subset[data_subset['quality_class'] != 0]
+        data_subset = data_subset[data_subset['informative']]
+        return np.nanmean(data_subset['rel_err'])
+
+    def get_unusable_percentage(self, indices, labels=None):
+        data_subset = self.informative_info.loc[indices]
+        if labels is not None:
+            data_subset = data_subset[labels]
+            unusable = data_subset[data_subset['sqi_hr_diff_rel'] == np.finfo(np.float32).max]
+        else:
+            unusable = data_subset[data_subset['quality_class'] == 0]
+        return 100 / len(data_subset.index) * len(unusable)
+
+    def get_percent_coverage(self, threshold, indices, labels=None):
+        data_subset = self.informative_info.loc[indices]
+        if labels is not None:
+            data_subset = data_subset[labels]
+            covered = data_subset[np.logical_or(data_subset['sqi_hr_diff_rel'] < threshold,
+                                                data_subset['sqi_hr_diff_abs'] < threshold/2)]
+        else:
+            covered = data_subset[np.logical_or(data_subset['rel_err'] < threshold, data_subset['abs_err']
+                                                < threshold / 2)]
+        return 100 / len(data_subset.index) * len(covered)
 
 
 class PinoMinMaxStd(QualityEstimator):
@@ -180,12 +222,8 @@ class PinoMinMaxStd(QualityEstimator):
         labels = self.features['T1'] <= self.features['T2']
         return labels
 
-    def predict_test_set(self):
-        x1, x2, y1, y2, groups1, groups2 = self._get_patient_split()
-        return self.predict(x2)
-
     def predict(self, x):
-        data_subset = self.features[x.indices]
+        data_subset = self.features.loc[x.index]
         labels = data_subset['T1'] <= data_subset['T2']
         return labels
 
@@ -194,8 +232,8 @@ class MLStatisticalEstimator(QualityEstimator):
 
     def __init__(self, path, segment_length=10, overlap_amount=0.9, hr_threshold=10):
         super(MLStatisticalEstimator, self).__init__(segment_length, overlap_amount, hr_threshold)
-        if os.path.isfile(os.path.join(path, 'fitted_model.sav')):
-            with open(os.path.join(path, 'fitted_model.sav'), 'rb') as file:
+        if os.path.isfile(os.path.join(utils.get_grid_params_path(), path, 'fitted_model.sav')):
+            with open(os.path.join(utils.get_grid_params_path(), path, 'fitted_model.sav'), 'rb') as file:
                 grid_search = pickle.load(file)
                 self.model = grid_search.best_estimator_
         else:
@@ -217,11 +255,13 @@ class MLStatisticalEstimator(QualityEstimator):
         return pd.read_csv(path_hr, index_col=False)
 
     def _get_features(self):
-        features = np.delete(SegmentStatistical.get_feature_name_array(), Segment.get_feature_name_array())
-        return features
+        to_remove = [np.any(Segment.get_feature_name_array()[:] == v)
+                     for v in SegmentStatistical.get_feature_name_array()]
+        features = np.delete(SegmentStatistical.get_feature_name_array(), to_remove)
+        return self.data[features]
 
     def predict(self, x):
-        data_subset = self.features[x.indices]
+        data_subset = self.features.loc[x.index]
         labels = self.model.predict(data_subset)
         return labels
 
