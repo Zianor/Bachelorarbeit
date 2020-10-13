@@ -1,4 +1,4 @@
-\chapter{Signalverarbeitung bei ballistokardiographischen Signalen}
+\chapter{Signalverarbeitung bei ballistokardiographischen Signalen}\label{signalverarbeitung}
 
 Im folgenden Kapitel wird eine Einführung in das Thema der Signalverarbeitung und besonders Artefakterkennung bei ballistokardiographischen Signalen gegeben. Hierzu wird zunächst Grundlegendes zu der Verarbeitung kardiorespiratorischer Signale erläutert. Ein in dieser Arbeit verwendeter Algorithmus zur Detektion von Herzschlägen wird vorgestellt. Anschließend wird die Thematik der Artefakterkennung eingeführt und der aktuelle Stand der Wissenschaft bei \ac{BKG}-Signalen vorgestellt. Hierfür werden drei Verfahren im Detail betrachtet. Darüber hinaus werden die in dieser Arbeit untersuchten Daten vorgestellt und die durchgeführte Vorverarbeitung beschrieben.
 
@@ -12,7 +12,7 @@ Im folgenden Kapitel wird eine Einführung in das Thema der Signalverarbeitung u
 
 \section{Detektion von Herzschlägen}\label{CLIE}
 
-	In dieser Arbeit wird der von \citeauthor{Bruser2013} entwickelte Algorithmus, der \textit{Continuous Local Interval Estimator}, kurz \textit{CLIE} verwendet. Aus diesem Grund wird er hier vorgestellt. Der Algorithmus beruht auf der in Kapitel \ref{ballistokardiographie} erwähnten Annahme, dass sich aufeinander folgenden Herzschläge ähneln und schätzt die Herzrate anhand der Selbstähnlichkeit des Signals.
+	In dieser Arbeit wird der von \citeauthor{Bruser2013} entwickelte Algorithmus, der \acf{CLIE} verwendet. Aus diesem Grund wird er hier vorgestellt. Der Algorithmus beruht auf der in Kapitel \ref{ballistokardiographie} erwähnten Annahme, dass sich aufeinander folgenden Herzschläge ähneln und schätzt die Herzrate anhand der Selbstähnlichkeit des Signals.
 
 
 	Der Algorithmus iteriert mit einem \textit{Moving window} über das mit einem Bandpass gefilterte Signal. Es werden zwei Schwellwerte für die Intervalllänge $T$ genutzt, $T_\textsubscript{min}$ und $T_\textsubscript{max}$, basierend auf dem bekanntem Bereich der Herzrate von 30 bis 200 Schlägen pro Minute. Die Länge des Analysefensters $w_i$ entspricht $2 \cdot T_\textsubscript{max}$, sodass mindestens zwei vollständige Herzschläge enthalten sind.
@@ -177,7 +177,7 @@ Im folgenden Kapitel wird eine Einführung in das Thema der Signalverarbeitung u
 	Bei der Vorverarbeitung des \ac{BKG}-Signals wird der in Kapitel \ref{CLIE} vorgestellte CLIE-Algorithmus angewendet und die ermittelten Indices der Intervalle, die geschätzte Intervallängen und der in Kapitel \ref{brueserQI} beschriebene Qualitätsindex gespeichert. Für das \ac{EKG}-Signal wird für die alle drei Kanäle eine Detektion der QRS-Komplexe durchgeführt, mit denen die Schlag-zu-Schlag Intervalle ermittelt werden können. Dafür wird die Python-Implementierung von \citeauthor{Howell2019} des von \citeauthor{Elgendi2010} beschriebenen Algorithmus\footcite[][]{Elgendi2010} genutzt. Dieser zeigt in einer Untersuchung von \citeauthor{Porr2019} gute Ergebnisse.\footcite[Vgl.][]{Porr2019}
 	
 	
-	\subsection{Annotation der Daten}
+	\subsection{Annotation der Daten}\label{annotation}
 	
 	Die vorliegenden Daten sind nicht annotiert. Es ist im Rahmen dieser Arbeit nicht möglich, die Annotation durch Expert*innen durchführen zu lassen, weshalb auf das parallel aufgenommene \ac{EKG} zurückgegriffen wird. Aufgrund des nicht-linearen Drifts der Daten ist eine herzschlaggenaue Synchronisierung schwierig. Aus diesem Grund wurde entschieden, die Annotation bereichsweise vorzunehmen. Für jeden Bereich wird zunächst geprüft, ob ein aussagekräftiges Referenzsignal existiert. Falls nicht, wird der entsprechende Bereich ausgeschlossen und nicht weiter verwendet. Ansonsten wird die durchschnittliche Herzrate sowohl für BKG- als auch EKG-Signal berechnet. Für die Berechnung der Herzfrequenz im \ac{BKG} wird der Median der geschätzten Intervalllängen verwendet. So werden Ausreißer weniger stark gewichtet.
 	
@@ -226,8 +226,16 @@ Im folgenden Kapitel wird eine Einführung in das Thema der Signalverarbeitung u
 		E\textsubscript{HR} \hat{=} \Delta\text{HR}\textsubscript{abs} \cdot 2.
 	\end{align*}
 	
-	Wenn keine Herzrate auf dem \ac{BKG}-Signal ermittelt werden konnte, wird $E\textsubscript{HR}$ auf den maximalen Wert eines \textit{floats} gesetzt.
+	% TODO E_HR auf maximal mögliche Abweichung gesetzt
+	Wenn keine Herzrate auf dem \ac{BKG}-Signal ermittelt werden konnte, wird $E\textsubscript{HR}$ auf den maximalen Wert eines \textit{floats} gesetzt. Die Verteilung von $E\textsubscript{HR}$, abgebildet in \ref{fig:class-histo}, zeigt, dass Segmente mit Fehlern von mehr als 20\,\% und solche mit Fehlern unter 5\,\% jeweils die beiden größten Gruppen bilden. 
 	
+	
+	\begin{figure}[H]
+		\centering
+		\includegraphics{pic/data-E-HR-5-20.pdf}
+		\caption[Histogramm von $E\textsubscript{HR}$]{Histogramm von $E\textsubscript{HR}$}
+		\label{fig:class-histo}
+	\end{figure}
 	
 	
 	

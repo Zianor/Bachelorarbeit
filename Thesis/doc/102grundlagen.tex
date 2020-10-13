@@ -9,38 +9,18 @@ Da in dieser Arbeit Methoden des Maschinellen Lernens verwendet werden, wird im 
 
 	\subsection{Grundprinzipien}
 	
-	\begin{itemize}
-		\item „künstliche“ Generierung von Wissen auf Basis von Erfahrung: Lernen aus Beispielen -> verallgemeinern (Erkennung von Mustern, statistisches Modell basierend auf Daten mit denen trainiert wurde)
-		\item 3 Arten: supervised, unsupervised, reinforcement
-		\item Trainingsdaten $X$: Merkmale in Vektoren $x \in X \subseteq \mathbb{R}^n$
-		\item supervised, zB für Klassifizierung von Daten
-		\item Ziel $Y$ bekannt
-		\item Daten sind Eingabe-Ausgabe-Paare $(x_1, y_1), ...,(x_n, y_n), x_i \in X$
-		\item nur Funktion $f: X \to Y$ unbekannt
-		\item gesucht: $g$ dass $f$ approximiert
-	\end{itemize}
+	Maschinelles Lernen ist die \glqq künstliche \grqq{} Generierung von Wissen auf Basis von Erfahrung: Aus Beispielen wird gelernt und dieses Wissen nach einer Trainingsphase verallgemeinert. Dafür wird mit Mustererkennung gearbeitet und ein statistisches Modell aufgebaut, dass auf den Trainingsdaten beruht. Die Trainingsdaten $X$ bestehen aus Merkmalsvektoren  $x \in X \subseteq \mathbb{R}^n$. Gesucht ist eine Funktion $f$, die diese Daten beschreibt. Unterschieden wird bei dieser Beschreibung dieser Daten zwischen Klassifikation. Bei einer Klassifikation werden die Eingabedaten in verschiedene Klassen unterteilt. Bei einer Regression dagegen werden stetige Werte vorhergesagt, es wird die Verteilung der Daten beschrieben. Sie kann z.B. dafür genutzt werden, Verkaufszahlen vorauszusagen. Ein Sonderfall ist die logistische Regression, die die Wahrscheinlichkeit der Angehörigkeit zu einer Klasse benennt.
+	
+	Es wird zwischen verschiedenen Arten des maschinellen Lernens unterschieden, dem überwachten Lernen, dem unüberwachten Lernen und dem verstärkenden Lernen. Letzteres wird hier nicht betrachtet. Bei überwachtem Lernen bestehen die vorliegenden Daten aus Eingabe-Ausgabe-Paaren $(x_1, y_1), ...,(x_n, y_n), x_i \in X$. Demnach ist nur die Funktion $f: X \to Y$ ist unbekannt. Gesucht ist eine Funktion $g$, die $f$ approximiert. Ein Lernalgorithmus ermittelt diese Funktion aus einem Hypothesenset. Dieses Vorgehen ist in Abbildung \ref{fig:supervisedLearning} visualisiert. Bei unüberwachtem Lernen dagegen ist $Y$ unbekannt; die Eingabedaten haben die Form $x_1, ..., x_n, x_i \in X$. Hier ist ein $f$ gesucht, das die Daten möglichst gut beschreibt und sie beispielsweise eigenständig in Kategorien einteilt.
 	
 	\begin{figure}[H]
-	\centering
+		\centering
 		\includegraphics[width=0.7\textwidth]{pic/SupervisedLearning.png}
-	\caption[Darstellung von Supervised Learning]{Darstellung von Supervised Learning}
-	\label{fig:supervisedLearning}
+		\caption[Darstellung von überwachtem Lernen]{Darstellung von überwachtem Lernen}
+		\label{fig:supervisedLearning}
 	\end{figure}
-
-	\begin{itemize}
-		\item Unterscheidung zwischen Regression, Klassifikation
-		\item Klassifikation: unterteilt Daten in Klassen
-		\item Regression: beschreibt Verteilung der Daten, kann z.B. genutzt um Verkaufszahlen von Büchern vorauszusagen
-		\item logistische Regression: Wahrscheinlichkeit Angehörigkeit Klasse
-		\item unsupervised, Beschreibung von Daten
-		\item keine Labels -> Form der Eingabedaten (x1,….,xn)
-		\item $f: X \to Y$
-		\item gesucht: $f$, das Daten gut beschreibt
-		\item -> erstellt selbstständig Klassifikationen
-		\item Beispiel: Clustering zur Einteilung der Daten in Kategorien
-		\item reinforcement: Strategie gesucht, die eine Belohnung maximiert
-		\item in Arbeit supervised Learning betrachtet -> Daten müssen annotiert sein
-	\end{itemize}
+	
+	In dieser Arbeit wird überwachtes Lernen betrachtet, weshalb die untersuchten Daten annotiert werden müssen.
 	
 	\subsection{Mathematischer Hintergrund}
 	

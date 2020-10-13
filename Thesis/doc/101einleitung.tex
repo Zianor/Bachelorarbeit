@@ -11,15 +11,16 @@ Eine solche \textit{unobtrusive} Messmethode ist die \acf{BKG}. Sensoren lassen 
 
 \section{Ziel der Arbeit}
 
-Das Ziel dieser Arbeit ist es, Möglichkeiten der Beurteilung der Signalqualität von \ac{BKG}-Signalen mittels maschinellen Lernens zu untersuchen. Im besonderen Fokus liegen dabei Langzeitaufnahmen von bettlägerigen Patient*innen, da diese sich in der Vergangenheit als besonders anfällig für geringe Signalqualität gezeigt haben.
+Das Ziel dieser Arbeit ist es, Möglichkeiten der Beurteilung der Signalqualität von \ac{BKG}-Signalen mittels maschinellen Lernens zu untersuchen. Im besonderen Fokus liegen dabei Langzeitaufnahmen, sowohl nachts als auch tagsüber, von bettlägerigen Patient*innen, da diese sich in der Vergangenheit als besonders anfällig für geringe Signalqualität gezeigt haben.
 
-Dafür werden zunächst existierende Verfahren der Artefakterkennung für die vorliegenden Daten getestet und bewertet. Anschließend wird auf Basis von Domainenexpertise Merkmalskonstruktion betrieben und verschiedene Verfahren und Eingabeparameter verglichen. % TODO: was genau soll das Ergebnis sein?
+Dafür werden zunächst die vorliegenden Daten aufbereitet und existierende Verfahren der Artefakterkennung für diese getestet und bewertet. Anschließend wird das Signal auf mögliche Merkmale untersucht, die Aussagekraft über die Signalqualität ermöglichen. Anhand dieses Wissens werden Modelle des maschinellen Lernens ausgewählt und getestet. Auch wird untersucht, welchen Einfluss Annotation und Eingabeform auf das Ergebnis haben.
 
-Langfristig soll ermöglicht werden, \acf{BKG} im medizinischen Alltag anzuwenden. % TODO: sinnvoller schreiben
-
-\textbf{To be continued}
-
-
-
+Langfristig soll ermöglicht werden, \acf{BKG} im medizinischen Alltag auch in unkontrollierten Umgebungen anzuwenden. Ziel dieser Arbeit ist es, für diesen Anwendungszweck eine erste Möglichkeit zur Beurteilung der Signalqualität zu bieten.% TODO: sinnvoller schreiben
 
 \section{Gliederung}
+
+Zunächst wird im Kapitel \textbf{\nameref{grundlagen}} ein allgemeiner Überblick über den medizinischen und technischen Hintergrund gegeben, der nötig ist, um die vorliegende Arbeit zu verstehen.
+
+In \textbf{\nameref{signalverarbeitung}} wird das Thema der Verarbeitung ballistokardiographischer Signale näher betrachtet. Dazu gehört die Detektion von Herzschlägen bei \ac{BKG}-Signalen, existierende Verfahren zur Artefakterkennung und die Vorverarbeitung der vorliegenden Messdaten.
+
+
