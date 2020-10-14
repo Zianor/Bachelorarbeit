@@ -62,12 +62,15 @@ class QualityEstimator:
     def print_model_test_report(self):
         y_pred, y_true = self.predict_test_set()
         _, x2, _, y2, _, _ = self._get_patient_split()
+        if type(y_pred) != pd.Series:
+            y_pred = pd.Series(y_pred, index=y_true.index)
         test_indices = x2.index
+
         fp_indices = y_true[np.logical_and(~y_true, y_pred)].index
-        fp = y_pred[fp_indices]
+        fp = y_pred.loc[fp_indices]
 
         fn_indices = y_true[np.logical_and(y_true, ~y_pred)].index
-        fn = y_pred[fn_indices]
+        fn = y_pred.loc[fn_indices]
 
         print(f"Coverage klassifiziert: {len(y_pred[y_pred])/len(y_pred)*100:.2f} %")
         print(f"Coverage annotiert: {len(y_true[y_true]) / len(y_true)*100:.2f} %")
