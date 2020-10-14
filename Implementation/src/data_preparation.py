@@ -196,7 +196,7 @@ class DataSeries:
         abs_err = np.abs(ecg_hr - bcg_hr)
         rel_err = 100 / ecg_hr * abs_err
         if np.isnan(bcg_hr):
-            return np.finfo(np.float32).max
+            return 667  # max possible error
         if ecg_hr > 50:  # if error in percentage is larger
             return rel_err
         else:

@@ -246,9 +246,9 @@ class Segment:
         self.bcg_hr = bcg_hr
         self.abs_err = np.abs(ecg_hr - bcg_hr)
         if not np.isfinite(self.abs_err):
-            self.abs_err = np.finfo(np.float32).max
-            self.rel_err = np.finfo(np.float32).max
-            self.error = np.finfo(np.float32).max
+            self.abs_err = 170  # max possible error
+            self.rel_err = 667 # max possible error
+            self.error = 667
         else:
             self.rel_err = 100 / ecg_hr * self.abs_err
             if self.ecg_hr > 50:
@@ -266,7 +266,7 @@ class Segment:
             return 3
         elif self.error < 20:
             return 2
-        elif self.error == np.finfo(np.float32).max:
+        elif np.isclose(self.error, 667):
             return 0
         else:
             return 1
