@@ -73,7 +73,7 @@ class BCGSeries:
         """Returns coverage on given interval
         """
         est_lengths = self.get_interval_lengths(start, end)
-        coverage = np.sum(est_lengths)/(end-start)
+        coverage = np.sum(est_lengths) / (end - start)
         if coverage >= 1:
             return 100
         else:
@@ -133,6 +133,7 @@ class DataSeries:
         self.bcg = None
         self.patient_id = ecg_series.patient_id
         self.drift = None
+        self.coverage_threshold = 85
 
     def reference_exists(self, bcg_start, bcg_end) -> bool:
         """Checks if more than reference_threshold % of the values are not nan
@@ -183,7 +184,8 @@ class DataSeries:
         :param bcg_end: sample of bcg signal where window ends
         :param threshold: threshold for relative error in percent, abs threshold is threshold/2
         """
-        if self.get_error(bcg_start, bcg_end) > threshold:
+        if self.get_error(bcg_start, bcg_end) > threshold or self.bcg.get_coverage(bcg_start,
+                                                                                   bcg_end) < self.coverage_threshold:
             return False
         return True
 
@@ -200,7 +202,7 @@ class DataSeries:
         if ecg_hr > 50:  # if error in percentage is larger
             return rel_err
         else:
-            return abs_err/0.5
+            return abs_err / 0.5
 
     def get_best_est_int(self, bcg_start, bcg_end):
         idx = self.bcg.get_unique_peak_locations(bcg_start, bcg_end)
@@ -210,7 +212,7 @@ class DataSeries:
         interval_lengths = self.bcg.get_interval_lengths(bcg_start, bcg_end)
         if len(np.isfinite(sqis) > 0):
             max_id = np.argmax(sqis)
-            return self.bcg.filtered_data[idx[max_id]:int(idx[max_id]+interval_lengths[max_id])]
+            return self.bcg.filtered_data[idx[max_id]:int(idx[max_id] + interval_lengths[max_id])]
         return None
 
 

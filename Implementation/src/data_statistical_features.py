@@ -85,13 +85,15 @@ class DataSet:
             filtered_data = series.bcg.filtered_data[start:end]
         else:
             filtered_data = None
+        brueser_coverage = series.bcg.get_coverage(start, end)
         return Segment(
             patient_id=series.patient_id,
             ecg_hr=ecg_hr,
             bcg_hr=bcg_hr,
             brueser_sqi=brueser_sqi,
             informative=informative,
-            filtered_data=filtered_data
+            filtered_data=filtered_data,
+            coverage=brueser_coverage
         )
 
     @staticmethod
@@ -158,6 +160,7 @@ class DataSetStatistical(DataSet):
         return SegmentStatistical.get_feature_name_array()
 
     def _get_segment(self, series: DataSeries, start, end, informative, ecg_hr, brueser_sqi, bcg_hr):
+        brueser_coverage = series.bcg.get_coverage(start, end)
         return SegmentStatistical(
             raw_data=series.bcg.raw_data[start: end],
             patient_id=series.patient_id,
@@ -165,7 +168,8 @@ class DataSetStatistical(DataSet):
             bcg_hr=bcg_hr,
             brueser_sqi=brueser_sqi,
             sample_rate=series.bcg_sample_rate,
-            informative=informative
+            informative=informative,
+            coverage=brueser_coverage
         )
 
 
@@ -217,6 +221,7 @@ class DataSetPino(DataSet):
                                                 self.hr_threshold)
 
     def _get_segment(self, series: DataSeries, start, end, informative, ecg_hr, brueser_sqi, bcg_hr):
+        brueser_coverage = series.bcg.get_coverage(start, end)
         return SegmentPino(
             raw_data=series.bcg.raw_data[start: end],
             patient_id=series.patient_id,
@@ -225,6 +230,7 @@ class DataSetPino(DataSet):
             brueser_sqi=brueser_sqi,
             sample_rate=series.bcg_sample_rate,
             informative=informative,
+            coverage=brueser_coverage
         )
 
     @staticmethod
@@ -264,7 +270,8 @@ class Segment:
     """A segment of bcg data without any features yet
     """
 
-    def __init__(self, patient_id, ecg_hr, bcg_hr, brueser_sqi, informative, filtered_data=None):
+    def __init__(self, patient_id, ecg_hr, bcg_hr, brueser_sqi, informative, coverage, filtered_data=None):
+        self.coverage = coverage
         self.bcg = filtered_data
         self.brueser_sqi = brueser_sqi
         self.patient_id = patient_id
@@ -309,7 +316,8 @@ class Segment:
             'abs_err',
             'rel_err',
             'quality_class',
-            'error'
+            'error',
+            'brueser_coverage'
         ])
 
     def get_feature_array(self):
@@ -325,14 +333,15 @@ class Segment:
             self.abs_err,
             self.rel_err,
             self.quality_class,
-            self.error
+            self.error,
+            self.coverage
         ])
 
 
 class SegmentPino(Segment):
 
-    def __init__(self, raw_data, patient_id, ecg_hr, bcg_hr, brueser_sqi, sample_rate, informative):
-        super().__init__(patient_id, ecg_hr, bcg_hr, brueser_sqi, informative)
+    def __init__(self, raw_data, patient_id, ecg_hr, bcg_hr, brueser_sqi, sample_rate, informative, coverage):
+        super().__init__(patient_id, ecg_hr, bcg_hr, brueser_sqi, informative, coverage=coverage)
         self.bcg = raw_data
         minimum = np.min(self.bcg)
         maximum = np.max(self.bcg)
@@ -365,7 +374,7 @@ class SegmentStatistical(Segment):
     vital signs with opportunistic ambient sensing' (https://ieeexplore.ieee.org/document/7591234)
     """
 
-    def __init__(self, raw_data, patient_id, ecg_hr, bcg_hr, brueser_sqi, sample_rate, informative):
+    def __init__(self, raw_data, patient_id, ecg_hr, bcg_hr, brueser_sqi, sample_rate, informative, coverage):
         """
         Creates a segment and computes several statistical features
         :param raw_data: raw BCG data
@@ -373,7 +382,7 @@ class SegmentStatistical(Segment):
         :param coverage:
         :param mean_error: mean BBI error to reference
         """
-        super().__init__(patient_id, ecg_hr, bcg_hr, brueser_sqi, informative)
+        super().__init__(patient_id, ecg_hr, bcg_hr, brueser_sqi, informative, coverage=coverage)
         self.bcg = utils.butter_bandpass_filter(raw_data, 1, 12, sample_rate)
         self.minimum = np.min(self.bcg)
         self.maximum = np.max(self.bcg)
@@ -490,9 +499,8 @@ class SegmentOwn(SegmentStatistical):
     def __init__(self, series: DataSeries, start, end, informative, ecg_hr, brueser_sqi, bcg_hr):
         self.filtered_data = series.bcg.filtered_data[start: end]
         super(SegmentOwn, self).__init__(series.bcg.raw_data[start: end], series.patient_id, ecg_hr, bcg_hr,
-                                         brueser_sqi,
-                                         series.bcg_sample_rate, informative)
-        self.brueser_coverage = series.bcg.get_coverage(start, end)
+                                         brueser_sqi, series.bcg_sample_rate, informative,
+                                         coverage=series.bcg.get_coverage(start, end))
         self.interval_lengths = series.bcg.get_interval_lengths(start, end)  # in samples
         self.sqi_array = series.bcg.get_sqi_array(start, end)
         self.peak_values = series.bcg.get_unique_peak_values(start, end)
@@ -563,7 +571,6 @@ class SegmentOwn(SegmentStatistical):
         own_array = np.array([
             'hf_ratio_acf',
             'peak_frequency_acf',
-            'brueser_coverage',
             'abs_energy',
             'interval_lengths_std',
             'interval_lengths_range',
@@ -588,7 +595,6 @@ class SegmentOwn(SegmentStatistical):
         own_array = np.array([
             self.hf_ratio_acf,
             self.peak_frequency_acf,
-            self.brueser_coverage,
             self.abs_energy,
             self.interval_lengths_std,
             self.interval_lengths_range,
@@ -609,8 +615,8 @@ class SegmentOwn(SegmentStatistical):
 if __name__ == "__main__":
     DataSet()
     # DataSetOwn()
-    # DataSetBrueser()
-    # DataSetStatistical()
-    # DataSetPino()
-    # DataSetPino(4, 0.75)
+    DataSetStatistical()
+    DataSetPino()
+    DataSetPino(4, 0.75)
+    DataSetBrueser()
     pass
