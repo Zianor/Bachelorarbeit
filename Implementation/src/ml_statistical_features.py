@@ -348,7 +348,7 @@ def reconstruct_models_paper(paths, grid_search: bool, patient_cv: bool, hr_thre
     functions = (get_lda_grid_params, get_dt_grid_params, get_rf_grid_params, get_mlp_grid_params,
                  get_linear_svc_grid_params)
 
-    x, y, patient_id, _ = load_data(segment_length=10, overlap_amount=0, hr_threshold=hr_threshold)
+    x, y, patient_id, _ = load_data(segment_length=10, overlap_amount=0.9, hr_threshold=hr_threshold)
 
     for path, function in zip(paths, functions):
         clf, params = function()
