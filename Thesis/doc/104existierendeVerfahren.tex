@@ -5,16 +5,24 @@ Im diesem Kapitel werden die betrachteten Daten näher untersucht. Das beinhalte
 
 \section{Anwendung existierender Verfahren}
 
-Zunächst werden die in Kapitel \ref{artefakterkennung} beschriebenen existierenden Artefakterkennungsverfahren mit den in dieser Arbeit untersuchten Daten getestet und  ihre Leistungsfähigkeit untersucht und bewertet. Hierzu werden zunächst die verwendeten Merkmale segmentweise extrahiert und serialisiert. Die Segmentlänge wurde zunächst auf 10 Sekunden mit 90\,\% Überlappung festgelegt, da diese Werte auch in der Literatur verwendet wird\footcite[Vgl.][]{Yu2020} und eine ausreichend große Robustheit gegenüber des Drifts der Daten bietet Zusätzlich zu den verwendeten Merkmalen werden allgemeine Informationen über die Segmente mitgespeichert. Dazu gehören Patienten-ID, EKG-Herzrate, BKG-Herzrate, absoluter und relativer Fehler, $E\textsubscript{HR}$ und die binäre Annotation.
+Zunächst werden die in Kapitel \ref{artefakterkennung} beschriebenen existierenden Artefakterkennungsverfahren mit den in dieser Arbeit untersuchten Daten getestet und  ihre Leistungsfähigkeit untersucht und bewertet. Hierzu werden zunächst die verwendeten Merkmale segmentweise extrahiert und serialisiert. Die Segmentlänge wurde zunächst auf 10 Sekunden mit 90\,\% Überlappung festgelegt, da diese Werte auch in der Literatur verwendet wird\footcite[Vgl.][]{Yu2020} und eine ausreichend große Robustheit gegenüber des Drifts der Daten bietet Zusätzlich zu den verwendeten Merkmalen werden allgemeine Informationen über die Segmente mitgespeichert. Dazu gehören Patient*innen-ID, EKG-Herzrate, BKG-Herzrate, absoluter und relativer Fehler, $E\textsubscript{HR}$ und die binäre Annotation. Um vergleichbare Ergebnisse zu erhalten, wird auch bei Algorithmen, die kein Training benötigen, das Testset betrachtet. Um Trainings- und Testdaten inhaltlich vollständig zu trennen, wird anhand der Patient*innen-IDs getrennt, sodass Segmente einer Person lediglich in einem der beiden Sets verwendet werden.
+% TODO Patientensplit, Prozent, blablub, Tabelle verteilung
 
 \subsection{Ähnlichkeit der Intervallschätzer des CLIE-Algorithmus}
 
-Der \ac{SQI}, der die Ähnlichkeit der Intervallschätzer des \ac{CLIE}-Algorithmus angibt, wird im Normalfall herzschlagweise angewendet. Da die Datenannotion nur bereichsweise vorgenommen werden kann, wurde entschieden, ein Segment als informativ zu klassifizieren, wenn mit den Herzschlägen, deren \ac{SQI} über einem Schwellwert $q_{th}$ liegt, eine Coverage von über 85\,\% auf dem Segment erreicht wird. Zum Testen des Algorithmus wurde $q_{th} = 0{,}4$ gewählt, da dieser Wert auch von \citeauthor{Zink2017} verwendet wird. Bei der Berechnung der Merkmale werden für jedes Segment die detektierten Herzschläge extrahiert, deren \ac{SQI} über $q_{th}$ liegt. Auf Basis dieser Intervalllängen wird wie in Kapitel \ref{annotation} beschrieben die Herzrate, im Folgenden $HR\textsubscript{SQI}$ genannt, ermittelt. Extrahierte Merkmale sind sind damit in diesem Fall $HR\textsubscript{SQI}$ und die Coverage $C\textsubscript{SQI}$.
+Der \ac{SQI}, der die Ähnlichkeit der Intervallschätzer des \ac{CLIE}-Algorithmus angibt, wird im Normalfall herzschlagweise angewendet. Da die Datenannotion nur bereichsweise vorgenommen werden kann, wurde entschieden, ein Segment als informativ zu klassifizieren, wenn mit den Herzschlägen, deren \ac{SQI} über einem Schwellwert $q_{th}$ liegt, eine Coverage von über 85\,\% auf dem Segment erreicht wird. Zum Testen des Algorithmus wurde $q_{th} = 0{,}4$ gewählt, da dieser Wert auch von \citeauthor{Zink2017} verwendet wird. Bei der Berechnung der Merkmale werden für jedes Segment die detektierten Herzschläge extrahiert, deren \ac{SQI} über $q_{th}$ liegt. Auf Basis dieser Intervalllängen wird wie in Kapitel \ref{annotation} beschrieben die Herzrate, im Folgenden $HR\textsubscript{SQI}$ genannt, ermittelt. Extrahierte Merkmale sind damit in diesem Fall $HR\textsubscript{SQI}$ und die Coverage $C\textsubscript{SQI}$.
 
-
+\begin{itemize}
+	\item sehr gute Genauigkeit der erkannten Herzschläge
+	\item trotzdem knapp 22\,\% der informativen Segmente mit $E\textsubscript{HR} > 20$
+	\item keine unbrauchbaren Segment als informativ gelabelt
+	\item sehr geringe Coverage mit 9{,}27\,\% auf Testset im Vergleich zu 43{,}22 der Annotation
+\end{itemize}
 
 
 \subsection{Schwellwerte für Standardabweichung, Minimum und Maximum}
+
+Für dieses Verfahren werden lediglich zwei Schwellwerte $T_1$ und $T_2$ benötigt, die auf Standardabweichung, Minimum, Maximum und Durchschnitt des Signals beruhen
 
 \subsection{Maschinelles Lernen mittels statistischer Merkmale}
 
