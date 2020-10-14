@@ -62,6 +62,14 @@ class QualityEstimator:
         y_pred, y_true = self.predict_test_set()
         _, x2, _, y2, _, _ = self._get_patient_split()
         test_indices = x2.index
+        fp_indices = y_true[np.logical_and(~y_true, y_pred)].index
+        fp = y_pred[fp_indices]
+
+        fn_indices = y_true[np.logical_and(y_true, ~y_pred)].index
+        fn = y_pred[fn_indices]
+
+        print(f"Coverage klassifiziert: {len(y_pred[y_pred])/len(y_pred)*100:.2f} %")
+        print(f"Coverage annotiert: {len(y_true[y_true]) / len(y_true)*100:.2f} %")
         print(f"Fehler < 5 Prozent/2.5bpm insgesamt: {self.get_5percent_coverage(test_indices):.2f} %")
         print(f"Fehler < 5 Prozent/2.5bpm klassifiziert: {self.get_5percent_coverage(test_indices, y_pred):.2f} %")
         print(f"Fehler < 10 Prozent/5bpm insgesamt: {self.get_10percent_coverage(test_indices):.2f} %")
@@ -72,6 +80,9 @@ class QualityEstimator:
         print(f"Fehler < 20 Prozent/10bpm klassifiziert: {self.get_20percent_coverage(test_indices, y_pred):.2f} %")
         print(f"Keine Schaetzung insgesamt: {self.get_unusable_percentage(test_indices):.5f} %")
         print(f"Keine Schaetzung klassifiziert: {self.get_unusable_percentage(test_indices, y_pred):.5f} %")
+        print(f"Durchschnittlicher Fehler von False Positives: {self.get_mean_error_abs(fp_indices, fp)}")
+        # print(f"Standardabweichung des Fehlers von False Positives: {self.get_mean_error_abs(fp_indices, fp)}")
+        print(f"Durchschnittlicher Fehler von False Negatives: {self.get_mean_error_abs(fn_indices, fn)}")
 
     def _get_patient_split(self, test_size=0.33):
         patient_ids_1, patient_ids_2 = train_test_split(self.patient_id.unique(), random_state=1, test_size=test_size)
