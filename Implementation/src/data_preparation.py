@@ -10,6 +10,7 @@ from data_processing import get_ecg_processing, get_brueser_from_id
 
 
 class BCGSeries:
+    coverage_threshold = 80
 
     def __init__(self, bcg_id, raw_data, sqi, bbi_bcg, bbi_ecg, indices, sample_rate=100):
         self.bcg_id = bcg_id
@@ -30,7 +31,7 @@ class BCGSeries:
         """Calculates heart rate in given interval by calculating the mean length of the detected intervals
         """
         indices = np.where(np.logical_and(start <= self.unique_peaks, self.unique_peaks < end))
-        if len(indices) > 0:
+        if len(indices) > 0 and self.get_coverage(start, end) > self.coverage_threshold:
             hr = 60 / (np.median(self.medians[indices]) / self.sample_rate)
         else:
             hr = np.nan
@@ -133,7 +134,6 @@ class DataSeries:
         self.bcg = None
         self.patient_id = ecg_series.patient_id
         self.drift = None
-        self.coverage_threshold = 85
 
     def reference_exists(self, bcg_start, bcg_end) -> bool:
         """Checks if more than reference_threshold % of the values are not nan
@@ -184,8 +184,7 @@ class DataSeries:
         :param bcg_end: sample of bcg signal where window ends
         :param threshold: threshold for relative error in percent, abs threshold is threshold/2
         """
-        if self.get_error(bcg_start, bcg_end) > threshold or self.bcg.get_coverage(bcg_start,
-                                                                                   bcg_end) < self.coverage_threshold:
+        if self.get_error(bcg_start, bcg_end) > threshold:
             return False
         return True
 

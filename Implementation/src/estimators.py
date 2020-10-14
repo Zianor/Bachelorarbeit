@@ -128,7 +128,7 @@ class QualityEstimator:
 class BrueserSingleSQI(QualityEstimator):
 
     def __init__(self, segment_length=10, overlap_amount=0.9, hr_threshold=10, sqi_threshold=0.4,
-                 coverage_threshold=85, data_folder='data_patients'):
+                 coverage_threshold=80, data_folder='data_patients'):
         self.sqi_threshold = sqi_threshold
         super(BrueserSingleSQI, self).__init__(segment_length, overlap_amount, hr_threshold, data_folder)
         self.informative_info['sqi_hr_diff_abs'] = np.abs(self.informative_info['ecg_hr'] - self.features['sqi_hr'])
