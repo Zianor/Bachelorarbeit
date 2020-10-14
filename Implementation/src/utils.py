@@ -14,94 +14,94 @@ def get_thesis_pic_path() -> Path:
     return os.path.join(get_project_root().parent, 'Thesis/pic')
 
 
-def get_bcg_data_path() -> Path:
-    return os.path.join(get_bcg_path(), 'ml_data')
+def get_bcg_data_path(data_folder='data_patients') -> Path:
+    return os.path.join(get_bcg_path(data_folder), 'ml_data')
 
 
-def get_brueser_path() -> Path:
-    return os.path.join(get_bcg_path(), 'brueser')
+def get_brueser_path(data_folder='data_patients') -> Path:
+    return os.path.join(get_bcg_path(data_folder), 'brueser')
 
 
-def get_bcg_path() -> Path:
-    return os.path.join(get_data_path(), 'bcg')
+def get_bcg_path(data_folder='data_patients') -> Path:
+    return os.path.join(get_data_path(data_folder), 'bcg')
 
 
-def get_grid_params_path() -> Path:
-    return os.path.join(get_data_path(), 'grid_params')
+def get_grid_params_path(data_folder='data_patients') -> Path:
+    return os.path.join(get_data_path(data_folder), 'grid_params')
 
 
-def get_ecg_path() -> Path:
-    return os.path.join(get_data_path(), 'ecg')
+def get_ecg_path(data_folder='data_patients') -> Path:
+    return os.path.join(get_data_path(data_folder), 'ecg')
 
 
-def get_ecg_data_path() -> Path:
-    return get_ecg_path()
+def get_ecg_data_path(data_folder='data_patients') -> Path:
+    return get_ecg_path(data_folder)
 
 
-def get_rpeaks_path() -> Path:
-    return get_ecg_path()
+def get_rpeaks_path(data_folder='data_patients') -> Path:
+    return get_ecg_path(data_folder)
 
 
-def get_drift_path() -> Path:
-    return os.path.join(get_data_path(), 'drift_compensation')
+def get_drift_path(data_folder='data_patients') -> Path:
+    return os.path.join(get_data_path(data_folder), 'drift_compensation')
 
 
-def get_data_path() -> Path:
-    return os.path.join(get_project_root(), 'data/data_patients')
+def get_data_path(data_folder='data_patients') -> Path:
+    return os.path.join(get_project_root(), 'data', data_folder)
 
 
-def get_data_object_path() -> Path:
-    return os.path.join(get_data_path(), 'data.set')
+def get_data_object_path(data_folder='data_patients') -> Path:
+    return os.path.join(get_data_path(data_folder), 'data.set')
 
 
-def get_data_set_folder(segment_length, overlap_amount) -> Path:
+def get_data_set_folder(data_folder, segment_length, overlap_amount) -> Path:
     folder_name = 'data_set_l' + str(segment_length) + '_o' + str(overlap_amount)
-    return os.path.join(get_data_path(), folder_name)
+    return os.path.join(get_data_path(data_folder), folder_name)
 
 
-def get_features_csv_path(segment_length, overlap_amount, hr_threshold=None):
+def get_features_csv_path(data_folder, segment_length, overlap_amount, hr_threshold=None):
     if hr_threshold:
         filename = 'data_' + str(hr_threshold) + '.csv'
     else:
         filename = 'data.csv'
-    return os.path.join(get_data_set_folder(segment_length, overlap_amount), filename)
+    return os.path.join(get_data_set_folder(data_folder, segment_length, overlap_amount), filename)
 
 
-def get_own_features_csv_path(segment_length, overlap_amount, hr_threshold=None):
+def get_own_features_csv_path(data_folder, segment_length, overlap_amount, hr_threshold=None):
     if hr_threshold:
         filename = 'data_own_features_hr' + str(hr_threshold) + '.csv'
     else:
         filename = 'data_own_features.csv'
-    return os.path.join(get_data_set_folder(segment_length, overlap_amount), filename)
+    return os.path.join(get_data_set_folder(data_folder, segment_length, overlap_amount), filename)
 
 
-def get_statistical_features_csv_path(segment_length, overlap_amount, hr_threshold=None) -> Path:
+def get_statistical_features_csv_path(data_folder, segment_length, overlap_amount, hr_threshold=None) -> Path:
     if hr_threshold:
         filename = 'data_statistical_features_hr' + str(hr_threshold) + '.csv'
     else:
         filename = 'data_statistical_features.csv'
-    return os.path.join(get_data_set_folder(segment_length, overlap_amount), filename)
+    return os.path.join(get_data_set_folder(data_folder, segment_length, overlap_amount), filename)
 
 
-def get_brueser_features_csv_path(segment_length, overlap_amount, sqi_threshold, hr_threshold=None) -> Path:
+def get_brueser_features_csv_path(data_folder, segment_length, overlap_amount, sqi_threshold, hr_threshold=None) -> Path:
     if hr_threshold:
         filename = 'data_brueser_features_sqi' + str(sqi_threshold) + '_hr' + str(hr_threshold) + '.csv'
     else:
         filename = 'data_brueser_features_sqi' + str(sqi_threshold) + '.csv'
-    return os.path.join(get_data_set_folder(segment_length, overlap_amount), filename)
+    return os.path.join(get_data_set_folder(data_folder, segment_length, overlap_amount), filename)
 
 
-def get_pino_features_csv_path(segment_length, overlap_amount, hr_threshold=None) -> Path:
+def get_pino_features_csv_path(data_folder, segment_length, overlap_amount, hr_threshold=None) -> Path:
     if hr_threshold:
         filename = 'data_pino_features_hr' + str(hr_threshold) + '.csv'
     else:
         filename = 'data_pino_features.csv'
-    return os.path.join(get_data_set_folder(segment_length, overlap_amount), filename)
+    return os.path.join(get_data_set_folder(data_folder, segment_length, overlap_amount), filename)
 
 
-def get_image_folder(segment_length, overlap_amount, hr_threshold):
+def get_image_folder(data_folder, segment_length, overlap_amount, hr_threshold):
     filename = 'images_hr' + str(hr_threshold) + '.csv'
-    return os.path.join(get_data_set_folder(segment_length, overlap_amount), filename)
+    return os.path.join(get_data_set_folder(data_folder, segment_length, overlap_amount), filename)
 
 
 def seconds_to_frames(duration_seconds, frequency):

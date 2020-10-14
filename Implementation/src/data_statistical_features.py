@@ -18,7 +18,8 @@ class DataSet:
     writes a .csv file with the feature representation of all segments.
     """
 
-    def __init__(self, segment_length=10, overlap_amount=0.9, hr_threshold=10):
+    def __init__(self, segment_length=10, overlap_amount=0.9, hr_threshold=10, data_folder='data_patients'):
+        self.data_folder = data_folder
         self.hr_threshold = hr_threshold
         self.segment_length = segment_length
         self.overlap_amount = overlap_amount
@@ -26,28 +27,28 @@ class DataSet:
         self.save_csv()
 
     def _get_path(self):
-        return utils.get_features_csv_path(self.segment_length, self.overlap_amount)
+        return utils.get_features_csv_path(self.data_folder, self.segment_length, self.overlap_amount)
 
     def _get_path_hr(self):
-        return utils.get_features_csv_path(self.segment_length, self.overlap_amount, self.hr_threshold)
+        return utils.get_features_csv_path(self.data_folder, self.segment_length, self.overlap_amount, self.hr_threshold)
 
     def _create_segments(self):
         """
         Creates segments with a given length out of given BCG Data and writes them to csv
         """
-        if os.path.isfile(utils.get_data_object_path()):
-            with open(utils.get_data_object_path(), 'rb') as file:
+        if os.path.isfile(utils.get_data_object_path(self.data_folder)):
+            with open(utils.get_data_object_path(self.data_folder), 'rb') as file:
                 data = pickle.load(file)
         else:
             data = Data()
-            with open(utils.get_data_object_path(), 'wb') as file:
+            with open(utils.get_data_object_path(self.data_folder), 'wb') as file:
                 pickle.dump(data, file)
                 file.flush()
         segment_length_frames = utils.seconds_to_frames(self.segment_length, data.sample_rate)  # in samples
         segment_distance = utils.seconds_to_frames(self.segment_length - self.segment_length * self.overlap_amount,
                                                    data.sample_rate)
-        if not os.path.isdir(utils.get_data_set_folder(self.segment_length, self.overlap_amount)):
-            os.mkdir(utils.get_data_set_folder(self.segment_length, self.overlap_amount))
+        if not os.path.isdir(utils.get_data_set_folder(self.data_folder, self.segment_length, self.overlap_amount)):
+            os.mkdir(utils.get_data_set_folder(self.data_folder, self.segment_length, self.overlap_amount))
         with open(self._get_path_hr(), 'w', newline='') as f:
             writer = csv.writer(f)
             writer.writerow(self._get_feature_name_array())
@@ -97,7 +98,7 @@ class DataSet:
         Saves segments as images
         :param count: number of images saved
         """
-        path_images = utils.get_image_folder(self.segment_length_seconds, self.overlap_amount, self.hr_threshold)
+        path_images = utils.get_image_folder(self.data_folder, self.segment_length_seconds, self.overlap_amount, self.hr_threshold)
         if not os.path.exists(path_images):
             os.makedirs(path_images)
         count_informative = 0
@@ -126,10 +127,10 @@ class DataSetStatistical(DataSet):
         super(DataSetStatistical, self).__init__(segment_length, overlap_amount, hr_threshold)
 
     def _get_path(self):
-        return utils.get_statistical_features_csv_path(self.segment_length, self.overlap_amount)
+        return utils.get_statistical_features_csv_path(self.data_folder, self.segment_length, self.overlap_amount)
 
     def _get_path_hr(self):
-        return utils.get_statistical_features_csv_path(self.segment_length, self.overlap_amount, self.hr_threshold)
+        return utils.get_statistical_features_csv_path(self.data_folder, self.segment_length, self.overlap_amount, self.hr_threshold)
 
     @staticmethod
     def _get_feature_name_array():
@@ -154,10 +155,10 @@ class DataSetBrueser(DataSet):
         super(DataSetBrueser, self).__init__(segment_length, overlap_amount, hr_threshold)
 
     def _get_path(self):
-        return utils.get_brueser_features_csv_path(self.segment_length, self.overlap_amount, self.sqi_threshold)
+        return utils.get_brueser_features_csv_path(self.data_folder, self.segment_length, self.overlap_amount, self.sqi_threshold)
 
     def _get_path_hr(self):
-        return utils.get_brueser_features_csv_path(self.segment_length, self.overlap_amount, self.sqi_threshold,
+        return utils.get_brueser_features_csv_path(self.data_folder, self.segment_length, self.overlap_amount, self.sqi_threshold,
                                                    self.hr_threshold)
 
     def _get_segment(self, series: DataSeries, start, end, informative, ecg_hr, brueser_sqi, bcg_hr):
@@ -186,10 +187,10 @@ class DataSetPino(DataSet):
         super(DataSetPino, self).__init__(segment_length, overlap_amount, hr_threshold)
 
     def _get_path(self):
-        return utils.get_pino_features_csv_path(self.segment_length, self.overlap_amount)
+        return utils.get_pino_features_csv_path(self.data_folder, self.segment_length, self.overlap_amount)
 
     def _get_path_hr(self):
-        return utils.get_pino_features_csv_path(self.segment_length, self.overlap_amount, self.hr_threshold)
+        return utils.get_pino_features_csv_path(self.data_folder, self.segment_length, self.overlap_amount, self.hr_threshold)
 
     def _get_segment(self, series: DataSeries, start, end, informative, ecg_hr, brueser_sqi, bcg_hr):
         return SegmentPino(
@@ -213,10 +214,10 @@ class DataSetOwn(DataSet):
         super(DataSetOwn, self).__init__(segment_length, overlap_amount, hr_threshold)
 
     def _get_path(self):
-        return utils.get_own_features_csv_path(self.segment_length, self.overlap_amount)
+        return utils.get_own_features_csv_path(self.data_folder, self.segment_length, self.overlap_amount)
 
     def _get_path_hr(self):
-        return utils.get_own_features_csv_path(self.segment_length, self.overlap_amount, self.hr_threshold)
+        return utils.get_own_features_csv_path(self.data_folder, self.segment_length, self.overlap_amount, self.hr_threshold)
 
     def _get_segment(self, series: DataSeries, start, end, informative, ecg_hr, brueser_sqi, bcg_hr):
         return SegmentOwn(
@@ -579,9 +580,9 @@ class SegmentOwn(SegmentStatistical):
 
 if __name__ == "__main__":
     DataSet()
-    DataSetOwn()
-    DataSetBrueser()
-    DataSetStatistical()
-    DataSetPino()
-    DataSetPino(4, 0.75)
+    # DataSetOwn()
+    # DataSetBrueser()
+    # DataSetStatistical()
+    # DataSetPino()
+    # DataSetPino(4, 0.75)
     pass

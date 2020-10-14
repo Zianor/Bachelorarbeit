@@ -217,38 +217,41 @@ class DataSeries:
 class Data:
     sample_rate = 100
 
-    def __init__(self):
-        self.mapping = Data._load_mapping()
+    def __init__(self, data_folder='data_patients'):
+        """
+        :param data_folder: folder_name of all data
+        """
+        self.data_folder = data_folder
+        self.mapping = self._load_mapping()
         self.data_series = {}
         self._create_data_series()
         self._load_bcg_data()
         self._load_drift_compensation()
 
     def _load_drift_compensation(self):
-        paths = [path for path in os.listdir(utils.get_drift_path()) if
+        paths = [path for path in os.listdir(utils.get_drift_path(self.data_folder)) if
                  path.lower().endswith(".mat")]
-        paths = [os.path.join(utils.get_drift_path(), path) for path in paths]
+        paths = [os.path.join(utils.get_drift_path(self.data_folder), path) for path in paths]
         for path in paths:
             mat_dict = loadmat(path)
             patient_id = path.lower().split("_")[-1].replace(".mat", "")
             drift = pd.Series(index=mat_dict['t_bcg_samp'][0], data=mat_dict['t_ecg_corresp'][0])
             self.data_series[patient_id].drift = drift
 
-    @staticmethod
-    def _load_mapping():
+    def _load_mapping(self):
         """
         :return: mapping from bcg to ecg
         """
-        path = os.path.join(utils.get_data_path(), 'mapping.json')
+        path = os.path.join(utils.get_data_path(self.data_folder), 'mapping.json')
         with open(path, encoding='utf-8') as file:
             mapping = json.load(file)
         return mapping
 
     def _create_data_series(self):
-        paths = [path for path in os.listdir(utils.get_ecg_data_path()) if
+        paths = [path for path in os.listdir(utils.get_ecg_data_path(self.data_folder)) if
                  path.lower().endswith(".edf")]
         for path in paths:
-            path = os.path.join(utils.get_ecg_data_path(), path)
+            path = os.path.join(utils.get_ecg_data_path(self.data_folder), path)
             r_peaks, ecg_id, sample_rate, length = get_ecg_processing(path=path, use_existing=True)
             self.data_series[ecg_id] = DataSeries(ECGSeries(
                 patient_id=ecg_id,
@@ -262,9 +265,9 @@ class Data:
         """Loads all bcg data
         :return: array of found bcg_series
         """
-        paths = [path for path in os.listdir(utils.get_bcg_data_path()) if
+        paths = [path for path in os.listdir(utils.get_bcg_data_path(self.data_folder)) if
                  path.lower().endswith(".mat")]
-        paths = [os.path.join(utils.get_bcg_data_path(), path) for path in paths]
+        paths = [os.path.join(utils.get_bcg_data_path(self.data_folder), path) for path in paths]
         for path in paths:
             mat_dict = loadmat(path)
             bcg_id = path.lower().split("_")[-1].replace(".mat", "")

@@ -34,14 +34,14 @@ def load_data(segment_length=10, overlap_amount=0.9, hr_threshold=10):
     return features, target, patient_id, informative_info
 
 
-def load_data_as_dataframe(segment_length=10, overlap_amount=0.9, hr_threshold=10):
+def load_data_as_dataframe(segment_length=10, overlap_amount=0.9, hr_threshold=10, data_folder='data_patients'):
     """
     Loads BCG data as Dataframe
     :return: Dataframe
     """
-    path_hr = utils.get_statistical_features_csv_path(segment_length, overlap_amount, hr_threshold)
+    path_hr = utils.get_statistical_features_csv_path(data_folder, segment_length, overlap_amount, hr_threshold)
     if not os.path.isfile(path_hr):
-        path = utils.get_statistical_features_csv_path(segment_length, overlap_amount)  # other threshold?
+        path = utils.get_statistical_features_csv_path(data_folder, segment_length, overlap_amount)  # other threshold?
         if os.path.isfile(path):
             data = pd.read_csv(path, index_col=False)
             warnings.warn('Labels are recalculated')
@@ -246,14 +246,14 @@ def get_patient_split(features, target, patient_id, test_size):
 
 
 def eval_classifier(features, target, patient_id, pipe, grid_folder_name, test_size=0.33, grid_params=None,
-                    patient_cv=True, scoring='accuracy'):
-    if not os.path.isdir(os.path.join(utils.get_grid_params_path(), grid_folder_name)):
+                    patient_cv=True, scoring='accuracy', data_folder='data_patients'):
+    if not os.path.isdir(os.path.join(utils.get_grid_params_path(data_folder), grid_folder_name)):
         if not grid_params:
             raise Exception("No existing folder and no params given")
         else:
-            os.mkdir(path=os.path.join(utils.get_grid_params_path(), grid_folder_name))
+            os.mkdir(path=os.path.join(utils.get_grid_params_path(data_folder), grid_folder_name))
 
-    path = os.path.join(utils.get_grid_params_path(), grid_folder_name)
+    path = os.path.join(utils.get_grid_params_path(data_folder), grid_folder_name)
     model_filename = 'fitted_model.sav'
     params_filename = 'params.json'
     score_filename = 'score.json'
@@ -358,7 +358,7 @@ def reconstruct_models_paper(paths, grid_search: bool, patient_cv: bool, hr_thre
                                                                      grid_params=params, patient_cv=patient_cv)
 
 
-def get_all_scores(reconstruct: bool, paths):
+def get_all_scores(reconstruct: bool, paths, data_folder='data_patients'):
     if reconstruct:
         reconstruct_models_paper(grid_search=False)
     score_dict = {}
@@ -366,7 +366,7 @@ def get_all_scores(reconstruct: bool, paths):
     clf_names = ['LDA', 'DT', 'RF', 'MLP', 'SVM']
     for clf_name, folder in zip(clf_names, paths):
         location = folder + '/' + filename
-        path = os.path.join(utils.get_grid_params_path(), location)
+        path = os.path.join(utils.get_grid_params_path(data_folder), location)
         if os.path.isfile(path):
             with open(path) as file:
                 score = json.loads(file.read())

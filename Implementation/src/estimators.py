@@ -12,7 +12,8 @@ from data_statistical_features import Segment, DataSetBrueser, DataSetStatistica
 
 class QualityEstimator:
 
-    def __init__(self, segment_length=10, overlap_amount=0.9, hr_threshold=10):
+    def __init__(self, segment_length=10, overlap_amount=0.9, hr_threshold=10, data_folder='data_patients'):
+        self.data_folder = data_folder
         self.segment_length = segment_length
         self.overlap_amount = overlap_amount
         self.hr_threshold = hr_threshold
@@ -124,9 +125,9 @@ class QualityEstimator:
 class BrueserSingleSQI(QualityEstimator):
 
     def __init__(self, segment_length=10, overlap_amount=0.9, hr_threshold=10, sqi_threshold=0.4,
-                 coverage_threshold=85):
+                 coverage_threshold=85, data_folder='data_patients'):
         self.sqi_threshold = sqi_threshold
-        super(BrueserSingleSQI, self).__init__(segment_length, overlap_amount, hr_threshold)
+        super(BrueserSingleSQI, self).__init__(segment_length, overlap_amount, hr_threshold, data_folder)
         self.informative_info['sqi_hr_diff_abs'] = np.abs(self.informative_info['ecg_hr'] - self.features['sqi_hr'])
         self.informative_info['sqi_hr_diff_abs'] = self.informative_info['sqi_hr_diff_abs'].replace(np.nan, np.finfo(np.float32).max)
         self.informative_info['sqi_hr_diff_rel'] = 100 / self.informative_info['ecg_hr'] * self.informative_info['sqi_hr_diff_abs']
@@ -138,10 +139,10 @@ class BrueserSingleSQI(QualityEstimator):
         Loads BCG data as Dataframe
         :return: Dataframe
         """
-        path_hr = utils.get_brueser_features_csv_path(self.segment_length, self.overlap_amount, self.sqi_threshold,
+        path_hr = utils.get_brueser_features_csv_path(self.data_folder, self.segment_length, self.overlap_amount, self.sqi_threshold,
                                                       self.hr_threshold)
         if not os.path.isfile(path_hr):
-            path = utils.get_features_csv_path(self.segment_length, self.overlap_amount,
+            path = utils.get_features_csv_path(self.data_folder, self.segment_length, self.overlap_amount,
                                                self.sqi_threshold)  # other threshold?
             if os.path.isfile(path):
                 data = pd.read_csv(path, index_col=False)
@@ -207,13 +208,13 @@ class BrueserSingleSQI(QualityEstimator):
 
 class PinoMinMaxStd(QualityEstimator):
 
-    def __init__(self, segment_length=10, overlap_amount=0.9, hr_threshold=10):
-        super(PinoMinMaxStd, self).__init__(segment_length, overlap_amount, hr_threshold)
+    def __init__(self, segment_length=10, overlap_amount=0.9, hr_threshold=10, data_folder='data_patients'):
+        super(PinoMinMaxStd, self).__init__(segment_length, overlap_amount, hr_threshold, data_folder=data_folder)
 
     def _load_segments(self):
-        path_hr = utils.get_pino_features_csv_path(self.segment_length, self.overlap_amount, self.hr_threshold)
+        path_hr = utils.get_pino_features_csv_path(self.data_folder, self.segment_length, self.overlap_amount, self.hr_threshold)
         if not os.path.isfile(path_hr):
-            path = utils.get_pino_features_csv_path(self.segment_length, self.overlap_amount)  # other threshold?
+            path = utils.get_pino_features_csv_path(self.data_folder, self.segment_length, self.overlap_amount)  # other threshold?
             if os.path.isfile(path):
                 data = pd.read_csv(path, index_col=False)
                 warnings.warn('Labels are recalculated')
@@ -241,19 +242,19 @@ class PinoMinMaxStd(QualityEstimator):
 
 class MLStatisticalEstimator(QualityEstimator):
 
-    def __init__(self, path, segment_length=10, overlap_amount=0.9, hr_threshold=10):
-        super(MLStatisticalEstimator, self).__init__(segment_length, overlap_amount, hr_threshold)
-        if os.path.isfile(os.path.join(utils.get_grid_params_path(), path, 'fitted_model.sav')):
-            with open(os.path.join(utils.get_grid_params_path(), path, 'fitted_model.sav'), 'rb') as file:
+    def __init__(self, path, segment_length=10, overlap_amount=0.9, hr_threshold=10, data_folder='data_patients'):
+        super(MLStatisticalEstimator, self).__init__(segment_length, overlap_amount, hr_threshold, data_folder)
+        if os.path.isfile(os.path.join(utils.get_grid_params_path(self.data_folder), path, 'fitted_model.sav')):
+            with open(os.path.join(utils.get_grid_params_path(self.data_folder), path, 'fitted_model.sav'), 'rb') as file:
                 grid_search = pickle.load(file)
                 self.model = grid_search.best_estimator_
         else:
             raise Exception("No model found at given path")
 
     def _load_segments(self):
-        path_hr = utils.get_statistical_features_csv_path(self.segment_length, self.overlap_amount, self.hr_threshold)
+        path_hr = utils.get_statistical_features_csv_path(self.data_folder, self.segment_length, self.overlap_amount, self.hr_threshold)
         if not os.path.isfile(path_hr):
-            path = utils.get_statistical_features_csv_path(self.segment_length, self.overlap_amount)  # other threshold?
+            path = utils.get_statistical_features_csv_path(self.data_folder, self.segment_length, self.overlap_amount)  # other threshold?
             if os.path.isfile(path):
                 data = pd.read_csv(path, index_col=False)
                 warnings.warn('Labels are recalculated')
