@@ -18,19 +18,25 @@ class DataSet:
     writes a .csv file with the feature representation of all segments.
     """
 
-    def __init__(self, segment_length=10, overlap_amount=0.9, hr_threshold=10, data_folder='data_patients'):
+    def __init__(self, segment_length=10, overlap_amount=0.9, hr_threshold=10, data_folder='data_patients',
+                 images=False):
         self.data_folder = data_folder
         self.hr_threshold = hr_threshold
         self.segment_length = segment_length
         self.overlap_amount = overlap_amount
+        self.images = images
+        self.segments = []
         self._create_segments()
+        if self.images:
+            self.save_images()
         self.save_csv()
 
     def _get_path(self):
         return utils.get_features_csv_path(self.data_folder, self.segment_length, self.overlap_amount)
 
     def _get_path_hr(self):
-        return utils.get_features_csv_path(self.data_folder, self.segment_length, self.overlap_amount, self.hr_threshold)
+        return utils.get_features_csv_path(self.data_folder, self.segment_length, self.overlap_amount,
+                                           self.hr_threshold)
 
     def _create_segments(self):
         """
@@ -67,18 +73,25 @@ class DataSet:
                     bcg_hr = series.get_bcg_hr(start, end)
                     informative = series.is_informative(start, end, self.hr_threshold)
                     segment = self._get_segment(series, start, end, informative, ecg_hr, brueser_sqi, bcg_hr)
+                    if self.images:
+                        self.segments.append(segment)
                     with open(self._get_path_hr(), 'a', newline='') as f:
                         writer = csv.writer(f)
                         writer.writerow(segment.get_feature_array())
                         f.flush()
 
     def _get_segment(self, series: DataSeries, start, end, informative, ecg_hr, brueser_sqi, bcg_hr):
+        if self.images:
+            filtered_data = series.bcg.filtered_data[start:end]
+        else:
+            filtered_data = None
         return Segment(
             patient_id=series.patient_id,
             ecg_hr=ecg_hr,
             bcg_hr=bcg_hr,
             brueser_sqi=brueser_sqi,
-            informative=informative
+            informative=informative,
+            filtered_data=filtered_data
         )
 
     @staticmethod
@@ -98,27 +111,34 @@ class DataSet:
         Saves segments as images
         :param count: number of images saved
         """
-        path_images = utils.get_image_folder(self.data_folder, self.segment_length_seconds, self.overlap_amount, self.hr_threshold)
+        path_images = utils.get_image_folder(self.data_folder, self.segment_length, self.overlap_amount,
+                                             self.hr_threshold)
         if not os.path.exists(path_images):
             os.makedirs(path_images)
         count_informative = 0
         count_non_informative = 0
+        plt.rcParams.update(utils.get_plt_settings())
         for segment in self.segments:
             if count_non_informative > count and count_informative > count:
                 break
             if segment.informative and count_informative < count:
                 count_informative += 1
+                plt.figure(figsize=utils.get_plt_normal_size())
                 plt.plot(segment.bcg)
-                plt.title("Abs Error " + str(segment.abs_err) + ", Rel Error " + str(segment.rel_err))
-                plt.savefig(os.path.join(self.path_images, 'informative' + str(count_informative)))
+                plt.title(
+                    f"E\\textsubscript{{HR}}={segment.error:.2f}, HR\\textsubscript{{EKG}} = {segment.ecg_hr:.2f}")
+                plt.savefig(os.path.join(path_images, 'informative' + str(count_informative) + ".pdf"),
+                            transparent=True, bbox_inches='tight', dpi=300)
                 plt.clf()
-            else:
-                if count_non_informative < count:
-                    count_non_informative += 1
-                    plt.plot(segment.bcg)
-                    plt.title("Abs Error " + str(segment.abs_err) + ", Rel Error " + str(segment.rel_err))
-                    plt.savefig(os.path.join(path_images, 'non-informative' + str(count_non_informative)))
-                    plt.clf()
+            elif count_non_informative < count and not segment.informative:
+                count_non_informative += 1
+                plt.figure(figsize=utils.get_plt_normal_size())
+                plt.plot(segment.bcg)
+                plt.title(
+                    f"E\\textsubscript{{HR}}={segment.error:.2f}, HR\\textsubscript{{EKG}} = {segment.ecg_hr:.2f}")
+                plt.savefig(os.path.join(path_images, 'non-informative' + str(count_non_informative) + ".pdf"),
+                            transparent=True, bbox_inches='tight', dpi=300)
+                plt.clf()
 
 
 class DataSetStatistical(DataSet):
@@ -130,7 +150,8 @@ class DataSetStatistical(DataSet):
         return utils.get_statistical_features_csv_path(self.data_folder, self.segment_length, self.overlap_amount)
 
     def _get_path_hr(self):
-        return utils.get_statistical_features_csv_path(self.data_folder, self.segment_length, self.overlap_amount, self.hr_threshold)
+        return utils.get_statistical_features_csv_path(self.data_folder, self.segment_length, self.overlap_amount,
+                                                       self.hr_threshold)
 
     @staticmethod
     def _get_feature_name_array():
@@ -155,10 +176,12 @@ class DataSetBrueser(DataSet):
         super(DataSetBrueser, self).__init__(segment_length, overlap_amount, hr_threshold)
 
     def _get_path(self):
-        return utils.get_brueser_features_csv_path(self.data_folder, self.segment_length, self.overlap_amount, self.sqi_threshold)
+        return utils.get_brueser_features_csv_path(self.data_folder, self.segment_length, self.overlap_amount,
+                                                   self.sqi_threshold)
 
     def _get_path_hr(self):
-        return utils.get_brueser_features_csv_path(self.data_folder, self.segment_length, self.overlap_amount, self.sqi_threshold,
+        return utils.get_brueser_features_csv_path(self.data_folder, self.segment_length, self.overlap_amount,
+                                                   self.sqi_threshold,
                                                    self.hr_threshold)
 
     def _get_segment(self, series: DataSeries, start, end, informative, ecg_hr, brueser_sqi, bcg_hr):
@@ -190,7 +213,8 @@ class DataSetPino(DataSet):
         return utils.get_pino_features_csv_path(self.data_folder, self.segment_length, self.overlap_amount)
 
     def _get_path_hr(self):
-        return utils.get_pino_features_csv_path(self.data_folder, self.segment_length, self.overlap_amount, self.hr_threshold)
+        return utils.get_pino_features_csv_path(self.data_folder, self.segment_length, self.overlap_amount,
+                                                self.hr_threshold)
 
     def _get_segment(self, series: DataSeries, start, end, informative, ecg_hr, brueser_sqi, bcg_hr):
         return SegmentPino(
@@ -217,7 +241,8 @@ class DataSetOwn(DataSet):
         return utils.get_own_features_csv_path(self.data_folder, self.segment_length, self.overlap_amount)
 
     def _get_path_hr(self):
-        return utils.get_own_features_csv_path(self.data_folder, self.segment_length, self.overlap_amount, self.hr_threshold)
+        return utils.get_own_features_csv_path(self.data_folder, self.segment_length, self.overlap_amount,
+                                               self.hr_threshold)
 
     def _get_segment(self, series: DataSeries, start, end, informative, ecg_hr, brueser_sqi, bcg_hr):
         return SegmentOwn(
@@ -239,7 +264,8 @@ class Segment:
     """A segment of bcg data without any features yet
     """
 
-    def __init__(self, patient_id, ecg_hr, bcg_hr, brueser_sqi, informative):
+    def __init__(self, patient_id, ecg_hr, bcg_hr, brueser_sqi, informative, filtered_data=None):
+        self.bcg = filtered_data
         self.brueser_sqi = brueser_sqi
         self.patient_id = patient_id
         self.informative = informative
@@ -248,14 +274,14 @@ class Segment:
         self.abs_err = np.abs(ecg_hr - bcg_hr)
         if not np.isfinite(self.abs_err):
             self.abs_err = 170  # max possible error
-            self.rel_err = 667 # max possible error
+            self.rel_err = 667  # max possible error
             self.error = 667
         else:
             self.rel_err = 100 / ecg_hr * self.abs_err
             if self.ecg_hr > 50:
                 self.error = self.rel_err
             else:
-                self.error = self.abs_err/2
+                self.error = self.abs_err / 2
         self.quality_class = self.get_quality_class()
 
     def get_quality_class(self):
@@ -463,13 +489,14 @@ class SegmentOwn(SegmentStatistical):
 
     def __init__(self, series: DataSeries, start, end, informative, ecg_hr, brueser_sqi, bcg_hr):
         self.filtered_data = series.bcg.filtered_data[start: end]
-        super(SegmentOwn, self).__init__(series.bcg.raw_data[start: end], series.patient_id, ecg_hr, bcg_hr, brueser_sqi,
+        super(SegmentOwn, self).__init__(series.bcg.raw_data[start: end], series.patient_id, ecg_hr, bcg_hr,
+                                         brueser_sqi,
                                          series.bcg_sample_rate, informative)
         self.brueser_coverage = series.bcg.get_coverage(start, end)
         self.interval_lengths = series.bcg.get_interval_lengths(start, end)  # in samples
         self.sqi_array = series.bcg.get_sqi_array(start, end)
         self.peak_values = series.bcg.get_unique_peak_values(start, end)
-        self.acf = sm.tsa.acf(self.filtered_data, nlags=(end-start)//2, fft=True)
+        self.acf = sm.tsa.acf(self.filtered_data, nlags=(end - start) // 2, fft=True)
         f, den = welch(self.filtered_data, fs=series.bcg_sample_rate)
         self.peak_frequency_acf = f[np.nanargmax(den)]
         self.hf_ratio_acf = self.bcg_hr / self.peak_frequency_acf
@@ -488,7 +515,8 @@ class SegmentOwn(SegmentStatistical):
             self.peak_std = np.std(self.peak_values)
             self.peak_mean = np.mean(self.peak_values)
             self.template_correlations = self.get_template_correlations(series.get_best_est_int(start, end),
-                                                                        series.bcg.get_unique_peak_locations(start,end),
+                                                                        series.bcg.get_unique_peak_locations(start,
+                                                                                                             end),
                                                                         series)
         else:
             self.interval_lengths_std = np.finfo(np.float32).max
@@ -526,7 +554,7 @@ class SegmentOwn(SegmentStatistical):
                     traceback.print_stack()
                     print(peak_loaction)
                     return None
-                correlations[i] = np.sum(curr_corr)/len(curr_corr)
+                correlations[i] = np.sum(curr_corr) / len(curr_corr)
         return correlations
 
     @staticmethod
