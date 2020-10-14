@@ -47,7 +47,7 @@ def get_drift_path() -> Path:
 
 
 def get_data_path() -> Path:
-    return os.path.join(get_project_root(), 'data')
+    return os.path.join(get_project_root(), 'data/data_patients')
 
 
 def get_data_object_path() -> Path:

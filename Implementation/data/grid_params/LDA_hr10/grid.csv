@@ -1,7 +1,0 @@
-,params,rank_test_accuracy,mean_test_accuracy,rank_test_balanced_accuracy,mean_test_balanced_accuracy,rank_test_f1,mean_test_f1,rank_test_roc_auc,mean_test_roc_auc,rank_test_f1_weighted,mean_test_f1_weighted,rank_test_precision,mean_test_precision,rank_test_recall,mean_test_recall
-0,"{'clf__solver': 'svd', 'clf__shrinkage': 'auto'}",5,,5,,5,,5,,5,,5,,5,
-1,"{'clf__solver': 'lsqr', 'clf__shrinkage': 'auto'}",3,0.5148610368311987,3,0.5520367947716995,3,0.5308722863668308,3,0.5978636096948828,3,0.47794565010056594,3,0.5381252460074673,3,0.6592582379554225
-2,"{'clf__solver': 'eigen', 'clf__shrinkage': 'auto'}",3,0.5148610368311987,3,0.5520367947716995,3,0.5308722863668308,3,0.5978636096948828,3,0.47794565010056594,3,0.5381252460074673,3,0.6592582379554225
-3,"{'clf__solver': 'svd', 'clf__shrinkage': None}",1,0.5178928342168615,1,0.5543355821258059,1,0.5352596548890878,1,0.5996255953408034,1,0.48228309498768973,1,0.5405559307959137,1,0.6631572062659894
-4,"{'clf__solver': 'lsqr', 'clf__shrinkage': None}",1,0.5178928342168615,1,0.5543355821258059,1,0.5352596548890878,1,0.5996255953408034,1,0.48228309498768973,1,0.5405559307959137,1,0.6631572062659894
-5,"{'clf__solver': 'eigen', 'clf__shrinkage': None}",6,,6,,6,,6,,6,,6,,6,
