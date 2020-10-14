@@ -19,7 +19,7 @@ import multiprocessing as mp
 def brueser_process_all(fs, use_existing=True, data_folder='data_patients'):
     paths = [path for path in os.listdir(utils.get_bcg_data_path(data_folder)) if
              path.lower().endswith(".mat")]
-    pool = Pool(10)
+    pool = Pool(3)
     for path in paths:
         path = os.path.join(utils.get_bcg_data_path(data_folder), path)
         pool.apply_async(get_brueser,
