@@ -22,7 +22,8 @@ def brueser_process_all(fs, use_existing=True, data_folder='data_patients'):
     pool = Pool(10)
     for path in paths:
         path = os.path.join(utils.get_bcg_data_path(data_folder), path)
-        pool.apply_async(get_brueser, kwds={'fs': fs, 'path': path, 'use_existing': use_existing})
+        pool.apply_async(get_brueser,
+                         kwds={'fs': fs, 'path': path, 'use_existing': use_existing, 'data_folder': data_folder})
         # brueser_csv(fs=fs, path=path, use_existing=use_existing)
     pool.close()
     pool.join()
