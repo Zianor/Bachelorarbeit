@@ -132,8 +132,14 @@ dmypy.json
 .idea/*
 
 # data
+Implementation/data/*.pdf
+Implementation/data/*/bcg/
+Implementation/data/*/ecg/
+Implementation/data/*/data_set*
+Implementation/data/*/images/
+
 *.mat
-*.csv
+*.sav
 *.edf
 *.EDF
 *.set
