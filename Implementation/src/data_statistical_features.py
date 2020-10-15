@@ -190,6 +190,7 @@ class DataSetBrueser(DataSet):
 
     def _get_segment(self, series: DataSeries, start, end, informative, ecg_hr, brueser_sqi, bcg_hr):
         indices = np.where(np.logical_and(start < series.bcg.unique_peaks, series.bcg.unique_peaks < end))
+        brueser_coverage = series.bcg.get_coverage(start, end)
         return SegmentBrueserSQI(
             patient_id=series.patient_id,
             ecg_hr=ecg_hr,
@@ -200,7 +201,8 @@ class DataSetBrueser(DataSet):
             threshold=self.sqi_threshold,
             medians=series.bcg.medians[indices],
             qualities=series.bcg.brueser_sqi[indices],
-            length_samples=utils.seconds_to_frames(self.segment_length, series.bcg_sample_rate)
+            length_samples=utils.seconds_to_frames(self.segment_length, series.bcg_sample_rate),
+            coverage=brueser_coverage
         )
 
     @staticmethod
@@ -379,8 +381,7 @@ class SegmentStatistical(Segment):
         Creates a segment and computes several statistical features
         :param raw_data: raw BCG data
         :param informative: boolean indicating if segment is labeled as informative or not
-        :param coverage:
-        :param mean_error: mean BBI error to reference
+        :param coverage: coverage of brueser intervals
         """
         super().__init__(patient_id, ecg_hr, bcg_hr, brueser_sqi, informative, coverage=coverage)
         self.bcg = utils.butter_bandpass_filter(raw_data, 1, 12, sample_rate)
@@ -461,8 +462,8 @@ class SegmentStatistical(Segment):
 class SegmentBrueserSQI(Segment):
 
     def __init__(self, patient_id, ecg_hr, bcg_hr, brueser_sqi, informative, threshold, medians, qualities,
-                 sample_rate, length_samples):
-        super().__init__(patient_id, ecg_hr, bcg_hr, brueser_sqi, informative)
+                 sample_rate, length_samples, coverage):
+        super().__init__(patient_id, ecg_hr, bcg_hr, brueser_sqi, informative, coverage=coverage)
         indices = np.argwhere(qualities >= threshold)
         self.sqi_hr = np.nan
         self.sqi_coverage = np.nan
@@ -522,46 +523,49 @@ class SegmentOwn(SegmentStatistical):
             self.peak_min = np.max(self.peak_values)
             self.peak_std = np.std(self.peak_values)
             self.peak_mean = np.mean(self.peak_values)
-            self.template_correlations = self.get_template_correlations(series.get_best_est_int(start, end),
-                                                                        series.bcg.get_unique_peak_locations(start,
-                                                                                                             end),
-                                                                        series)
+            self.template_corrs_highest_sqi = self.get_template_correlations(series.get_best_est_int(start, end),
+                                                                             series.bcg.get_unique_peak_locations(start,
+                                                                                                                  end),
+                                                                             series)
+            self.template_corrs_median_sqi = self.get_template_correlations(series.get_median_est_int(start, end),
+                                                                            series.bcg.get_unique_peak_locations(start,
+                                                                                                                 end),
+                                                                            series)
         else:
-            self.interval_lengths_std = np.finfo(np.float32).max
-            self.interval_lengths_range = np.finfo(np.float32).max
-            self.interval_lengths_mean = np.finfo(np.float32).max
-            self.sqi_std = np.finfo(np.float32).max
-            self.sqi_max = np.finfo(np.float32).max
-            self.sqi_min = np.finfo(np.float32).max
-            self.peak_max = np.finfo(np.float32).max
-            self.peak_min = np.finfo(np.float32).max
-            self.peak_std = np.finfo(np.float32).max
-            self.peak_mean = np.finfo(np.float32).max
-            self.template_correlations = None
-        if self.template_correlations is not None:
-            self.template_correlation_mean = np.mean(self.template_correlations)
-            self.template_correlation_std = np.std(self.template_correlations)
+            self.interval_lengths_std = np.nan
+            self.interval_lengths_range = np.nan
+            self.interval_lengths_mean = np.nan
+            self.sqi_std = np.nan
+            self.sqi_max = np.nan
+            self.sqi_min = np.nan
+            self.peak_max = np.nan
+            self.peak_min = np.nan
+            self.peak_std = np.nan
+            self.peak_mean = np.nan
+            self.template_corrs_highest_sqi = None
+            self.template_corrs_median_sqi = None
+        if self.template_corrs_highest_sqi is not None:
+            self.template_correlation_highest_sqi_mean = np.mean(self.template_corrs_highest_sqi)
+            self.template_correlation_highest_sqi_std = np.std(self.template_corrs_highest_sqi)
+            self.template_correlation_median_sqi_mean = np.mean(self.template_corrs_median_sqi)
+            self.template_correlation_median_sqi_std = np.std(self.template_corrs_median_sqi)
         else:
-            self.template_correlation_mean = 0
-            self.template_correlation_std = np.finfo(np.float32).max
+            self.template_correlation_highest_sqi_mean = 0
+            self.template_correlation_highest_sqi_std = np.nan
+            self.template_correlation_median_sqi_mean = 0
+            self.template_correlation_median_sqi_std = np.nan
 
-    def get_template_correlations(self, template, peak_loactions, series):
+    def get_template_correlations(self, template, peak_locations, series):
         if template is None:
             return None
         correlations = np.zeros(len(self.interval_lengths))
-        for i, peak_loaction in enumerate(peak_loactions):
+        for i, peak_location in enumerate(peak_locations):
             interval_length = self.interval_lengths[i]
             if interval_length == 0:
                 correlations[i] = 0
             else:
-                heartbeat = series.bcg.filtered_data[peak_loaction: int(peak_loaction + interval_length)]
-                try:
-                    curr_corr = correlate(template, heartbeat, method='auto')
-                except:
-                    import traceback
-                    traceback.print_stack()
-                    print(peak_loaction)
-                    return None
+                heartbeat = series.bcg.filtered_data[peak_location: int(peak_location + interval_length)]
+                curr_corr = correlate(template, heartbeat, method='auto')
                 correlations[i] = np.sum(curr_corr) / len(curr_corr)
         return correlations
 
@@ -582,8 +586,10 @@ class SegmentOwn(SegmentStatistical):
             'peak_min',
             'peak_mean',
             'peak_std',
-            'template_corr_mean',
-            'template_corr_std'
+            'template_corr_highest_sqi_mean',
+            'template_corr_highest_sqi_std',
+            'template_corr_median_sqi_mean',
+            'template_corr_median_sqi_std'
         ])
         return np.concatenate((segment_array, own_array), axis=0)
 
@@ -606,8 +612,10 @@ class SegmentOwn(SegmentStatistical):
             self.peak_min,
             self.peak_mean,
             self.peak_std,
-            self.template_correlation_mean,
-            self.template_correlation_std
+            self.template_correlation_highest_sqi_mean,
+            self.template_correlation_highest_sqi_std,
+            self.template_correlation_median_sqi_mean,
+            self.template_correlation_median_sqi_std
         ])
         return np.concatenate((segment_array, own_array), axis=0)
 

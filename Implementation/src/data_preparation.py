@@ -214,6 +214,17 @@ class DataSeries:
             return self.bcg.filtered_data[idx[max_id]:int(idx[max_id] + interval_lengths[max_id])]
         return None
 
+    def get_median_est_int(self, bcg_start, bcg_end):
+        idx = self.bcg.get_unique_peak_locations(bcg_start, bcg_end)
+        if len(idx) == 0:
+            return None
+        sqis = self.bcg.get_sqi_array(bcg_start, bcg_end)
+        interval_lengths = self.bcg.get_interval_lengths(bcg_start, bcg_end)
+        if len(np.isfinite(sqis) > 0):
+            median_id = np.argwhere(np.median(sqis))
+            return self.bcg.filtered_data[idx[median_id]:int(idx[median_id] + interval_lengths[median_id])]
+        return None
+
 
 class Data:
     sample_rate = 100
