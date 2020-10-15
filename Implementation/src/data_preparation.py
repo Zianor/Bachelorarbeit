@@ -12,7 +12,7 @@ from data_processing import get_ecg_processing, get_brueser_from_id
 class BCGSeries:
     coverage_threshold = 80
 
-    def __init__(self, bcg_id, raw_data, sqi, bbi_bcg, bbi_ecg, indices, sample_rate=100):
+    def __init__(self, bcg_id, raw_data, sqi, bbi_bcg, bbi_ecg, indices, data_folder, sample_rate=100):
         self.bcg_id = bcg_id
         self.raw_data = raw_data
         self.filtered_data = utils.butter_bandpass_filter(raw_data, 1, 12, sample_rate)
@@ -22,7 +22,7 @@ class BCGSeries:
         self.indices = indices
         self.sample_rate = sample_rate
         self.length = len(raw_data) / sample_rate  # in seconds
-        self.brueser_df = get_brueser_from_id(self.sample_rate, self.bcg_id).dropna()
+        self.brueser_df = get_brueser_from_id(self.sample_rate, self.bcg_id, data_folder=data_folder).dropna()
         self.medians = self.brueser_df['medians'].to_numpy()
         self.unique_peaks = self.brueser_df['unique_peaks'].to_numpy()
         self.brueser_sqi = self.brueser_df['qualities'].to_numpy()
@@ -264,7 +264,8 @@ class Data:
                  path.lower().endswith(".edf")]
         for path in paths:
             path = os.path.join(utils.get_ecg_data_path(self.data_folder), path)
-            r_peaks, ecg_id, sample_rate, length = get_ecg_processing(path=path, use_existing=True)
+            r_peaks, ecg_id, sample_rate, length = get_ecg_processing(path=path, use_existing=True,
+                                                                      data_folder=self.data_folder)
             self.data_series[ecg_id] = DataSeries(ECGSeries(
                 patient_id=ecg_id,
                 r_peaks=r_peaks.to_numpy(),
@@ -283,7 +284,7 @@ class Data:
         for path in paths:
             mat_dict = loadmat(path)
             bcg_id = path.lower().split("_")[-1].replace(".mat", "")
-            if bcg_id == '14':  # skip file without drift vector
+            if self.data_folder == 'data_patients' and bcg_id == '14':  # skip file without drift vector
                 continue
             bcg = BCGSeries(
                 raw_data=mat_dict['BCG_raw_data'][0],
@@ -292,7 +293,8 @@ class Data:
                 bbi_ecg=mat_dict['BBI_ECG'][:, 0],
                 indices=mat_dict['indx'][:, 0],
                 sample_rate=self.sample_rate,
-                bcg_id=bcg_id
+                bcg_id=bcg_id,
+                data_folder=self.data_folder
             )
             ecg_id = self.mapping[bcg_id]
             self.data_series[str(ecg_id)].bcg = bcg

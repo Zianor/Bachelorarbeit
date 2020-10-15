@@ -58,7 +58,7 @@ def get_brueser(fs, path, use_existing=True, data_folder='data_patients'):
 def get_brueser_from_id(fs, brueser_id, use_existing=True, data_folder='data_patients'):
     filename = 'ML_data_patient_' + brueser_id + '.mat'
     path = os.path.join(utils.get_bcg_data_path(data_folder), filename)
-    return get_brueser(fs=fs, path=path, use_existing=use_existing)
+    return get_brueser(fs=fs, path=path, use_existing=use_existing, data_folder=data_folder)
 
 
 def ecg_process_all(use_existing=True, data_folder='data_patients'):
