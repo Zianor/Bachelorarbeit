@@ -46,7 +46,7 @@ class DataSet:
             with open(utils.get_data_object_path(self.data_folder), 'rb') as file:
                 data = pickle.load(file)
         else:
-            data = Data()
+            data = Data(self.data_folder)
             with open(utils.get_data_object_path(self.data_folder), 'wb') as file:
                 pickle.dump(data, file)
                 file.flush()
