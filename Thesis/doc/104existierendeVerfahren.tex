@@ -5,8 +5,7 @@ Im diesem Kapitel werden die betrachteten Daten näher untersucht. Das beinhalte
 
 \section{Anwendung existierender Verfahren}
 
-Zunächst werden die in Kapitel \ref{artefakterkennung} beschriebenen existierenden Artefakterkennungsverfahren mit den in dieser Arbeit untersuchten Daten getestet und  ihre Leistungsfähigkeit untersucht und bewertet. Hierzu werden zunächst die verwendeten Merkmale segmentweise extrahiert und serialisiert. Die Segmentlänge wurde zunächst auf 10 Sekunden mit 90\,\% Überlappung festgelegt, da diese Werte auch in der Literatur verwendet wird\footcite[Vgl.][]{Yu2020} und eine ausreichend große Robustheit gegenüber des Drifts der Daten bietet Zusätzlich zu den verwendeten Merkmalen werden allgemeine Informationen über die Segmente mitgespeichert. Dazu gehören Patient*innen-ID, EKG-Herzrate, BKG-Herzrate, absoluter und relativer Fehler, $E\textsubscript{HR}$ und die binäre Annotation. Um vergleichbare Ergebnisse zu erhalten, wird auch bei Algorithmen, die kein Training benötigen, das Testset betrachtet. Um Trainings- und Testdaten inhaltlich vollständig zu trennen, wird anhand der Patient*innen-IDs getrennt, sodass Segmente einer Person lediglich in einem der beiden Sets verwendet werden.
-% TODO Patientensplit, Prozent, blablub, Tabelle verteilung
+Zunächst werden die in Kapitel \ref{artefakterkennung} beschriebenen existierenden Artefakterkennungsverfahren mit den in dieser Arbeit untersuchten Daten getestet und  ihre Leistungsfähigkeit untersucht und bewertet. Hierzu werden die verwendeten Merkmale segmentweise extrahiert und serialisiert. Die Segmentlänge wurde dabei auf 10 Sekunden mit 90\,\% Überlappung festgelegt, da diese Segmentlänge häufiger verwendet wird\footcite[Vgl.][]{Yu2020, Sadek2016} und eine ausreichend große Robustheit gegenüber des Drifts der Daten bietet Zusätzlich zu den verwendeten Merkmalen werden allgemeine Informationen über die Segmente gespeichert. Dazu gehören Patient*innen-ID, EKG-Herzrate, BKG-Herzrate, absoluter und relativer Fehler, $E\textsubscript{HR}$ und die binäre Annotation. Um vergleichbare Ergebnisse zu erhalten, wird auch bei Algorithmen, die kein Training benötigen, das Testset betrachtet. Um Trainings- und Testdaten inhaltlich vollständig zu trennen, wird anhand der Patient*innen-IDs getrennt, sodass Segmente einer Person lediglich in einem der beiden Sets verwendet werden. Das Testset in dieser Arbeit entspricht $frac{1}{3}$ der Patient*innen, die restlichen $\frac{2}{3}$ werden zur Datenexploration, zur Merkmalskonstruktion und zum Training verwendet. Die Verteilung der Label und des relativen Fehlers sind in Abbildung %TODO: Figure \ref{} gezeigt.
 
 \subsection{Ähnlichkeit der Intervallschätzer des CLIE-Algorithmus}
 
@@ -22,9 +21,18 @@ Der \ac{SQI}, der die Ähnlichkeit der Intervallschätzer des \ac{CLIE}-Algorith
 
 \subsection{Schwellwerte für Standardabweichung, Minimum und Maximum}
 
-Für dieses Verfahren werden lediglich zwei Schwellwerte $T_1$ und $T_2$ benötigt, die auf Standardabweichung, Minimum, Maximum und Durchschnitt des Signals beruhen
+Für dieses Verfahren werden lediglich zwei Schwellwerte $T_1$ und $T_2$ benötigt, die auf Standardabweichung, Minimum, Maximum und Durchschnitt des Signals beruhen. Die Klassifikation ist ein einfacher Vergleich. \citeauthor{Pino2015} verwenden sehr kleine Fenster, die hier aufgrund Robustheit der Annotation nicht verwendet werden können. Stattdessen wird der Algorithmus sowohl auf 10\,Sekunden- als auch 5\,Sekunden-Segmenten getestet, damit sichtbar wird, ob die Segmentlänge einen Einfluss auf das Ergebnis hat.
+
+\begin{itemize}
+	\item fast alles informativ
+	\item Segmentlänge egal
+	\item damit keine brauchbare Klassifikation
+	\item nicht weiter nutzbar
+\end{itemize}
 
 \subsection{Maschinelles Lernen mittels statistischer Merkmale}
+
+Für das maschinellen Lernen mittels statistischer Merkmale werden die in Kapital \ref{ml-beschreibung} aufgezählten Merkmale extrahiert. Als Bibliothek für die Modelle des maschinellen Lernes wird \textit{scikit-learn}\footcite[]{scikit-learn} verwendet.
 
 \section{Datenanalyse und Merkmalskonstruktion}
 

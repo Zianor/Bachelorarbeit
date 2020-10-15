@@ -114,7 +114,7 @@ Im folgenden Kapitel wird eine Einführung in das Thema der Signalverarbeitung u
 	Hier zeigt sich, dass beim Großteil des hier betrachteten Signals die \ac{HR} größtenteils mit einer Genauigkeit von $\pm 3$ Schläge pro Minute bestimmt werden konnte. Allerdings handelt es sich hier um im Sitzen aufgenommenes Signal, bei dem die Variabilität geringer ist als bei in Betten aufgenommenem \ac{BKG}.
 	
 	
-	\subsection{Maschinelles Lernen mit statistischen Merkmalen}
+	\subsection{Maschinelles Lernen mit statistischen Merkmalen}\label{ml-beschreibung}	
 	
 	Ein Algorithmus zur Beurteilung der Signalqualität mittels maschinellen Lernens wird von \citeauthor{Sadek2016} im Paper \citetitle{Sadek2016} beschrieben. Betrachtet werden \ac{BKG}-Signale, die in einem Massagesessel aufgenommen werden, also ebenfalls im Sitzen aufgenommenes Signal, bei dem eine geringere Variabilität als in unserem Anwendungsfall erwartet wird.
 	
@@ -179,7 +179,7 @@ Im folgenden Kapitel wird eine Einführung in das Thema der Signalverarbeitung u
 	
 	\subsection{Annotation der Daten}\label{annotation}
 	
-	Die vorliegenden Daten sind nicht annotiert. Es ist im Rahmen dieser Arbeit nicht möglich, die Annotation durch Expert*innen durchführen zu lassen, weshalb auf das parallel aufgenommene \ac{EKG} zurückgegriffen wird. Aufgrund des nicht-linearen Drifts der Daten ist eine herzschlaggenaue Synchronisierung schwierig. Aus diesem Grund wurde entschieden, die Annotation bereichsweise vorzunehmen. Für jeden Bereich wird zunächst geprüft, ob ein aussagekräftiges Referenzsignal existiert. Falls nicht, wird der entsprechende Bereich ausgeschlossen und nicht weiter verwendet. Ansonsten wird die durchschnittliche Herzrate sowohl für BKG- als auch EKG-Signal berechnet. Für die Berechnung der Herzfrequenz im \ac{BKG} wird der Median der geschätzten Intervalllängen verwendet. So werden Ausreißer weniger stark gewichtet.
+	Die vorliegenden Daten sind nicht annotiert. Es ist im Rahmen dieser Arbeit nicht möglich, die Annotation durch Expert*innen durchführen zu lassen, weshalb auf das parallel aufgenommene \ac{EKG} zurückgegriffen wird. Aufgrund des nicht-linearen Drifts der Daten ist eine herzschlaggenaue Synchronisierung schwierig. Aus diesem Grund wurde entschieden, die Annotation bereichsweise vorzunehmen. Für jeden Bereich wird zunächst geprüft, ob ein aussagekräftiges Referenzsignal existiert. Falls nicht, wird der entsprechende Bereich ausgeschlossen und nicht weiter verwendet. Ansonsten wird die durchschnittliche Herzrate sowohl für BKG- als auch EKG-Signal berechnet. Für die Berechnung der Herzfrequenz im \ac{BKG} wird der Median der geschätzten Intervalllängen verwendet. So werden Ausreißer weniger stark gewichtet. Wenn mit den geschätzten Intervalllängen eine Coverage von unter 80\,\% erreicht wird, wird die Herzrate verworfen, da in diesem Fall nur kleine Teile des Signals aussagekräftig sind.
 	
 	Auch bei dem Referenzsignal wird die Herzrate über den Median der Intervalllängen ermittelt. Die Intervalllängen entsprechen hier den Abständen der ermittelten R-Peaks. Da drei \ac{EKG}-Kanäle vorliegen, wird die Herzrate zunächst für jeden Kanal einzeln geschätzt. Falls die geschätzte Herzrate außerhalb des erwarteten Bereichs von 30 bis 200 Schlägen pro Minute liegt, wird der Kanal verworfen. Die Auswahl des Kanals gestaltet sich schwieriger, da auch im Referenzsignal teilweise schlechtes Signal vorliegt. Um dies auszugleichen, wird zur Auswahl des Kanals die Herzrate ebenfalls auf einem doppelt so großem Fenster berechnet. Von diesen drei Herzraten wird die ausgewählt, deren Kanal die geringste Spannweite an Intervalllängen aufweist. Mit Hilfe der geschätzten Herzrate des größeren Fensters wird nun der Kanal für die endgültige Schätzung ausgewählt, der die geringste Abweichung zu der Schätzung des größeren Fensters hat. Der Ablauf ist in Abbildung \ref{fig:ecg-hr-estimation} visualisiert.
 	
@@ -226,8 +226,7 @@ Im folgenden Kapitel wird eine Einführung in das Thema der Signalverarbeitung u
 		E\textsubscript{HR} \hat{=} \Delta\text{HR}\textsubscript{abs} \cdot 2.
 	\end{align*}
 	
-	% TODO E_HR auf maximal mögliche Abweichung gesetzt
-	Wenn keine Herzrate auf dem \ac{BKG}-Signal ermittelt werden konnte, wird $E\textsubscript{HR}$ auf den maximalen Wert eines \textit{floats} gesetzt. Die Verteilung von $E\textsubscript{HR}$, abgebildet in \ref{fig:class-histo}, zeigt, dass Segmente mit Fehlern von mehr als 20\,\% und solche mit Fehlern unter 5\,\% jeweils die beiden größten Gruppen bilden. 
+	Wenn keine Herzrate auf dem \ac{BKG}-Signal ermittelt werden konnte, wird $E\textsubscript{HR}$ auf den maximalen Wert 667 gesetzt, da das der maximal möglichen relativen Abweichung entspricht. Die Verteilung von $E\textsubscript{HR}$, abgebildet in \ref{fig:class-histo}, zeigt, dass Segmente mit Fehlern von mehr als 20\,\% und solche mit Fehlern unter 5\,\% jeweils die beiden größten Gruppen bilden. 
 	
 	
 	\begin{figure}[H]
