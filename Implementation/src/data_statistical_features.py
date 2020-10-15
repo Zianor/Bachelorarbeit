@@ -5,7 +5,7 @@ import pickle
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from scipy.signal import find_peaks, hilbert, welch, correlate
+from scipy.signal import find_peaks, hilbert, welch, correlate, periodogram
 from scipy.stats import median_abs_deviation, kurtosis, skew
 import statsmodels.api as sm
 
@@ -506,11 +506,22 @@ class SegmentOwn(SegmentStatistical):
         self.sqi_array = series.bcg.get_sqi_array(start, end)
         self.peak_values = series.bcg.get_unique_peak_values(start, end)
         self.acf = sm.tsa.acf(self.filtered_data, nlags=(end - start) // 2, fft=True)
-        f, den = welch(self.filtered_data, fs=series.bcg_sample_rate)
-        self.peak_frequency_acf = f[np.nanargmax(den)]
+        f_acf, den_acf = periodogram(self.acf, fs=series.bcg_sample_rate)
+        f_data, den_data = periodogram(self.filtered_data, fs=series.bcg_sample_rate)
+        self.peak_frequency_data = f_data[np.nanargmax(den_data)]
+        self.peak_frequency_acf = f_acf[np.nanargmax(den_acf)]
+        self.hf_ratio_data = self.bcg_hr / self.peak_frequency_data
+        self.hf_diff_data = self.bcg_hr - self.peak_frequency_data
+        if not np.isfinite(self.hf_ratio_data):
+            self.hf_ratio_data = 0
+        if not np.isfinite(self.hf_diff_data):
+            self.hf_diff_data = 0
         self.hf_ratio_acf = self.bcg_hr / self.peak_frequency_acf
+        self.hf_diff_data = self.bcg_hr - self.peak_frequency_acf
         if not np.isfinite(self.hf_ratio_acf):
             self.hf_ratio_acf = 0
+        if not np.isfinite(self.hf_diff_acf):
+            self.hf_diff_data = 0
         self.abs_energy = np.sum(self.filtered_data * self.filtered_data)
         if len(self.interval_lengths) > 0:
             self.interval_lengths_std = np.std(self.interval_lengths)
@@ -574,7 +585,11 @@ class SegmentOwn(SegmentStatistical):
         segment_array = SegmentStatistical.get_feature_name_array()
         own_array = np.array([
             'hf_ratio_acf',
+            'hf_ratio_data',
+            'hf_diff_acf',
+            'hf_diff_data',
             'peak_frequency_acf',
+            'peak_frequency_data',
             'abs_energy',
             'interval_lengths_std',
             'interval_lengths_range',
@@ -600,7 +615,11 @@ class SegmentOwn(SegmentStatistical):
         segment_array = super().get_feature_array()
         own_array = np.array([
             self.hf_ratio_acf,
+            self.hf_ratio_data,
+            self.hf_diff_acf,
+            self.hf_diff_data,
             self.peak_frequency_acf,
+            self.peak_frequency_data,
             self.abs_energy,
             self.interval_lengths_std,
             self.interval_lengths_range,
@@ -627,4 +646,6 @@ if __name__ == "__main__":
     DataSetPino()
     DataSetPino(4, 0.75)
     DataSetBrueser()
+    DataSetBrueser(sqi_threshold=0.3)
+    DataSetBrueser(sqi_threshold=0.2)
     pass
