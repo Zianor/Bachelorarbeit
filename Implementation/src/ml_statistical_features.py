@@ -45,7 +45,7 @@ def load_data_as_dataframe(segment_length=10, overlap_amount=0.9, hr_threshold=1
         if os.path.isfile(path):
             data = pd.read_csv(path, index_col=False)
             warnings.warn('Labels are recalculated')
-            data['informative'] = data['rel_err'] < hr_threshold
+            data['informative'] = data['error'] < hr_threshold
             data.to_csv(path_hr, index=False)
         else:
             warnings.warn('No csv, data needs to be reproduced. This may take some time')
