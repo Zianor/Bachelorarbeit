@@ -508,8 +508,14 @@ class SegmentOwn(SegmentStatistical):
         self.acf = sm.tsa.acf(self.filtered_data, nlags=(end - start) // 2, fft=True)
         f_acf, den_acf = periodogram(self.acf, fs=series.bcg_sample_rate)
         f_data, den_data = periodogram(self.filtered_data, fs=series.bcg_sample_rate)
-        self.peak_frequency_data = f_data[np.nanargmax(den_data)]
-        self.peak_frequency_acf = f_acf[np.nanargmax(den_acf)]
+        if len(den_data[np.isfinite(den_data)]) > 0:
+            self.peak_frequency_data = f_data[np.nanargmax(den_data)]
+        else:
+            self.peak_frequency_data = np.nan
+        if len(den_acf[np.isfinite(den_acf)]) > 0:
+            self.peak_frequency_acf = f_data[np.nanargmax(den_acf)]
+        else:
+            self.peak_frequency_acf = np.nan
         self.hf_ratio_data = self.bcg_hr / self.peak_frequency_data
         self.hf_diff_data = self.bcg_hr - self.peak_frequency_data
         if not np.isfinite(self.hf_ratio_data):
@@ -517,11 +523,11 @@ class SegmentOwn(SegmentStatistical):
         if not np.isfinite(self.hf_diff_data):
             self.hf_diff_data = 0
         self.hf_ratio_acf = self.bcg_hr / self.peak_frequency_acf
-        self.hf_diff_data = self.bcg_hr - self.peak_frequency_acf
+        self.hf_diff_acf = self.bcg_hr - self.peak_frequency_acf
         if not np.isfinite(self.hf_ratio_acf):
             self.hf_ratio_acf = 0
         if not np.isfinite(self.hf_diff_acf):
-            self.hf_diff_data = 0
+            self.hf_diff_acf = 0
         self.abs_energy = np.sum(self.filtered_data * self.filtered_data)
         if len(self.interval_lengths) > 0:
             self.interval_lengths_std = np.std(self.interval_lengths)

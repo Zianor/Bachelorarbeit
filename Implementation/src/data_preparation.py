@@ -221,8 +221,9 @@ class DataSeries:
         sqis = self.bcg.get_sqi_array(bcg_start, bcg_end)
         interval_lengths = self.bcg.get_interval_lengths(bcg_start, bcg_end)
         if len(np.isfinite(sqis) > 0):
-            median_id = np.argwhere(np.median(sqis))
-            return self.bcg.filtered_data[idx[median_id]:int(idx[median_id] + interval_lengths[median_id])]
+            median_id = np.argpartition(interval_lengths, len(interval_lengths) // 2)[len(interval_lengths) // 2]
+            if np.isfinite(interval_lengths[median_id]):
+                return self.bcg.filtered_data[idx[median_id]:int(idx[median_id] + interval_lengths[median_id])]
         return None
 
 
