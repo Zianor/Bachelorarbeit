@@ -2,8 +2,8 @@ import os
 import pickle
 import warnings
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 from sklearn.model_selection import train_test_split
 
 import utils as utils
@@ -34,30 +34,89 @@ class QualityEstimator:
     def _load_segments(self):
         raise Exception("Not implemented in base class")
 
-    def get_5percent_coverage(self, indices, labels=None):
-        return self.get_percent_coverage(5, indices, labels)
+    def get_5percent_coverage(self, indices, labels=None, informative_only=False, use_brueser_hr=False):
+        return self.get_percent_coverage(5, indices, labels, informative_only, use_brueser_hr)
 
-    def get_10percent_coverage(self, indices, labels=None):
-        return self.get_percent_coverage(10, indices, labels)
+    def get_10percent_coverage(self, indices, labels=None, informative_only=False, use_brueser_hr=False):
+        return self.get_percent_coverage(10, indices, labels, informative_only, use_brueser_hr)
 
-    def get_15percent_coverage(self, indices, labels=None):
-        return self.get_percent_coverage(15, indices, labels)
+    def get_15percent_coverage(self, indices, labels=None, informative_only=False, use_brueser_hr=False):
+        return self.get_percent_coverage(15, indices, labels, informative_only, use_brueser_hr)
 
-    def get_20percent_coverage(self, indices, labels=None):
-        return self.get_percent_coverage(20, indices, labels)
+    def get_20percent_coverage(self, indices, labels=None, informative_only=False, use_brueser_hr=False):
+        return self.get_percent_coverage(20, indices, labels, informative_only, use_brueser_hr)
 
-    def get_unusable_percentage(self, indices, labels=None):
+    def get_unusable_percentage(self, indices, labels=None, informative_only=False, use_brueser_hr=False):
+        """
+        :param indices: indices of used data
+        :param labels: if None all data is assumed as informative and used
+        :param informative_only: if true percentage only of data[labels]
+        :param use_brueser_hr: only for brueser classification
+        """
         data_subset = self.informative_info.loc[indices]
         if labels is not None:
             data_subset = data_subset[labels]
-        return 100 / len(data_subset.index) * len(data_subset[data_subset['quality_class'] == 0])
+        if informative_only:
+            all_length = len(data_subset.index)
+            if all_length == 0:
+                raise Exception("informative_only not supported when no informative Segments are given")
+        else:
+            all_length = len(indices)
+        return 100 / all_length * len(data_subset[data_subset['quality_class'] == 0])
 
-    def get_percent_coverage(self, threshold, indices, labels=None):
+    def get_percent_coverage(self, threshold, indices, labels=None, informative_only=False, use_brueser_hr=False):
+        """
+        :param indices: indices of used data
+        :param labels: if None all data is assumed as informative and used
+        :param informative_only: if true percentage only of data[labels]
+        :param use_brueser_hr: only for brueser classification
+        """
         data_subset = self.informative_info.loc[indices]
         if labels is not None:
             data_subset = data_subset[labels]
-        covered = data_subset[np.logical_or(data_subset['rel_err'] < threshold, data_subset['abs_err'] < threshold/2)]
-        return 100 / len(data_subset.index) * len(covered)
+        covered = data_subset[data_subset['error'] < threshold]
+        if informative_only:
+            all_length = len(data_subset.index)
+            if all_length == 0:
+                raise Exception("informative_only not supported when no informative Segments are given")
+        else:
+            all_length = len(indices)
+        return 100 / all_length * len(covered)
+
+    def plot_bland_altman(self, indices, title=None):
+        utils.bland_altman_plot(self.informative_info.loc[indices, 'ecg_hr'],
+                                self.informative_info.loc[indices, 'bcg_hr'], title=title)
+
+    def print_report_all_signal(self, test_indices, y_pred):
+        print("\n Coverage bestimmter Fehler des genutzten Signals auf Gesamtsignal")
+        print(f"Fehler < 5 gesamt           : {self.get_5percent_coverage(test_indices, use_brueser_hr=False):.2f} %")
+        print(f"Fehler < 5 klassifiziert    : {self.get_5percent_coverage(test_indices, y_pred):.2f} %")
+        print(f"Fehler < 10 gesamt          : {self.get_10percent_coverage(test_indices, use_brueser_hr=False):.2f} %")
+        print(f"Fehler < 10 klassifiziert   : {self.get_10percent_coverage(test_indices, y_pred):.2f} %")
+        print(f"Fehler < 15 gesamt          : {self.get_15percent_coverage(test_indices, use_brueser_hr=False):.2f} %")
+        print(f"Fehler < 15 klassifiziert   : {self.get_15percent_coverage(test_indices, y_pred):.2f} %")
+        print(f"Fehler < 20 gesamt          : {self.get_20percent_coverage(test_indices, use_brueser_hr=False):.2f} %")
+        print(f"Fehler < 20 klassifiziert   : {self.get_20percent_coverage(test_indices, y_pred):.2f} %")
+        print(f"Fehler = 667 gesamt         : {self.get_unusable_percentage(test_indices, use_brueser_hr=False):.5f} %")
+        print(f"Fehler = 667 klassifiziert  : {self.get_unusable_percentage(test_indices, y_pred):.5f} %")
+        # TODO: plot
+
+    def print_report_informative_signal(self, test_indices, y_pred):
+        print("\n Anteil bestimmter Fehler auf informativem Signal")
+        self.print_report_coverage(test_indices, y_pred)
+        # TODO: plot
+
+    def print_report_coverage(self, test_indices, y_pred):
+        print(
+            f"Fehler < 5    : {self.get_5percent_coverage(test_indices, y_pred, informative_only=True):.2f} %")
+        print(
+            f"Fehler < 10   : {self.get_10percent_coverage(test_indices, y_pred, informative_only=True):.2f} %")
+        print(
+            f"Fehler < 15   : {self.get_15percent_coverage(test_indices, y_pred, informative_only=True):.2f} %")
+        print(
+            f"Fehler < 20   : {self.get_20percent_coverage(test_indices, y_pred, informative_only=True):.2f} %")
+        print(
+            f"Fehler = 667  : {self.get_unusable_percentage(test_indices, y_pred, informative_only=True):.5f} %")
 
     def print_model_test_report(self):
         y_pred, y_true = self.predict_test_set()
@@ -67,26 +126,42 @@ class QualityEstimator:
         test_indices = x2.index
 
         fp_indices = y_true[np.logical_and(~y_true, y_pred)].index
-        fp = y_pred.loc[fp_indices]
+        fp_labels = y_pred[fp_indices]
 
         fn_indices = y_true[np.logical_and(y_true, ~y_pred)].index
-        fn = y_pred.loc[fn_indices]
+        fn_labels = y_pred[fn_indices]
 
-        print(f"Coverage klassifiziert: {len(y_pred[y_pred])/len(y_pred)*100:.2f} %")
-        print(f"Coverage annotiert: {len(y_true[y_true]) / len(y_true)*100:.2f} %")
-        print(f"Fehler < 5 Prozent/2.5bpm insgesamt: {self.get_5percent_coverage(test_indices):.2f} %")
-        print(f"Fehler < 5 Prozent/2.5bpm klassifiziert: {self.get_5percent_coverage(test_indices, y_pred):.2f} %")
-        print(f"Fehler < 10 Prozent/5bpm insgesamt: {self.get_10percent_coverage(test_indices):.2f} %")
-        print(f"Fehler < 10 Prozent/5bpm klassifiziert: {self.get_10percent_coverage(test_indices, y_pred):.2f} %")
-        print(f"Fehler < 15 Prozent/7.5bpm insgesamt: {self.get_15percent_coverage(test_indices):.2f} %")
-        print(f"Fehler < 15 Prozent/7.5bpm klassifiziert: {self.get_15percent_coverage(test_indices, y_pred):.2f} %")
-        print(f"Fehler < 20 Prozent/10bpm insgesamt: {self.get_20percent_coverage(test_indices):.2f} %")
-        print(f"Fehler < 20 Prozent/10bpm klassifiziert: {self.get_20percent_coverage(test_indices, y_pred):.2f} %")
-        print(f"Keine Schaetzung insgesamt: {self.get_unusable_percentage(test_indices):.5f} %")
-        print(f"Keine Schaetzung klassifiziert: {self.get_unusable_percentage(test_indices, y_pred):.5f} %")
-        print(f"Durchschnittlicher Fehler von False Positives: {self.get_mean_error_abs(fp_indices, fp)}")
+        print("MAE auf als informativ klassifizierten Segmenten: %.2f" % self.get_mean_error(
+            y_true.index, y_pred))
+        print("MAE auf als informativ annotierten Segmenten:  %.2f" % self.get_mean_error(
+            y_true.index, y_true, use_brueser_hr=False))
+        print("MAE insgesamt:  %.2f" % self.get_mean_error(
+            y_true.index, use_brueser_hr=False))
+        print("MSE auf als informativ klassifizierten Segmenten: %.2f" % self.get_mean_squared_error(
+            y_true.index, y_pred))
+        print("MSE auf als informativ annotierten Segmenten:  %.2f" % self.get_mean_squared_error(
+            y_true.index, y_true, use_brueser_hr=False))
+        print("MSE insgesamt:  %.2f" % self.get_mean_squared_error(
+            y_true.index, use_brueser_hr=False))
+        print("\n")
+
+        print(f"Coverage klassifiziert      : {len(y_pred[y_pred]) / len(y_pred) * 100:.2f} %")
+        print(f"Coverage annotiert          : {len(y_true[y_true]) / len(y_true) * 100:.2f} %")
+        self.print_report_all_signal(test_indices, y_pred)
+        self.print_report_informative_signal(test_indices, y_pred)
+        self.plot_bland_altman(test_indices[y_pred], "Informativ klassifiziert")
+        self.plot_bland_altman(test_indices[np.logical_and(y_pred, y_true)], "True Positives")
+
+
+        print("\n False Positives")
+        print(f"Durchschnittlicher Fehler von False Positives: {self.get_mean_error(fp_indices):.2f} %")
+        self.print_report_coverage(fp_indices, fp_labels)
+        self.plot_bland_altman(fp_indices, "False Positives")
         # print(f"Standardabweichung des Fehlers von False Positives: {self.get_mean_error_abs(fp_indices, fp)}")
-        print(f"Durchschnittlicher Fehler von False Negatives: {self.get_mean_error_abs(fn_indices, fn)}")
+        print("\n False Negatives")
+        print(f"Durchschnittlicher Fehler von False Negatives: {self.get_mean_error(fn_indices):.2f} %")
+        self.print_report_coverage(fn_indices, ~fn_labels)
+        self.plot_bland_altman(fn_indices, "False Negatives")
 
     def _get_patient_split(self, test_size=0.33):
         patient_ids_1, patient_ids_2 = train_test_split(self.patient_id.unique(), random_state=1, test_size=test_size)
@@ -108,21 +183,34 @@ class QualityEstimator:
     def predict(self, x):
         raise Exception("Not implemented in base class")
 
-    def get_mean_error_abs(self, indices, labels=None):
+    def get_mean_error(self, indices, labels=None, use_brueser_hr=False):
         data_subset = self.informative_info.loc[indices]
         if labels is not None:
             data_subset = data_subset[labels]
-        data_subset = data_subset[data_subset['informative']]
-        data_subset = data_subset[data_subset['quality_class'] != 0]
-        return np.nanmean(data_subset['abs_err'])
+        # data_subset = data_subset[data_subset['quality_class'] != 0]
+        return np.mean(data_subset['error'])
 
-    def get_mean_error_rel(self, indices, labels=None):
+    def get_mean_squared_error(self, indices, labels=None, use_brueser_hr=False):
         data_subset = self.informative_info.loc[indices]
         if labels is not None:
             data_subset = data_subset[labels]
-        data_subset = data_subset[data_subset['quality_class'] != 0]
+        # data_subset = data_subset[data_subset['quality_class'] != 0]
+        return np.mean(data_subset['error'].pow(2))
+
+    def get_mean_error_abs(self, indices, labels=None, use_brueser_hr=False):
+        data_subset = self.informative_info.loc[indices]
+        if labels is not None:
+            data_subset = data_subset[labels]
+        # data_subset = data_subset[data_subset['quality_class'] != 0]
+        return np.mean(data_subset['abs_err'])
+
+    def get_mean_error_rel(self, indices, labels=None, use_brueser_hr=False):
+        data_subset = self.informative_info.loc[indices]
+        if labels is not None:
+            data_subset = data_subset[labels]
+        # data_subset = data_subset[data_subset['quality_class'] != 0]
         data_subset = data_subset[data_subset['informative']]
-        return np.nanmean(data_subset['rel_err'])
+        return np.mean(data_subset['rel_err'])
 
 
 class BrueserSingleSQI(QualityEstimator):
@@ -132,9 +220,15 @@ class BrueserSingleSQI(QualityEstimator):
         self.sqi_threshold = sqi_threshold
         super(BrueserSingleSQI, self).__init__(segment_length, overlap_amount, hr_threshold, data_folder)
         self.informative_info['sqi_hr_diff_abs'] = np.abs(self.informative_info['ecg_hr'] - self.features['sqi_hr'])
-        self.informative_info['sqi_hr_diff_abs'] = self.informative_info['sqi_hr_diff_abs'].replace(np.nan, np.finfo(np.float32).max)
-        self.informative_info['sqi_hr_diff_rel'] = 100 / self.informative_info['ecg_hr'] * self.informative_info['sqi_hr_diff_abs']
-        self.informative_info['sqi_hr_diff_rel'] = self.informative_info['sqi_hr_diff_rel'].replace(np.nan, np.finfo(np.float32).max)
+        mask_less_50 = self.features['sqi_hr'] < 50
+        self.informative_info['sqi_hr_diff_rel'] = 100 / self.informative_info['ecg_hr'] * self.informative_info[
+            'sqi_hr_diff_abs']
+        self.informative_info['sqi_hr_error'] = self.informative_info['sqi_hr_diff_rel']
+        self.informative_info.loc[mask_less_50, 'sqi_hr_error'] = self.informative_info.loc[mask_less_50,
+                                                                                            'sqi_hr_diff_abs']
+        self.informative_info['sqi_hr_diff_abs'] = self.informative_info['sqi_hr_diff_abs'].replace(np.nan, 170)
+        self.informative_info['sqi_hr_diff_rel'] = self.informative_info['sqi_hr_diff_rel'].replace(np.nan, 667)
+        self.informative_info['sqi_hr_error'] = self.informative_info['sqi_hr_error'].replace(np.nan, 667)
         self.coverage_threshold = coverage_threshold
 
     def _load_segments(self):
@@ -142,7 +236,8 @@ class BrueserSingleSQI(QualityEstimator):
         Loads BCG data as Dataframe
         :return: Dataframe
         """
-        path_hr = utils.get_brueser_features_csv_path(self.data_folder, self.segment_length, self.overlap_amount, self.sqi_threshold,
+        path_hr = utils.get_brueser_features_csv_path(self.data_folder, self.segment_length, self.overlap_amount,
+                                                      self.sqi_threshold,
                                                       self.hr_threshold)
         if not os.path.isfile(path_hr):
             path = utils.get_features_csv_path(self.data_folder, self.segment_length, self.overlap_amount,
@@ -170,43 +265,89 @@ class BrueserSingleSQI(QualityEstimator):
         labels = data_subset['sqi_coverage'] >= self.coverage_threshold
         return labels
 
-    def get_mean_error_abs(self, indices, labels=None):
-        data_subset = self.informative_info.loc[indices]
-        if labels is not None:
-            data_subset = data_subset[labels]
-            return np.nanmean(data_subset['sqi_hr_diff_abs'])
-        data_subset = data_subset[data_subset['quality_class'] != 0]
-        data_subset = data_subset[data_subset['informative']]
-        return np.nanmean(data_subset['abs_err'])
+    def plot_bland_altman(self, indices, title=None):
+        utils.bland_altman_plot(self.informative_info.loc[indices, 'ecg_hr'],
+                                self.features.loc[indices, 'sqi_hr'], title=title)
 
-    def get_mean_error_rel(self, indices, labels=None):
+    def get_mean_error(self, indices, labels=None, use_brueser_hr=True):
         data_subset = self.informative_info.loc[indices]
         if labels is not None:
             data_subset = data_subset[labels]
-            return np.nanmean(data_subset['sqi_hr_diff_rel'])
-        data_subset = data_subset[data_subset['quality_class'] != 0]
-        data_subset = data_subset[data_subset['informative']]
-        return np.nanmean(data_subset['rel_err'])
+        if use_brueser_hr:
+            # data_subset = data_subset[~np.isclose(data_subset['sqi_hr_error'], 667)]
+            return np.mean(data_subset['sqi_hr_error'])
+        # data_subset = data_subset[~np.isclose(data_subset['error'], 667)]
+        return np.mean(data_subset['error'])
 
-    def get_unusable_percentage(self, indices, labels=None):
+    def get_mean_squared_error(self, indices, labels=None, use_brueser_hr=True):
         data_subset = self.informative_info.loc[indices]
         if labels is not None:
             data_subset = data_subset[labels]
-            unusable = data_subset[data_subset['sqi_hr_diff_rel'] == np.finfo(np.float32).max]
+        if use_brueser_hr:
+            # data_subset = data_subset[~np.isclose(data_subset['sqi_hr_error'], 667)]
+            return np.mean(data_subset['sqi_hr_error'].pow(2))
+        # data_subset = data_subset[~np.isclose(data_subset['error'], 667)]
+        return np.mean(data_subset['error'].pow(2))
+
+    def get_mean_error_abs(self, indices, labels=None, use_brueser_hr=True):
+        data_subset = self.informative_info.loc[indices]
+        if labels is not None:
+            data_subset = data_subset[labels]
+        if use_brueser_hr:
+            # data_subset = data_subset[~np.isclose(data_subset['sqi_hr_error'], 667)]
+            return np.mean(data_subset['sqi_hr_diff_abs'])
+        # data_subset = data_subset[~np.isclose(data_subset['error'], 667)]
+        return np.mean(data_subset['error'])
+
+    def get_mean_error_rel(self, indices, labels=None, use_brueser_hr=True):
+        data_subset = self.informative_info.loc[indices]
+        if labels is not None:
+            data_subset = data_subset[labels]
+        if use_brueser_hr:
+            # data_subset = data_subset[~np.isclose(data_subset['sqi_hr_error'], 667)]
+            return np.mean(data_subset['sqi_hr_diff_rel'])
+        # data_subset = data_subset[~np.isclose(data_subset['error'], 667)]
+        return np.mean(data_subset['error'])
+
+    def get_unusable_percentage(self, indices, labels=None, informative_only=False, use_brueser_hr=True):
+        data_subset = self.informative_info.loc[indices]
+        if labels is not None:
+            data_subset = data_subset[labels]
+        if use_brueser_hr:
+            unusable = data_subset[np.isclose(data_subset['sqi_hr_diff_rel'], 677)]
         else:
             unusable = data_subset[data_subset['quality_class'] == 0]
-        return 100 / len(data_subset.index) * len(unusable)
+        if informative_only:
+            all_length = len(data_subset.index)
+        else:
+            all_length = len(indices)
+        return 100 / all_length * len(unusable)
 
-    def get_percent_coverage(self, threshold, indices, labels=None):
+    def get_5percent_coverage(self, indices, labels=None, informative_only=False, use_brueser_hr=True):
+        return self.get_percent_coverage(5, indices, labels, informative_only, use_brueser_hr)
+
+    def get_10percent_coverage(self, indices, labels=None, informative_only=False, use_brueser_hr=True):
+        return self.get_percent_coverage(10, indices, labels, informative_only, use_brueser_hr)
+
+    def get_15percent_coverage(self, indices, labels=None, informative_only=False, use_brueser_hr=True):
+        return self.get_percent_coverage(15, indices, labels, informative_only, use_brueser_hr)
+
+    def get_20percent_coverage(self, indices, labels=None, informative_only=False, use_brueser_hr=True):
+        return self.get_percent_coverage(20, indices, labels, informative_only, use_brueser_hr)
+
+    def get_percent_coverage(self, threshold, indices, labels=None, informative_only=False, use_brueser_hr=True):
         data_subset = self.informative_info.loc[indices]
         if labels is not None:
             data_subset = data_subset[labels]
-            covered = data_subset[np.logical_or(data_subset['sqi_hr_diff_rel'] < threshold,
-                                                data_subset['sqi_hr_diff_abs'] < threshold/2)]
+        if use_brueser_hr:
+            covered = data_subset[data_subset['sqi_hr_error'] < threshold]
         else:
-            covered = data_subset[np.logical_or(data_subset['rel_err'] < threshold, data_subset['abs_err']
-                                                < threshold / 2)]
-        return 100 / len(data_subset.index) * len(covered)
+            covered = data_subset[data_subset['error'] < threshold]
+        if informative_only:
+            all_length = len(data_subset.index)
+        else:
+            all_length = len(indices)
+        return 100 / all_length * len(covered)
 
 
 class PinoMinMaxStd(QualityEstimator):
@@ -215,9 +356,11 @@ class PinoMinMaxStd(QualityEstimator):
         super(PinoMinMaxStd, self).__init__(segment_length, overlap_amount, hr_threshold, data_folder=data_folder)
 
     def _load_segments(self):
-        path_hr = utils.get_pino_features_csv_path(self.data_folder, self.segment_length, self.overlap_amount, self.hr_threshold)
+        path_hr = utils.get_pino_features_csv_path(self.data_folder, self.segment_length, self.overlap_amount,
+                                                   self.hr_threshold)
         if not os.path.isfile(path_hr):
-            path = utils.get_pino_features_csv_path(self.data_folder, self.segment_length, self.overlap_amount)  # other threshold?
+            path = utils.get_pino_features_csv_path(self.data_folder, self.segment_length,
+                                                    self.overlap_amount)  # other threshold?
             if os.path.isfile(path):
                 data = pd.read_csv(path, index_col=False)
                 warnings.warn('Labels are recalculated')
@@ -248,16 +391,19 @@ class MLStatisticalEstimator(QualityEstimator):
     def __init__(self, path, segment_length=10, overlap_amount=0.9, hr_threshold=10, data_folder='data_patients'):
         super(MLStatisticalEstimator, self).__init__(segment_length, overlap_amount, hr_threshold, data_folder)
         if os.path.isfile(os.path.join(utils.get_grid_params_path(self.data_folder), path, 'fitted_model.sav')):
-            with open(os.path.join(utils.get_grid_params_path(self.data_folder), path, 'fitted_model.sav'), 'rb') as file:
+            with open(os.path.join(utils.get_grid_params_path(self.data_folder), path, 'fitted_model.sav'),
+                      'rb') as file:
                 grid_search = pickle.load(file)
                 self.model = grid_search.best_estimator_
         else:
             raise Exception("No model found at given path")
 
     def _load_segments(self):
-        path_hr = utils.get_statistical_features_csv_path(self.data_folder, self.segment_length, self.overlap_amount, self.hr_threshold)
+        path_hr = utils.get_statistical_features_csv_path(self.data_folder, self.segment_length, self.overlap_amount,
+                                                          self.hr_threshold)
         if not os.path.isfile(path_hr):
-            path = utils.get_statistical_features_csv_path(self.data_folder, self.segment_length, self.overlap_amount)  # other threshold?
+            path = utils.get_statistical_features_csv_path(self.data_folder, self.segment_length,
+                                                           self.overlap_amount)  # other threshold?
             if os.path.isfile(path):
                 data = pd.read_csv(path, index_col=False)
                 warnings.warn('Labels are recalculated')
@@ -282,4 +428,6 @@ class MLStatisticalEstimator(QualityEstimator):
 
 
 if __name__ == "__main__":
+    brueser = BrueserSingleSQI()
+    brueser.print_model_test_report()
     pass
