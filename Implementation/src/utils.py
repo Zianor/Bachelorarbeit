@@ -2,6 +2,8 @@ from pathlib import Path
 import os
 
 from scipy.signal import lfilter, butter
+import numpy as np
+import matplotlib.pyplot as plt
 
 
 def get_project_root() -> Path:
@@ -170,4 +172,24 @@ def get_plt_big_size():
     width = 426.8 / 72.27
     height = width / 1.618
     return width, height
+
+
+def bland_altman_plot(hr1, hr2, title=None):
+    hr1 = np.asarray(hr1)
+    hr2 = np.asarray(hr2)
+    mean = np.mean([hr1, hr2], axis=0)
+    diff = hr1 - hr2  # Difference between data1 and data2
+    md = np.mean(diff)  # Mean of the difference
+    sd = np.std(diff, axis=0)  # Standard deviation of the difference
+
+    plt.figure(figsize=(get_plt_big_size()))
+
+    plt.scatter(mean, diff, s=1.0)
+    plt.axhline(md, color='gray', linestyle='--')
+    plt.axhline(md + 1.96 * sd, color='gray', linestyle='--')
+    plt.axhline(md - 1.96 * sd, color='gray', linestyle='--')
+    plt.xlabel("$0.5 * (hr\\textsubscript{ECG} + hr\\textsubscript{BCG})$")
+    plt.ylabel("${ecg_{hr} - bcg_{hr}}$")
+    if title is not None:
+        plt.title(title)
 
