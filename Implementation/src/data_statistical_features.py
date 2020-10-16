@@ -582,8 +582,17 @@ class SegmentOwn(SegmentStatistical):
                 correlations[i] = 0
             else:
                 heartbeat = series.bcg.filtered_data[peak_location: int(peak_location + interval_length)]
-                curr_corr = correlate(template, heartbeat, method='auto')
-                correlations[i] = np.sum(curr_corr) / len(curr_corr)
+                try:
+                    curr_corr = correlate(template, heartbeat, method='auto')
+                    correlations[i] = np.sum(curr_corr) / len(curr_corr)
+                except:
+                    print(template)
+                    print(heartbeat)
+                    print(self.interval_lengths)
+                    print(peak_location)
+                    import traceback
+                    traceback.print_exc()
+                    SystemExit(-1)
         return correlations
 
     @staticmethod

@@ -66,8 +66,10 @@ class BCGSeries:
         return self.filtered_data[start:end]
 
     def get_interval_lengths(self, start, end):
-        """Returns estimated interval lengths in given window"""
+        """Returns estimated interval lengths in given window. Filters for NaN values in SQI"""
         indices = np.where(np.logical_and(start <= self.unique_peaks, self.unique_peaks < end))
+        interval_lengths = self.medians[indices]
+        interval_lengths = interval_lengths[np.argwhere(~np.isnan(self.sqi[indices]))]
         return self.medians[indices]
 
     def get_coverage(self, start, end):
@@ -210,7 +212,7 @@ class DataSeries:
         sqis = self.bcg.get_sqi_array(bcg_start, bcg_end)
         interval_lengths = self.bcg.get_interval_lengths(bcg_start, bcg_end)
         if len(np.isfinite(sqis) > 0):
-            max_id = np.argmax(sqis)
+            max_id = np.nanargmax(sqis)
             return self.bcg.filtered_data[idx[max_id]:int(idx[max_id] + interval_lengths[max_id])]
         return None
 
@@ -222,7 +224,7 @@ class DataSeries:
         interval_lengths = self.bcg.get_interval_lengths(bcg_start, bcg_end)
         if len(np.isfinite(sqis) > 0):
             median_id = np.argpartition(interval_lengths, len(interval_lengths) // 2)[len(interval_lengths) // 2]
-            if np.isfinite(interval_lengths[median_id]):
+            if np.isfinite(interval_lengths[median_id]) and interval_lengths[median_id] > 0:
                 return self.bcg.filtered_data[idx[median_id]:int(idx[median_id] + interval_lengths[median_id])]
         return None
 

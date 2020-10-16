@@ -18,7 +18,7 @@ from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 
 from data_statistical_features import DataSet, Segment, DataSetStatistical
-import utils as utils
+import utils
 
 
 def load_data(segment_length=10, overlap_amount=0.9, hr_threshold=10):
@@ -360,7 +360,7 @@ def reconstruct_models_paper(paths, grid_search: bool, patient_cv: bool, hr_thre
 
 def get_all_scores(reconstruct: bool, paths, data_folder='data_patients'):
     if reconstruct:
-        reconstruct_models_paper(grid_search=False)
+        reconstruct_models_paper(paths=paths, grid_search=False, patient_cv=True)
     score_dict = {}
     filename = 'score.json'
     clf_names = ['LDA', 'DT', 'RF', 'MLP', 'SVM']
@@ -378,5 +378,5 @@ def get_all_scores(reconstruct: bool, paths, data_folder='data_patients'):
 
 if __name__ == "__main__":
     paths_patient_cv = ['LDA_hr10', 'DT_hr10', 'RF_hr10', 'MLP_hr10', 'SVC_hr10']
-    reconstruct_models_paper(paths=paths_patient_cv, grid_search=False, patient_cv=True, hr_threshold=10)
+    reconstruct_models_paper(paths=paths_patient_cv, grid_search=True, patient_cv=True, hr_threshold=10)
     SystemExit(0)
