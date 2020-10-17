@@ -17,18 +17,29 @@ Zunächst werden die in Kapitel \ref{artefakterkennung} beschriebenen existieren
 
 \subsection{Ähnlichkeit der Intervallschätzer des CLIE-Algorithmus}
 
-Der \ac{SQI}, der die Ähnlichkeit der Intervallschätzer des \ac{CLIE}-Algorithmus angibt, wird im Normalfall herzschlagweise angewendet. Da die Datenannotion nur bereichsweise vorgenommen werden kann, wurde entschieden, ein Segment als informativ zu klassifizieren, wenn mit den Herzschlägen, deren \ac{SQI} über einem Schwellwert $q_{th}$ liegt, eine Coverage von über 80\,\% auf dem Segment erreicht wird. Zum Testen des Algorithmus wurde unter anderem $q_{th} = 0{,}4$ gewählt, da dieser Wert auch von \citeauthor{Zink2017} verwendet wird. Zusätzlich wurden $q_{th} = 0{,}3$ und $q_{th} = 0{,}2$ untersucht, um den Einfluss von $q_{th}$ einzuordnen. Bei der Berechnung der Merkmale werden für jedes Segment die detektierten Herzschläge extrahiert, deren \ac{SQI} über $q_{th}$ liegt. Auf Basis dieser Intervalllängen wird wie in Kapitel \ref{annotation} beschrieben die Herzrate, im Folgenden $HR\textsubscript{SQI}$ genannt, ermittelt. Extrahierte Merkmale sind damit in diesem Fall $HR\textsubscript{SQI}$ und die Coverage $C\textsubscript{SQI}$.
+Der \ac{SQI}, der die Ähnlichkeit der Intervallschätzer des \ac{CLIE}-Algorithmus angibt, wird im Normalfall herzschlagweise angewendet. Da die Datenannotion nur bereichsweise vorgenommen werden kann, wurde entschieden, ein Segment als informativ zu klassifizieren, wenn mit den Herzschlägen, deren \ac{SQI} über einem Schwellwert $q_{th}$ liegt, eine Coverage über einem gegebenen Schwellwert $c_{th}$ auf dem Segment erreicht wird. Getestete Schwellwerte sind 50\,\%, 75\,\% und 80\,\%. Zum Testen des Algorithmus wurde unter anderem $q_{th} = 0{,}4$ gewählt, da dieser Wert auch von \citeauthor{Zink2017} verwendet wird. Zusätzlich wurden $q_{th} = 0{,}3$ und $q_{th} = 0{,}2$ untersucht, um den Einfluss von $q_{th}$ einzuordnen. Bei der Berechnung der Merkmale werden für jedes Segment die detektierten Herzschläge extrahiert, deren \ac{SQI} über $q_{th}$ liegt. Auf Basis dieser Intervalllängen wird wie in Kapitel \ref{annotation} beschrieben die Herzrate, im Folgenden $HR\textsubscript{SQI}$ genannt, ermittelt. Extrahierte Merkmale sind damit in diesem Fall $HR\textsubscript{SQI}$ und die Coverage $C\textsubscript{SQI}$. Für die Auswertung muss beachtet werden, dass sich die ermittelte Herzrate durch Anwendung des Algorithmus verändert. Diese wird aufgrund der Vergleichbarkeit nicht für die Berechnung des \ac{MAE} des Algorithmus verwendet.
 
- % q_{th}=0{,}4
- \begin{figure}
+In Abbildung \ref{fig:brueser-sqi-MAE-Coverage} wird sichtbar, dass die Wahl der Schwellwerte großen Einfluss auf das Ergebnis hat und in jedem Fall Genauigkeit gegen Coverage eingetauscht wird. Auch ist deutlich, dass die Accuracy der Klassifikation mit mit Werten knapp über 0{,}6 nicht gut ist. Des Weiteren ist die Coverage bei verhältnismäßig kleineren \ac{MAE} sehr niedrig ist.
+ 
+  \begin{figure}[H]
  	\centering
- 	\begin{tabular}{l || c | c | c }
- 					& insgesamt	& annotiert		& klassifiziert	\\ \hline
- 		\ac{MAE} 	& 20{,}18	& 3{,}18			& 11{,}48		\\
- 		Coverage	& -			& 43{,}22\,\%	& 10{,}46\,\%	\\
+ 	\begin{tabular}{l || c | c | c}
+ 									& \ac{MAE}	& Coverage		& Accuracy\\ \hline
+ 		insgesamt 					& 20{,}18	& -				& \\
+ 		annotiert					& 3{,}18		& 43{,}22\,\%	& \\ \hline
+ 		$q_{th}=0{,}4, c_{th}=50$	& 11{,}59	& 20{,}95\,\%	& 0{,}65\\
+ 		$q_{th}=0{,}4, c_{th}=75$	& 9{,}33		& 11{,}78\,\%	& 0{,}63\\
+ 		$q_{th}=0{,}4, c_{th}=100$	& 8{,}69		& 5{,}26\,\%		& 0{,}60\\ \hline
+ 		$q_{th}=0{,}3, c_{th}=50$	& 20{,}12	& 58{,}73\,\%	& 0{,}55\\
+ 		$q_{th}=0{,}3, c_{th}=75$	& 17{,}10	& 37{,}87\,\%	& 0{,}62\\
+ 		$q_{th}=0{,}3, c_{th}=100$	& 13{,}05	& 19{,}25\,\%	& 0{,}63\\ \hline
+ 		$q_{th}=0{,}2, c_{th}=75$	& 20{,}29	& 96{,}43\,\%	& 0{,}44\\
  	\end{tabular}
- 	\caption[Fehler und Coverage der Klassifikation nach der Ähnlichkeit der Intervallschätzer des CLIE-Algorithmus mit $q_{th}=0{,}4$ im Vergleich zum gesamten Signal und der Annotation]{Fehler und Coverage der Klassifikation nach der Ähnlichkeit der Intervallschätzer des CLIE-Algorithmus mit $q_{th}=0{,}4$ im Vergleich zum gesamten Signal und der Annotation}
- \end{figure}
+ 	\caption[Fehler und Coverage der Klassifikation nach der Ähnlichkeit der Intervallschätzer des CLIE-Algorithmus für verschiedene Schwellwerte im Vergleich zum gesamten Signal und der Annotation]{Fehler und Coverage für verschiedene Schwellwerte im Vergleich zum gesamten Signal und der Annotation}
+ 	\label{fig:brueser-sqi-MAE-Coverage}
+ 	\end{figure}
+ 	
+ Die detailliertere Evaluation wird die Schwellwerte $q_{th} = 0.4$ und $q_{th}$ mit $c_{th}=75$ vorgestellt.
 
 \begin{itemize}
 	\item sehr gute Genauigkeit der erkannten Herzschläge
