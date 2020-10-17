@@ -14,7 +14,7 @@ from sklearn.model_selection import train_test_split, cross_val_score, GridSearc
 from sklearn.neural_network import MLPClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
-from sklearn.svm import SVC
+from sklearn.svm import SVC, LinearSVC
 from sklearn.tree import DecisionTreeClassifier
 
 from data_statistical_features import DataSet, Segment, DataSetStatistical
@@ -86,7 +86,8 @@ def get_svm_grid_params():
     """
     parameters = {
         'clf__kernel': ('linear', 'rbf', 'sigmoid'),
-        'clf__C': np.logspace(0.1, 1, 10),
+        'clf__gamma': [0.1, 1],
+        'clf__C': [0.1, 1, 10],
         'clf__class_weight': (None, 'balanced')
     }
     # create pipeline for standardization
@@ -103,7 +104,7 @@ def get_linear_svc_grid_params():
         'clf__class_weight': [None, 'balanced']
     }
     pipe = Pipeline(
-        steps=[('scaler', StandardScaler()), ('trans', Nystroem(random_state=1)), ('clf', SVC(random_state=1))])
+        steps=[('scaler', StandardScaler()), ('trans', Nystroem(random_state=1)), ('clf', LinearSVC(random_state=1, loss='hinge'))])
     return pipe, parameters
 
 
@@ -150,7 +151,7 @@ def get_rf_grid_params():
     }
 
     # create pipeline for standardization
-    pipe = Pipeline([('clf', RandomForestClassifier(random_state=1, n_jobs=-2))])
+    pipe = Pipeline([('clf', RandomForestClassifier(random_state=1))])
 
     return pipe, parameters
 
@@ -295,7 +296,7 @@ def eval_classifier(features, target, patient_id, pipe, grid_folder_name, test_s
     if not grid_search:  # either not loaded or didn't performed yet
         scores = ['accuracy', 'balanced_accuracy', 'f1', 'roc_auc', 'f1_weighted', 'precision', 'recall']
         grid_search = RandomizedSearchCV(estimator=pipe, param_distributions=grid_params, scoring=scores, cv=cv,
-                                         n_jobs=-2, verbose=2, refit=scoring)
+                                         n_jobs=-3, verbose=2, refit=scoring, n_iter=15)
         grid_search.fit(x_g1, y_g1, groups=groups1)
         # save fitted model
         with open(os.path.join(path, model_filename), 'wb') as file:
