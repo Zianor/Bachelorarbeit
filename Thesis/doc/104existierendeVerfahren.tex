@@ -30,7 +30,7 @@ Bei einer ersten Betrachtung von \ac{MAE}, \textit{Coverage} und Accuracy wird s
  		annotiert					& 3{,}28		& 43{,}22\,\%	& - \\ \hline
  		$q_{th}=0{,}4, c_{th}=50$	& 12{,}30	& 20{,}95\,\%	& 0{,}65\\
  		$q_{th}=0{,}4, c_{th}=75$	& 9{,}57		& 11{,}78\,\%	& 0{,}63\\
- 		$q_{th}=0{,}4, c_{th}=100$	& 8{,}76	& 5{,}26\,\%		& 0{,}60\\ \hline
+ 		$q_{th}=0{,}4, c_{th}=100$	& 8{,}76		& 5{,}26\,\%		& 0{,}60\\ \hline
  		$q_{th}=0{,}3, c_{th}=50$	& 21{,}35	& 58{,}73\,\%	& 0{,}55\\
  		$q_{th}=0{,}3, c_{th}=75$	& 17{,}97	& 37{,}87\,\%	& 0{,}62\\
  		$q_{th}=0{,}3, c_{th}=100$	& 13{,}44	& 19{,}25\,\%	& 0{,}63\\ \hline
@@ -60,7 +60,19 @@ Bei einer ersten Betrachtung von \ac{MAE}, \textit{Coverage} und Accuracy wird s
  \end{figure}
  
  % TODO: Visualisierung Coverage
- Außerdem wurde untersucht, wie hoch die \textit{Coverage} unter einem bestimmten Fehler $E\textsubscript{HR}$ auf dem gesamten Signal ist, wenn nur die als informativ klassifizierten Segmente verwendet werden. Hier wird besonders sichtbar, wie niedrig die erreichte \textit{Coverage} ist. So werden mit $q_{th}=0{,}4$ und $c_{th}=75$ nur 5{,}42\,\% \textit{Coverage} für $E\textsubscript{HR} < 5$ erreicht werden, obwohl das ganze Signal 32{,}61\,\% enthält. Mit $q_{th}=0{,}3$ und $c_{th}=75$ sind es immerhin 8{,}82\,\%, aber auch das liegt deutlich unter dem tatsächlichen Wert.
+ Außerdem wurde untersucht, wie hoch die \textit{Coverage} unter einem bestimmten Fehler $E\textsubscript{HR}$ auf dem gesamten Signal ist, wenn nur die als informativ klassifizierten Segmente verwendet werden. Hier wird besonders sichtbar, wie niedrig die erreichte \textit{Coverage} ist. So werden mit $q_{th}=0{,}4$ und $c_{th}=75$ nur 5{,}42\,\% \textit{Coverage} für $E\textsubscript{HR} < 5$ erreicht werden, obwohl das ganze Signal 32{,}61\,\% enthält. Mit $q_{th}=0{,}3$ und $c_{th}=75$ sind es immerhin 8{,}82\,\%, aber auch das liegt deutlich unter dem tatsächlichen Wert. Die Verteilung ist auch in Abbildung \ref{fig:brueser-coverage} gezeigt.
+ 
+ \begin{figure}[H]
+ 	\begin{tabular}{l || c | c | c}
+ 									& insgesamt 		& $q_{th}=0{,}3, c_{th}=75$ & $q_{th}=0{,}4, c_{th}=75$\\\hline
+ 		$E\textsubscript{HR} < 5$ 	&  32{,}61\,\% 	& 8,82\,\% 					& 5,42\,\%	\\
+ 		$E\textsubscript{HR} < 10$ 	&  43{,}22\,\% 	& 15,33\,\% 					& 7,39\,\%	\\
+ 		$E\textsubscript{HR} < 15$ 	&  51{,}66\,\% 	& 20,44\,\% 					& 8,39\,\%	\\
+ 		$E\textsubscript{HR} < 20$ 	&  59{,}40\,\% 	& 24,60\,\% 					& 9,18\,\%\\
+ 	\end{tabular}
+ 	\caption[Coverage unter bestimmten Fehlern $E\textsubscript{HR}$ vor und nach Klassifikation]{Coverage unter bestimmten Fehlern $E\textsubscript{HR}$ vor und nach Klassifikation}
+ 	\label{fig:brueser-coverage}
+ \end{figure}
  
  Alles in allem zeigt sich, dass trotz einer sehr niedrigen erreichten \textit{Coverage} der Fehler in der Klassifikation verhältnismäßig hoch ist. Dieses Verfahren ist also bei dem hier vorliegenden Signal nicht ausreichend. Wenn $q_{th}$ und $c_{th}$ nicht zu niedrig gewählt werden, kann ein Teil des nicht informativen Signals markiert und somit der Fehler in weiterer Verarbeitung insgesamt reduziert werden. 
  
