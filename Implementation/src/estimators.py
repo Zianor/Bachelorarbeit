@@ -105,7 +105,7 @@ class QualityEstimator:
 
     def print_report_informative_signal(self, test_indices, y_pred, path=None):
         print("\n Anteil bestimmter Fehler auf informativem Signal")
-        self.print_report_coverage(test_indices, y_pred, name="Informatives Signal", path=path)
+        self.print_report_coverage(test_indices, y_pred, name="Informativ klassifiziertes Signal", path=path)
         # TODO: plot
 
     def print_report_coverage(self, test_indices, y_pred, name=None, path=None):
@@ -354,7 +354,7 @@ class BrueserSingleSQI(QualityEstimator):
             # data_subset = data_subset[~np.isclose(data_subset['sqi_hr_error'], 667)]
             return np.mean(data_subset['sqi_hr_diff_abs'])
         # data_subset = data_subset[~np.isclose(data_subset['error'], 667)]
-        return np.mean(data_subset['error'])
+        return np.mean(data_subset['abs_err'])
 
     def get_mean_error_rel(self, indices, labels=None, use_brueser_hr=False):
         data_subset = self.informative_info.loc[indices]
@@ -364,7 +364,7 @@ class BrueserSingleSQI(QualityEstimator):
             # data_subset = data_subset[~np.isclose(data_subset['sqi_hr_error'], 667)]
             return np.mean(data_subset['sqi_hr_diff_rel'])
         # data_subset = data_subset[~np.isclose(data_subset['error'], 667)]
-        return np.mean(data_subset['error'])
+        return np.mean(data_subset['rel_err'])
 
     def get_unusable_percentage(self, indices, labels=None, informative_only=False, use_brueser_hr=False):
         data_subset = self.informative_info.loc[indices]
@@ -380,19 +380,19 @@ class BrueserSingleSQI(QualityEstimator):
             all_length = len(indices)
         return 100 / all_length * len(unusable)
 
-    def get_5percent_coverage(self, indices, labels=None, informative_only=False, use_brueser_hr=True):
+    def get_5percent_coverage(self, indices, labels=None, informative_only=False, use_brueser_hr=False):
         return self.get_percent_coverage(5, indices, labels, informative_only, use_brueser_hr)
 
-    def get_10percent_coverage(self, indices, labels=None, informative_only=False, use_brueser_hr=True):
+    def get_10percent_coverage(self, indices, labels=None, informative_only=False, use_brueser_hr=False):
         return self.get_percent_coverage(10, indices, labels, informative_only, use_brueser_hr)
 
-    def get_15percent_coverage(self, indices, labels=None, informative_only=False, use_brueser_hr=True):
+    def get_15percent_coverage(self, indices, labels=None, informative_only=False, use_brueser_hr=False):
         return self.get_percent_coverage(15, indices, labels, informative_only, use_brueser_hr)
 
-    def get_20percent_coverage(self, indices, labels=None, informative_only=False, use_brueser_hr=True):
+    def get_20percent_coverage(self, indices, labels=None, informative_only=False, use_brueser_hr=False):
         return self.get_percent_coverage(20, indices, labels, informative_only, use_brueser_hr)
 
-    def get_percent_coverage(self, threshold, indices, labels=None, informative_only=False, use_brueser_hr=True):
+    def get_percent_coverage(self, threshold, indices, labels=None, informative_only=False, use_brueser_hr=False):
         data_subset = self.informative_info.loc[indices]
         if labels is not None:
             data_subset = data_subset[labels]
@@ -421,7 +421,7 @@ class PinoMinMaxStd(QualityEstimator):
             if os.path.isfile(path):
                 data = pd.read_csv(path, index_col=False)
                 warnings.warn('Labels are recalculated')
-                data['informative'] = data['rel_err'] < self.hr_threshold
+                data['informative'] = data['error'] < self.hr_threshold
                 data.to_csv(path_hr, index=False)
             else:
                 warnings.warn('No csv, data needs to be reproduced. This may take some time')
@@ -464,7 +464,7 @@ class MLStatisticalEstimator(QualityEstimator):
             if os.path.isfile(path):
                 data = pd.read_csv(path, index_col=False)
                 warnings.warn('Labels are recalculated')
-                data['informative'] = data['rel_err'] < self.hr_threshold
+                data['informative'] = data['error'] < self.hr_threshold
                 data.to_csv(path_hr, index=False)
             else:
                 warnings.warn('No csv, data needs to be reproduced. This may take some time')
