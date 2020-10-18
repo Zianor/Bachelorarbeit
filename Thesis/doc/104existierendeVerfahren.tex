@@ -40,7 +40,23 @@ Bei einer ersten Betrachtung von \ac{MAE}, \textit{Coverage} und Accuracy wird s
  	\label{fig:brueser-sqi-MAE-Coverage}
  	\end{figure}
  	
- Die detailliertere Evaluation wird beispielhaft für die Schwellwerte $q_{th} = 0.4$ und $q_{th} = 0.3$ mit $c_{th}=75$ vorgestellt. Positiv hervorzuheben ist, dass bei beiden kein Signal als informativ klassifiziert wird, bei denen $E\textsubscript{HR}$ maximal ist. Allerdings ist bei über 20\,\% der mit $q_{th} = 0.4$ als informativ klassifizierten Segmenten $E\textsubscript{HR}$ größer als 20, mit $q_{th} = 0.3$ bei sogar mehr als 35\,\%. Die Verteilung von $E\textsubscript{HR}$ auf informativ klassifizierten Segmenten ist in Abbildung \ref{fig:brueser-positives} abgebildet.
+ Die detailliertere Evaluation wird beispielhaft für die Schwellwerte $q_{th} = 0.4$ und $q_{th} = 0.3$ mit $c_{th}=75$ vorgestellt. Positiv hervorzuheben ist, dass bei beiden kein Signal als informativ klassifiziert wird, bei denen $E\textsubscript{HR}$ maximal ist. Allerdings ist bei über 20\,\% der mit $q_{th} = 0.4$ als informativ klassifizierten Segmenten $E\textsubscript{HR}$ größer als 20, mit $q_{th} = 0.3$ bei sogar mehr als 35\,\%, wie auch in Abbildung\ref{fig:brueser-positives} abgebildet. Das bedeutet, dass Falschklassifikationen nicht nur im Randbereich vorkommen. Dies wird noch deutlicher, wenn man sich \ac{MAE} auf jeweils auf den Falsch-Positiven und Falsch-Negativen anschaut. So beträgt der \ac{MAE} für falsch-negative Segmente 3,64, ist also nah an dem \ac{MAE} aller informativen Segmente von 3,28.
+ 
+%  \begin{figure}[H]
+% 	\centering
+%		\begin{subfigure}{.45\textwidth}
+%			\centering
+% 			\includegraphics[scale=0.7]{pic/brueser04-bland-altman-inf.pdf}
+% 			\caption[$q_{th}=0.4$]{$q_{th}=0.4$}
+% 		\end{subfigure}
+%    	\begin{subfigure}{.45\textwidth}
+%    		\centering
+% 			\includegraphics[scale=0.7]{pic/brueser04-bland-altman-fn.pdf}
+% 			\caption[$q_{th}=0.4$]{$q_{th}=0.4$}
+%		\end{subfigure}
+% 	\caption[Verteilung von $E\textsubscript{HR}$ bei den als informativ klassifizierten Segmenten]{Verteilung von $E\textsubscript{HR}$ bei den als informativ klassifizierten Segmenten}
+% 	\label{fig:brueser-positives}
+% \end{figure}
  
  
  \begin{figure}[H]
@@ -63,7 +79,8 @@ Bei einer ersten Betrachtung von \ac{MAE}, \textit{Coverage} und Accuracy wird s
  Außerdem wurde untersucht, wie hoch die \textit{Coverage} unter einem bestimmten Fehler $E\textsubscript{HR}$ auf dem gesamten Signal ist, wenn nur die als informativ klassifizierten Segmente verwendet werden. Hier wird besonders sichtbar, wie niedrig die erreichte \textit{Coverage} ist. So werden mit $q_{th}=0{,}4$ und $c_{th}=75$ nur 5{,}42\,\% \textit{Coverage} für $E\textsubscript{HR} < 5$ erreicht werden, obwohl das ganze Signal 32{,}61\,\% enthält. Mit $q_{th}=0{,}3$ und $c_{th}=75$ sind es immerhin 8{,}82\,\%, aber auch das liegt deutlich unter dem tatsächlichen Wert. Die Verteilung ist auch in Abbildung \ref{fig:brueser-coverage} gezeigt.
  
  \begin{figure}[H]
- 	\begin{tabular}{l || c | c | c}
+ 	\centering
+  	\begin{tabular}{l || c | c | c}
  									& insgesamt 		& $q_{th}=0{,}3, c_{th}=75$ & $q_{th}=0{,}4, c_{th}=75$\\\hline
  		$E\textsubscript{HR} < 5$ 	&  32{,}61\,\% 	& 8,82\,\% 					& 5,42\,\%	\\
  		$E\textsubscript{HR} < 10$ 	&  43{,}22\,\% 	& 15,33\,\% 					& 7,39\,\%	\\
@@ -88,6 +105,8 @@ Die Tests mit beiden Segmentlängen zeigen, dass dieses Verfahren nicht nutzbar 
 \subsection{Maschinelles Lernen mittels statistischer Merkmale}
 
 Für das maschinellen Lernen mittels statistischer Merkmale werden die in Kapital \ref{ml-beschreibung} aufgezählten Merkmale extrahiert. Als Bibliothek für die Modelle des maschinellen Lernes wird \textit{scikit-learn}\footcite[]{scikit-learn} verwendet. Da die Daten sich grundlegend von den von \citeauthor{Sadek2016} untersuchten unterscheidet, werden die Hyperparameter der Modelle im Zuge dieser Arbeit erneut optimiert. Bei der dafür durchgeführten Kreuzvalidierung wird wie schon bei der Unterteilung in Trainings- und Validierungsset anhand der Patient*innen-ID geteilt, damit auch diese aussagekräftige Ergebnisse liefert.
+
+Insgesamt zeigen bereits Accuracy und \ac{MAE} eindeutig, dass
 
 \section{Datenanalyse und Merkmalskonstruktion}
 
