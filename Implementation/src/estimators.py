@@ -85,9 +85,9 @@ class QualityEstimator:
             all_length = len(indices)
         return 100 / all_length * len(covered)
 
-    def plot_bland_altman(self, indices, title=None):
+    def plot_bland_altman(self, indices, title=None, color=None):
         utils.bland_altman_plot(self.informative_info.loc[indices, 'ecg_hr'],
-                                self.informative_info.loc[indices, 'bcg_hr'], title=title)
+                                self.informative_info.loc[indices, 'bcg_hr'], title=title, color=color)
 
     def print_report_all_signal(self, test_indices, y_pred):
         print("\n Coverage bestimmter Fehler des genutzten Signals auf Gesamtsignal")
@@ -144,10 +144,10 @@ class QualityEstimator:
         test_indices = x2.index
 
         fp_indices = y_true[np.logical_and(~y_true, y_pred)].index
-        fp_labels = y_pred[fp_indices]
+        fp_labels = y_pred.loc[fp_indices]
 
         fn_indices = y_true[np.logical_and(y_true, ~y_pred)].index
-        fn_labels = y_pred[fn_indices]
+        fn_labels = y_pred.loc[fn_indices]
 
         class_names = ['non-informative', 'informative']
         plt.figure(figsize=utils.get_plt_normal_size())
@@ -181,14 +181,17 @@ class QualityEstimator:
         else:
             file = None
         self.print_report_informative_signal(test_indices, y_pred, path=file)
-        self.plot_bland_altman(test_indices[y_pred], "Informativ klassifiziert")
+        p_indices = test_indices[y_pred]
+        is_tp = np.logical_and(y_true.loc[p_indices], y_pred.loc[p_indices])
+        self.plot_bland_altman(p_indices, "Informativ klassifiziert", color=is_tp)
         if save_title is not None:
             file = save_title + '-bland-altman-inf.pdf'
             file = os.path.join(utils.get_thesis_pic_path(), file)
             plt.savefig(file, transparent=True, bbox_inches='tight', dpi=300)
-        self.plot_bland_altman(test_indices[np.logical_and(y_pred, y_true)], "True Positives")
+
+        self.plot_bland_altman(fn_indices, "Falsch-Negative")
         if save_title is not None:
-            file = save_title + '-bland-altman-tp.pdf'
+            file = save_title + '-bland-altman-fn.pdf'
             file = os.path.join(utils.get_thesis_pic_path(), file)
             plt.savefig(file, transparent=True, bbox_inches='tight', dpi=300)
 
@@ -199,13 +202,9 @@ class QualityEstimator:
             file = os.path.join(utils.get_thesis_pic_path(), file)
         else:
             file = None
-        self.print_report_coverage(fp_indices, fp_labels, name="Falsch Positive", path=file)
-        self.plot_bland_altman(fp_indices, "Falsch Positive")
-        if save_title is not None:
-            file = save_title + '-bland-altman-fp.pdf'
-            file = os.path.join(utils.get_thesis_pic_path(), file)
-            plt.savefig(file, transparent=True, bbox_inches='tight', dpi=300)
+        self.print_report_coverage(fp_indices, fp_labels, name="Falsch-Positive", path=file)
         # print(f"Standardabweichung des Fehlers von False Positives: {self.get_mean_error_abs(fp_indices, fp)}")
+
         print("\n False Negatives")
         print(f"Durchschnittlicher Fehler von False Negatives: {self.get_mean_error(fn_indices):.2f}")
         if save_title is not None:
@@ -213,12 +212,7 @@ class QualityEstimator:
             file = os.path.join(utils.get_thesis_pic_path(), file)
         else:
             file = None
-        self.print_report_coverage(fn_indices, ~fn_labels, name="Falsch Negative", path=file)
-        self.plot_bland_altman(fn_indices, title="Falsch Negative")
-        if save_title is not None:
-            file = save_title + '-bland-altman-fn.pdf'
-            file = os.path.join(utils.get_thesis_pic_path(), file)
-            plt.savefig(file, transparent=True, bbox_inches='tight', dpi=300)
+        self.print_report_coverage(fn_indices, ~fn_labels, name="Falsch-Negative", path=file)
 
     def _get_patient_split(self, test_size=0.33):
         patient_ids_1, patient_ids_2 = train_test_split(self.patient_id.unique(), random_state=1, test_size=test_size)
@@ -321,10 +315,6 @@ class BrueserSingleSQI(QualityEstimator):
         data_subset = self.features.loc[x.index]
         labels = data_subset['sqi_coverage'] >= self.coverage_threshold
         return labels
-
-    def plot_bland_altman(self, indices, title=None):
-        utils.bland_altman_plot(self.informative_info.loc[indices, 'ecg_hr'],
-                                self.features.loc[indices, 'sqi_hr'], title=title)
 
     def get_mean_error(self, indices, labels=None, use_brueser_hr=False):
         data_subset = self.informative_info.loc[indices]
