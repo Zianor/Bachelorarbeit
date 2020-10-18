@@ -143,3 +143,4 @@ Implementation/data/*/images/
 *.edf
 *.EDF
 *.set
+.vscode/settings.json
