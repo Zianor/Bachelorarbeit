@@ -290,7 +290,7 @@ class Segment:
             if self.ecg_hr > 50:
                 self.error = self.rel_err
             else:
-                self.error = self.abs_err / 2
+                self.error = self.abs_err / 0.5
         self.quality_class = self.get_quality_class()
 
     def get_quality_class(self):
