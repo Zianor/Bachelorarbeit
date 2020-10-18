@@ -149,6 +149,15 @@ class QualityEstimator:
         fn_indices = y_true[np.logical_and(y_true, ~y_pred)].index
         fn_labels = y_pred.loc[fn_indices]
 
+        print("\n Testset insgesamt")
+        if save_title is not None:
+            file = save_title + '-testset.pdf'
+            file = os.path.join(utils.get_thesis_pic_path(), file)
+        else:
+            file = None
+        all_true = [True for i in range(len(test_indices))]
+        self.print_report_coverage(test_indices, all_true, name="Validierungsset", path=file)
+
         class_names = ['non-informative', 'informative']
         plt.figure(figsize=utils.get_plt_normal_size())
         ConfusionMatrixDisplay(confusion_matrix(y_true, y_pred), display_labels=class_names).plot()
