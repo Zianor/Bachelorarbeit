@@ -174,7 +174,7 @@ def get_plt_big_size():
     return width, height
 
 
-def bland_altman_plot(hr1, hr2, title=None):
+def bland_altman_plot(hr1, hr2, title=None, color=None):
     hr1 = np.asarray(hr1)
     hr2 = np.asarray(hr2)
     mean = np.mean([hr1, hr2], axis=0)
@@ -182,9 +182,18 @@ def bland_altman_plot(hr1, hr2, title=None):
     md = np.mean(diff)  # Mean of the difference
     sd = np.std(diff, axis=0)  # Standard deviation of the difference
 
-    plt.figure(figsize=(get_plt_big_size()))
+    if color is not None:
+        fig, ax = plt.subplots(1, 1, figsize=get_plt_normal_size())
+        label_dict = {True: 'richtig-positiv', False: 'falsch-positiv'}
+        color_dict = {True: 'b', False: 'r'}
+        for g in np.unique(color):
+            ix = np.where(color == g)
+            ax.scatter(mean[ix], diff[ix], c=color_dict[g], label=label_dict[g], s=1.0)
+        plt.legend()
+    else:
+        plt.figure(figsize=get_plt_normal_size())
+        plt.scatter(mean, diff, s=1.0, c=color)
 
-    plt.scatter(mean, diff, s=1.0)
     plt.axhline(md, color='gray', linestyle='--')
     plt.axhline(md + 1.96 * sd, color='gray', linestyle='--')
     plt.axhline(md - 1.96 * sd, color='gray', linestyle='--')
