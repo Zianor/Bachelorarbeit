@@ -379,5 +379,5 @@ def get_all_scores(reconstruct: bool, paths, data_folder='data_patients'):
 
 if __name__ == "__main__":
     paths_patient_cv = ['LDA_hr10', 'DT_hr10', 'RF_hr10', 'MLP_hr10', 'SVC_hr10']
-    reconstruct_models_paper(paths=paths_patient_cv, grid_search=True, patient_cv=True, hr_threshold=10)
+    reconstruct_models_paper(paths=paths_patient_cv, grid_search=False, patient_cv=True, hr_threshold=10)
     SystemExit(0)
