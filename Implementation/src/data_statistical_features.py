@@ -540,11 +540,19 @@ class SegmentOwn(SegmentStatistical):
             peak_locations = series.bcg.get_unique_peak_locations(start, end)
             for i, peak_location in enumerate(peak_locations):
                 interval_length = self.interval_lengths[i]
+                curr_end = int(peak_location - start + interval_length)
+                if curr_end > end - start:
+                    curr_end = end - start
                 curr_interval_data = self.filtered_data[
-                                     peak_locations - start: peak_locations - start + interval_length]
-                self.interval_means[i] = np.mean(curr_interval_data)
-                self.interval_stds[i] = np.std(curr_interval_data)
-                self.interval_ranges[i] = np.max(curr_interval_data) - np.min(curr_interval_data)
+                                     int(peak_location - start): ]
+                if len(curr_interval_data) > 0:
+                    self.interval_means[i] = np.mean(curr_interval_data)
+                    self.interval_stds[i] = np.std(curr_interval_data)
+                    self.interval_ranges[i] = np.max(curr_interval_data) - np.min(curr_interval_data)
+                else:
+                    self.interval_means[i] = np.nan
+                    self.interval_stds[i] = np.nan
+                    self.interval_ranges[i] = np.nan
 
             self.interval_means_std = np.std(self.interval_means)
             self.interval_stds_std = np.std(self.interval_stds)
@@ -701,12 +709,12 @@ class SegmentOwn(SegmentStatistical):
 
 
 if __name__ == "__main__":
-    DataSet()
-    # DataSetOwn()
-    DataSetStatistical()
-    DataSetPino()
-    DataSetPino(4, 0.75)
-    DataSetBrueser()
-    DataSetBrueser(sqi_threshold=0.3)
-    DataSetBrueser(sqi_threshold=0.2)
+    # DataSet()
+    DataSetOwn()
+    # DataSetStatistical()
+    # DataSetPino()
+    # DataSetPino(4, 0.75)
+    # DataSetBrueser()
+    # DataSetBrueser(sqi_threshold=0.3)
+    # DataSetBrueser(sqi_threshold=0.2)
     pass
