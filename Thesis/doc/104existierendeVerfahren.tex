@@ -168,32 +168,32 @@ Bei einer ähnlich hohen Coverage wie der Annotation ist der deutlich höhere \a
 
 Obwohl keines der Verfahren für die vorliegenden Daten zufriedenstellende Ergebnisse erzielt, ist besonders bei den Modellen maschinellen Lernens interessant, welchen Einfluss und welchen Informationsgewinn die jeweiligen Merkmale haben bzw. liefern. Aus diesem Grund wird im Folgenden eine explorative Datenanalyse durchgeführt.
 
-Zunächst wird betrachtet, ob die Merkmale untereinander und mit $E\textsubscript{HR}$ und der Annotation korreliert sind. Da die Merkmale das Segment gemeinschaftlich statistisch beschreiben ist eine hohe Korrelation untereinander erwartet und zeigt sich auch. Eine Ausnahme bilden Kurtosis, Mittelwert und Schiefe. Außerdem zeigt sich bei der Betrachtung des in Abbildung \ref{fig:corr-heatmap-statistical} abgebildeten Korrelationsdiagramm, dass die Korrelation zu $E\textsubscript{HR}$ und der Annotation nicht signifikant ist. Auch bei paarweiser Visualisierung zeigt sich, dass sich anhand keines untersuchten Merkmalspaares informative von nicht informativen unterscheiden lassen.
+Zunächst wird betrachtet, ob die Merkmale untereinander und mit $E\textsubscript{HR}$ und der Annotation korreliert sind. Da die Merkmale das Segment gemeinschaftlich statistisch beschreiben ist eine hohe Korrelation untereinander erwartet und zeigt sich auch. Eine Ausnahme bilden Kurtosis, Mittelwert und Schiefe. Die Anzahl der Nulldurchgänge ist ebenfalls nur schwächer mit den restlichen Mermalen korreliert. Außerdem zeigt sich bei der Betrachtung des in Abbildung \ref{fig:corr-heatmap-statistical} abgebildeten Korrelationsdiagramm, dass die Korrelation zu $E\textsubscript{HR}$ und der Annotation nicht signifikant ist. Auch bei paarweiser Visualisierung zeigt sich, dass sich anhand keines untersuchten Merkmalspaares informative von nicht informativen unterscheiden lassen.
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[scale=0.85]{pic/corr-heatmap-statistical.pdf}
+	\includegraphics[scale=0.95]{pic/corr-heatmap-statistical.pdf}
 	\caption{Korrelationsdiagramm der statistischen Merkmale, $E\textsubscript{HR}$ und der binären Annotation}
 	\label{fig:corr-heatmap-statistical}
 \end{figure}
 
-Da die Visualisierung hochdimensionaler Daten schwierig ist und auch Modelle maschinellen Lernens bei einer hohen Merkmalszahl aufwändiger zu trainieren sind, wurde ebenfalls untersucht, wie sich die Daten bei einer Transformation in einen zweidimensionalen Raum verhalten. Untersuchte Transformationen umfassen sowohl unüberwachte Verfahren wie \ac{PCA} mit verschiedenen Kernel als auch überwachte Verfahren wie eine Dimensionsreduktion mit einer \ac{LDA}. Auch die transformierten Daten lassen sich nicht voneinander trennen, wie auch in Abbildung \ref{fig:dim-red-statistical} beispielhaft für eine \ac{PCA} mit linearem Kernel gezeigt ist.
+Weiteren Einblick ermöglicht die Analyse des \ac{RF}, da bei diesem ermittelt werden kann, wie wichtig die einzelnen Merkmale jeweils für die Entscheidungsfindung sind. Das Ergebnis zeigt, dass der Durchschnitt des Signals deutlich weniger Einfluss als die anderen betrachteten Merkmale hat. Die Schiefe (skewness) und die Anzahl der Nulldurchgänge sind, wie in Abbildung \ref{fig:rf-statistical-importances} sichtbar, die beiden wichtigsten Merkmale. 
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.95]{pic/rf-cl-statistical.pdf}
+	\caption{Wichtigkeit der Merkmale für den \ac{RF}-Klassifikator}
+	\label{fig:rf-statistical-importances}
+\end{figure}
+
+Da die Visualisierung hochdimensionaler Daten schwierig ist und auch Modelle maschinellen Lernens bei einer hohen Merkmalszahl aufwändiger zu trainieren sind, wurde ebenfalls untersucht, wie sich die Daten bei einer Transformation in einen niedriger dimensionierten Raum verhalten. Untersuchte Transformationen umfassen sowohl unüberwachte Verfahren wie eine \ac{PCA} mit verschiedenen Kernel als auch überwachte Verfahren wie eine Dimensionsreduktion mit einer \ac{LDA}. Auch die transformierten Daten lassen sich nicht voneinander trennen, wie auch in Abbildung \ref{fig:dim-red-statistical} beispielhaft für eine \ac{PCA} mit linearem Kernel gezeigt ist.
 
 
  \begin{figure}[H]
  	\centering
- 	\includegraphics[scale=0.6]{pic/statistical-pca-lin.pdf}
+ 	\includegraphics[scale=0.85]{pic/statistical-pca-lin.pdf}
 	\caption{Dimensionsreduktion der statistischen Merkmale mit einer \ac{PCA} mit linearem Kernel}
 	\label{fig:dim-red-statistical}
-\end{figure}
-
-Weiteren Einblick ermöglicht die Analyse des \ac{RF}, da bei diesem ermittelt werden kann, wie wichtig die einzelnen Merkmale jeweils für die Entscheidungsfindung sind. Das Ergebnis zeigt, dass der Durchschnitt des Signals deutlich weniger Einfluss als die anderen betrachteten Merkmale hat. Die Schiefe (skewness) und die Anzahl der Nulldurchläufe sind, wie in Abbildung \ref{fig:rf-statistical-importances} zu sehen, die beiden wichtigsten Merkmale. 
-
-\begin{figure}[H]
-	\centering
-	\includegraphics[scale=0.9]{pic/rf-cl-statistical.pdf}
-	\caption{Wichtigkeit der Merkmale für den \ac{RF}-Klassifikator}
-	\label{fig:rf-statistical-importances}
 \end{figure}
 
 Anhand der statistischen Merkmale kann also keine Klassifikation vorgenommen werden. Vermutlich sorgt die große Variation der in Betten aufgenommenen \ac{BKG}-Signale dafür, dass sich die Signale nicht statistisch verallgemeinern lassen. Auch die reine Betrachtung der Ähnlichkeit der Intervallschätzer ist nicht ausreichend. Es müssen also andere Merkmale gefunden werden, die allein oder ergänzend zu den bereits betrachteten eine Aussage zu der Signalqualität ermöglichen.
