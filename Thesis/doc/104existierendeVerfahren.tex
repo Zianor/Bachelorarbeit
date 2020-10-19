@@ -25,9 +25,9 @@ Zunächst werden die in Kapitel \ref{artefakterkennung} beschriebenen existieren
 \subsection{Ähnlichkeit der Intervallschätzer des CLIE-Algorithmus}
 
 Der \ac{SQI}, der die Ähnlichkeit der Intervallschätzer des \ac{CLIE}-Algorithmus angibt, wird im Normalfall herzschlagweise angewendet. Da die Datenannotion nur bereichsweise vorgenommen werden kann, wurde entschieden, ein Segment als informativ zu klassifizieren, wenn mit den Herzschlägen, deren \ac{SQI} über einem Schwellwert $q_{th}$ liegt, eine Coverage über einem gegebenen Schwellwert $c_{th}$ auf dem Segment erreicht wird. %TODO: evtl kürzen/trennen
-Getestete Schwellwerte für die Coverage sind 50\,\%, 75\,\% und 80\,\%. Zum Testen des Algorithmus wurde unter anderem $q_{th} = 0{,}4$ gewählt, da dieser Wert auch von \citeauthor{Zink2017} verwendet wird.\footcite[]{Zink2017} Zusätzlich wurden $q_{th} = 0{,}3$ und $q_{th} = 0{,}2$ untersucht, um den Einfluss von $q_{th}$ einzuordnen. Bei der Berechnung der Merkmale werden für jedes Segment die detektierten Herzschläge extrahiert, deren \ac{SQI} über $q_{th}$ liegt. Auf Basis dieser Intervalllängen wird wie in Kapitel \ref{annotation} beschrieben die Herzrate, im Folgenden $HR\textsubscript{SQI}$ genannt, ermittelt. Extrahierte Merkmale sind damit in diesem Fall $HR\textsubscript{SQI}$ und die Coverage $C\textsubscript{SQI}$. Für die Auswertung muss beachtet werden, dass sich die ermittelte Herzrate $HR\textsubscript{SQI}$ von der zur Annotation verwendeten Herzrate unterscheidet. Aufgrund der Vergleichbarkeit wird $HR\textsubscript{SQI}$ nicht für die Berechnung des \ac{MAE} des Algorithmus verwendet.
+Getestete Schwellwerte für die Coverage sind 50\,\%, 75\,\% und 100\,\%. Zum Testen des Algorithmus wurde unter anderem $q_{th} = 0{,}4$ gewählt, da dieser Wert auch von \citeauthor{Zink2017} verwendet wird.\footcite[]{Zink2017} Zusätzlich wurden $q_{th} = 0{,}3$ und $q_{th} = 0{,}2$ untersucht, um den Einfluss von $q_{th}$ einzuordnen. Bei der Berechnung der Merkmale werden für jedes Segment die detektierten Herzschläge extrahiert, deren \ac{SQI} über $q_{th}$ liegt. Auf Basis dieser Intervalllängen wird wie in Kapitel \ref{annotation} beschrieben die Herzrate, im Folgenden $HR\textsubscript{SQI}$ genannt, ermittelt. Extrahierte Merkmale sind damit in diesem Fall $HR\textsubscript{SQI}$ und die Coverage $C\textsubscript{SQI}$. Für die Auswertung muss beachtet werden, dass sich die ermittelte Herzrate $HR\textsubscript{SQI}$ von der zur Annotation verwendeten Herzrate unterscheidet. Aufgrund der Vergleichbarkeit wird $HR\textsubscript{SQI}$ nicht für die Berechnung des \ac{MAE} des Algorithmus verwendet.
 
-Bei einer ersten Betrachtung von \ac{MAE}, Coverage und Accuracy wird sichtbar, dass die Wahl der Schwellwerte großen Einfluss auf das Ergebnis hat und in jedem Fall Aussagekraft des Signals gegen Coverage eingetauscht wird. Die genauen Ergebnisse sind in \ref{fig:brueser-sqi-MAE-Coverage} Auch ist deutlich, dass die Accuracy der Klassifikation mit mit Werten knapp über 0{,}6 nicht gut ist. Des Weiteren ist die Coverage bei verhältnismäßig kleineren \ac{MAE} sehr niedrig.
+Bei einer ersten Betrachtung von \ac{MAE}, Coverage und Accuracy wird sichtbar, dass die Wahl der Schwellwerte großen Einfluss auf das Ergebnis hat und in jedem Fall Aussagekraft des Signals gegen Coverage eingetauscht wird. Die genauen Ergebnisse sind in Abbildung \ref{fig:brueser-sqi-MAE-Coverage} Auch ist deutlich, dass die Accuracy der Klassifikation mit mit Werten knapp über 0{,}6 nicht gut ist. Des Weiteren ist die Coverage bei verhältnismäßig kleineren \ac{MAE} sehr niedrig.
  
   \begin{figure}[H]
  	\centering
@@ -47,7 +47,7 @@ Bei einer ersten Betrachtung von \ac{MAE}, Coverage und Accuracy wird sichtbar, 
  	\label{fig:brueser-sqi-MAE-Coverage}
  	\end{figure}
  	
- Die detailliertere Evaluation wird beispielhaft für die Schwellwerte $q_{th} = 0.4$ und $q_{th} = 0.3$ mit $c_{th}=75$ vorgestellt. Positiv hervorzuheben ist, dass bei beiden kein Signal als informativ klassifiziert wird, bei denen $E\textsubscript{HR}$ maximal ist. Allerdings ist bei über 20\,\% der mit $q_{th} = 0.4$ als informativ klassifizierten Segmenten $E\textsubscript{HR}$ größer als 20, mit $q_{th} = 0.3$ bei sogar mehr als 35\,\%, wie auch in Abbildung \ref{fig:brueser-positives} abgebildet. Das bedeutet, dass Falschklassifikationen nicht nur im Randbereich vorkommen. Dies wird noch deutlicher, wenn man sich \ac{MAE} auf jeweils auf den Falsch-Positiven und Falsch-Negativen anschaut. So beträgt der \ac{MAE} für falsch-negative Segmente 3,64, ist also nah an dem \ac{MAE} aller informativen Segmente von 3,28.
+ Die detailliertere Evaluation wird beispielhaft für die Schwellwerte $q_{th} = 0.4$ und $q_{th} = 0.3$ mit $c_{th}=75$ vorgestellt. Positiv hervorzuheben ist, dass bei beiden kein Signal als informativ klassifiziert wird, bei denen $E\textsubscript{HR}$ maximal ist. Allerdings ist bei über 20\,\% der mit $q_{th} = 0.4$ als informativ klassifizierten Segmenten $E\textsubscript{HR}$ größer als 20, mit $q_{th} = 0.3$ bei sogar mehr als 35\,\%, wie auch in Abbildung \ref{fig:brueser-positives} abgebildet. Das bedeutet, dass Falschklassifikationen nicht nur im Randbereich vorkommen. Dies wird noch deutlicher, wenn man sich den \ac{MAE} auf jeweils auf den Falsch-Positiven und Falsch-Negativen anschaut. So beträgt der \ac{MAE} für falsch-negative Segmente 3,64, ist also nah an dem \ac{MAE} aller informativen Segmente von 3,28.
  
 %  \begin{figure}[H]
 % 	\centering
@@ -168,4 +168,32 @@ Bei einer ähnlich hohen Coverage wie der Annotation ist der deutlich höhere \a
 
 Obwohl keines der Verfahren für die vorliegenden Daten zufriedenstellende Ergebnisse erzielt, ist besonders bei den Modellen maschinellen Lernens interessant, welchen Einfluss und welchen Informationsgewinn die jeweiligen Merkmale haben bzw. liefern. Aus diesem Grund wird im Folgenden eine explorative Datenanalyse durchgeführt.
 
+Zunächst wird betrachtet, ob die Merkmale untereinander und mit $E\textsubscript{HR}$ und der Annotation korreliert sind. Da die Merkmale das Segment gemeinschaftlich statistisch beschreiben ist eine hohe Korrelation untereinander erwartet und zeigt sich auch. Eine Ausnahme bilden Kurtosis, Mittelwert und Schiefe. Außerdem zeigt sich bei der Betrachtung des in Abbildung \ref{fig:corr-heatmap-statistical} abgebildeten Korrelationsdiagramm, dass die Korrelation zu $E\textsubscript{HR}$ und der Annotation nicht signifikant ist. Auch bei paarweiser Visualisierung zeigt sich, dass sich anhand keines untersuchten Merkmalspaares informative von nicht informativen unterscheiden lassen.
 
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.85]{pic/corr-heatmap-statistical.pdf}
+	\caption{Korrelationsdiagramm der statistischen Merkmale, $E\textsubscript{HR}$ und der binären Annotation}
+	\label{fig:corr-heatmap-statistical}
+\end{figure}
+
+Da die Visualisierung hochdimensionaler Daten schwierig ist und auch Modelle maschinellen Lernens bei einer hohen Merkmalszahl aufwändiger zu trainieren sind, wurde ebenfalls untersucht, wie sich die Daten bei einer Transformation in einen zweidimensionalen Raum verhalten. Untersuchte Transformationen umfassen sowohl unüberwachte Verfahren wie \ac{PCA} mit verschiedenen Kernel als auch überwachte Verfahren wie eine Dimensionsreduktion mit einer \ac{LDA}. Auch die transformierten Daten lassen sich nicht voneinander trennen, wie auch in Abbildung \ref{fig:dim-red-statistical} beispielhaft für eine \ac{PCA} mit linearem Kernel gezeigt ist.
+
+
+ \begin{figure}[H]
+ 	\centering
+ 	\includegraphics[scale=0.6]{pic/statistical-pca-lin.pdf}
+	\caption{Dimensionsreduktion der statistischen Merkmale mit einer \ac{PCA} mit linearem Kernel}
+	\label{fig:dim-red-statistical}
+\end{figure}
+
+Weiteren Einblick ermöglicht die Analyse des \ac{RF}, da bei diesem ermittelt werden kann, wie wichtig die einzelnen Merkmale jeweils für die Entscheidungsfindung sind. Das Ergebnis zeigt, dass der Durchschnitt des Signals deutlich weniger Einfluss als die anderen betrachteten Merkmale hat. Die Schiefe (skewness) und die Anzahl der Nulldurchläufe sind, wie in Abbildung \ref{fig:rf-statistical-importances} zu sehen, die beiden wichtigsten Merkmale. 
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.9]{pic/rf-cl-statistical.pdf}
+	\caption{Wichtigkeit der Merkmale für den \ac{RF}-Klassifikator}
+	\label{fig:rf-statistical-importances}
+\end{figure}
+
+Anhand der statistischen Merkmale kann also keine Klassifikation vorgenommen werden. Vermutlich sorgt die große Variation der in Betten aufgenommenen \ac{BKG}-Signale dafür, dass sich die Signale nicht statistisch verallgemeinern lassen. Auch die reine Betrachtung der Ähnlichkeit der Intervallschätzer ist nicht ausreichend. Es müssen also andere Merkmale gefunden werden, die allein oder ergänzend zu den bereits betrachteten eine Aussage zu der Signalqualität ermöglichen.
