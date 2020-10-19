@@ -65,17 +65,19 @@ class BCGSeries:
         """Returns filtered bcg in given window"""
         return self.filtered_data[start:end]
 
-    def get_interval_lengths(self, start, end):
+    def get_interval_lengths(self, start, end, sqi_threshold=None):
         """Returns estimated interval lengths in given window. Filters for NaN values in SQI"""
         indices = np.where(np.logical_and(start <= self.unique_peaks, self.unique_peaks < end))
+        if sqi_threshold is not None:
+            indices = indices[np.nonzero(self.brueser_sqi[indices] > sqi_threshold)]
         interval_lengths = self.medians[indices]
         interval_lengths = interval_lengths[np.argwhere(~np.isnan(self.sqi[indices]))]
-        return self.medians[indices]
+        return interval_lengths
 
-    def get_coverage(self, start, end):
+    def get_coverage(self, start, end, sqi_threshold=None):
         """Returns coverage on given interval
         """
-        est_lengths = self.get_interval_lengths(start, end)
+        est_lengths = self.get_interval_lengths(start, end, sqi_threshold)
         coverage = np.sum(est_lengths) / (end - start)
         if coverage >= 1:
             return 100
