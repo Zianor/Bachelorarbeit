@@ -5,9 +5,9 @@ import pickle
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from scipy.signal import find_peaks, hilbert, welch, correlate, periodogram
-from scipy.stats import median_abs_deviation, kurtosis, skew
 import statsmodels.api as sm
+from scipy.signal import find_peaks, hilbert, correlate, periodogram
+from scipy.stats import median_abs_deviation, kurtosis, skew
 
 import utils
 from data_preparation import DataSeries, Data
@@ -530,12 +530,34 @@ class SegmentOwn(SegmentStatistical):
             self.hf_diff_acf = 0
         self.abs_energy = np.sum(self.filtered_data * self.filtered_data)
         if len(self.interval_lengths) > 0:
+            self.sqi_coverage_03 = series.bcg.get_coverage(start, end, sqi_threshold=0.3)
+            self.sqi_coverage_04 = series.bcg.get_coverage(start, end, sqi_threshold=0.4)
+            self.sqi_coverage_05 = series.bcg.get_coverage(start, end, sqi_threshold=0.5)
+
+            self.interval_means = np.zeros(self.interval_lengths.shape)
+            self.interval_stds = np.zeros(self.interval_lengths.shape)
+            self.interval_ranges = np.zeros(self.interval_lengths.shape)
+            peak_locations = series.bcg.get_unique_peak_locations(start, end)
+            for i, peak_location in enumerate(peak_locations):
+                interval_length = self.interval_lengths[i]
+                curr_interval_data = self.filtered_data[
+                                     peak_locations - start: peak_locations - start + interval_length]
+                self.interval_means[i] = np.mean(curr_interval_data)
+                self.interval_stds[i] = np.std(curr_interval_data)
+                self.interval_ranges[i] = np.max(curr_interval_data) - np.min(curr_interval_data)
+
+            self.interval_means_std = np.std(self.interval_means)
+            self.interval_stds_std = np.std(self.interval_stds)
+            self.interval_ranges_std = np.std(self.interval_ranges)
+
             self.interval_lengths_std = np.std(self.interval_lengths)
             self.interval_lengths_range = np.max(self.interval_lengths) - np.min(self.interval_lengths)
             self.interval_lengths_mean = np.mean(self.interval_lengths)
             self.sqi_std = np.std(self.sqi_array)
             self.sqi_max = np.max(self.sqi_array)
             self.sqi_min = np.min(self.sqi_array)
+            self.sqi_median = np.median(self.sqi_array)
+            self.sqi_mean = np.mean(self.sqi_array)
             self.peak_max = np.max(self.peak_values)
             self.peak_min = np.max(self.peak_values)
             self.peak_std = np.std(self.peak_values)
@@ -549,12 +571,20 @@ class SegmentOwn(SegmentStatistical):
                                                                                                                  end),
                                                                             series)
         else:
+            self.interval_means_std = np.nan
+            self.interval_stds_std = np.nan
+            self.interval_ranges_std = np.nan
+            self.sqi_coverage_03 = 0
+            self.sqi_coverage_04 = 0
+            self.sqi_coverage_05 = 0
             self.interval_lengths_std = np.nan
             self.interval_lengths_range = np.nan
             self.interval_lengths_mean = np.nan
             self.sqi_std = np.nan
             self.sqi_max = np.nan
             self.sqi_min = np.nan
+            self.sqi_median = np.nan
+            self.sqi_mean = np.nan
             self.peak_max = np.nan
             self.peak_min = np.nan
             self.peak_std = np.nan
@@ -612,6 +642,8 @@ class SegmentOwn(SegmentStatistical):
             'sqi_std',
             'sqi_min',
             'sqi_max',
+            'sqi_median',
+            'sqi_mean',
             'peak_max',
             'peak_min',
             'peak_mean',
@@ -619,7 +651,13 @@ class SegmentOwn(SegmentStatistical):
             'template_corr_highest_sqi_mean',
             'template_corr_highest_sqi_std',
             'template_corr_median_sqi_mean',
-            'template_corr_median_sqi_std'
+            'template_corr_median_sqi_std',
+            'interval_means_std',
+            'interval_stds_std',
+            'interval_ranges_std',
+            'sqi_coverage_03',
+            'sqi_coverage_04',
+            'sqi_coverage_05'
         ])
         return np.concatenate((segment_array, own_array), axis=0)
 
@@ -642,6 +680,8 @@ class SegmentOwn(SegmentStatistical):
             self.sqi_std,
             self.sqi_min,
             self.sqi_max,
+            self.sqi_median,
+            self.sqi_mean,
             self.peak_max,
             self.peak_min,
             self.peak_mean,
@@ -649,7 +689,13 @@ class SegmentOwn(SegmentStatistical):
             self.template_correlation_highest_sqi_mean,
             self.template_correlation_highest_sqi_std,
             self.template_correlation_median_sqi_mean,
-            self.template_correlation_median_sqi_std
+            self.template_correlation_median_sqi_std,
+            self.interval_means_std,
+            self.interval_stds_std,
+            self.interval_ranges_std,
+            self.sqi_coverage_03,
+            self.sqi_coverage_04,
+            self.sqi_coverage_05
         ])
         return np.concatenate((segment_array, own_array), axis=0)
 
