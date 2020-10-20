@@ -73,12 +73,20 @@ class DataSet:
                     bcg_hr = series.get_bcg_hr(start, end)
                     informative = series.is_informative(start, end, self.hr_threshold)
                     segment = self._get_segment(series, start, end, informative, ecg_hr, brueser_sqi, bcg_hr)
-                    if self.images:
-                        self.segments.append(segment)
-                    with open(self._get_path_hr(), 'a', newline='') as f:
-                        writer = csv.writer(f)
-                        writer.writerow(segment.get_feature_array())
-                        f.flush()
+                    self.segments.append(segment)
+                    if len(self.segments)>100:
+                        self.write_segments()
+        self.write_segments()
+
+    def write_segments(self):
+        with open(self._get_path_hr(), 'a', newline='') as f:
+            writer = csv.writer(f)
+            for segment in self.segments:
+                writer.writerow(segment.get_feature_array())
+            f.flush()
+            if not self.images:
+                self.segments = []
+
 
     def _get_segment(self, series: DataSeries, start, end, informative, ecg_hr, brueser_sqi, bcg_hr):
         if self.images:
