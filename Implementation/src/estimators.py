@@ -5,11 +5,14 @@ import warnings
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix, classification_report
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix, classification_report, max_error, \
+    mean_absolute_error, mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
 
 import utils as utils
-from data_statistical_features import Segment, DataSetBrueser, DataSetStatistical, DataSetPino, SegmentStatistical
+from data_statistical_features import Segment, DataSetBrueser, DataSetStatistical, DataSetPino, SegmentStatistical, \
+    SegmentOwn, DataSetOwn
 
 
 class QualityEstimator:
@@ -480,6 +483,115 @@ class MLStatisticalEstimator(QualityEstimator):
     def predict(self, x):
         data_subset = self.features.loc[x.index]
         labels = self.model.predict(data_subset)
+        return labels
+
+
+class OwnEstimator(QualityEstimator):
+
+    def __init__(self, clf, path, segment_length=10, overlap_amount=0.9, hr_threshold=10, data_folder='data_patients'):
+        super(OwnEstimator, self).__init__(segment_length=segment_length, overlap_amount=overlap_amount,
+                                           hr_threshold=hr_threshold, data_folder=data_folder)
+        pd.options.mode.use_inf_as_na = True
+        self.error_target = self.data['error']
+        self.features['brueser_sqi'] = self.data['brueser_sqi']
+        self.path = os.path.join(utils.get_data_set_folder(self.data_folder, self.segment_length, self.overlap_amount),
+                                 path)
+        if clf is not None:
+            self.clf = clf
+            print("Modell is trained, this may need some time")
+            self._train()
+            self._save_model()
+        else:
+            if os.path.isfile(self.path):
+                with open(self.path, 'rb') as file:
+                    self.clf = pickle.load(file)
+            else:
+                raise Exception("No model given and not found at given path")
+
+    def _save_model(self):
+        with open(self.path, 'wb') as file:
+            pickle.dump(self.clf, file=file)
+
+    def _get_features(self):
+        to_remove = [np.any(Segment.get_feature_name_array()[:] == v)
+                     for v in SegmentOwn.get_feature_name_array()]
+        features = np.delete(SegmentOwn.get_feature_name_array(), to_remove)
+        return self.data[features]
+
+    def _load_segments(self):
+        path_hr = utils.get_own_features_csv_path(self.data_folder, self.segment_length, self.overlap_amount,
+                                                  self.hr_threshold)
+        if not os.path.isfile(path_hr):
+            path = utils.get_own_features_csv_path(self.data_folder, self.segment_length,
+                                                   self.overlap_amount)  # other threshold?
+            if os.path.isfile(path):
+                data = pd.read_csv(path, index_col=False)
+                warnings.warn('Labels are recalculated')
+                data['informative'] = data['error'] < self.hr_threshold
+                data.to_csv(path_hr, index=False)
+            else:
+                warnings.warn('No csv, data needs to be reproduced. This may take some time')
+                DataSetOwn(segment_length=self.segment_length, overlap_amount=self.overlap_amount,
+                           hr_threshold=self.hr_threshold)
+        return pd.read_csv(path_hr, index_col=False)
+
+
+class OwnEstimatorRegression(OwnEstimator):
+
+    def __init__(self, clf, path, segment_length=10, overlap_amount=0.9, hr_threshold=10, data_folder='data_patients'):
+        super(OwnEstimatorRegression, self).__init__(clf, path, segment_length, overlap_amount, hr_threshold,
+                                                     data_folder)
+
+    def _train(self):
+        x1, x2, y1, y2, groups1, groups2 = self._get_patient_split()
+        mask_nan = x1.isna().any(axis=1)
+        y_true_error = self.error_target.loc[x1[~mask_nan].index]
+        self.clf.fit(x1.loc[~mask_nan], y_true_error)
+
+    def predict_test_set_error(self):
+        x1, x2, y1, y2, groups1, groups2 = self._get_patient_split()
+        return self.predict(x2), self.error_target.loc[y2.index]
+
+    def predict_error(self, x):
+        data_subset = self.features.loc[x.index].copy()
+        mask_nan = data_subset.isna().any(axis=1)
+        data_test = data_subset.loc[~mask_nan]
+        y_pred_error = self.clf.predict(data_test)
+        return data_test.index, y_pred_error
+
+    def predict(self, x):
+        data_subset = self.features.loc[x.index].copy()
+        index, y_pred_error = self.predict_error(x)
+        labels = pd.Series(index=data_subset.index, data=np.full((len(data_subset.index),), False), name='pred')
+        labels.loc[index] = pd.Series(np.array([err < self.hr_threshold for err in y_pred_error]), index,  dtype=bool)
+        return labels
+
+    def print_regression_test_report(self):
+        y_pred, y_true = self.predict_test_set_error()
+        print("Max Error: %.2f" % max_error(y_true, y_pred))
+        print("MAE: %.2f" % mean_absolute_error(y_true, y_pred))
+        print("MSE: %.2f" % mean_squared_error(y_true, y_pred))
+        print("R_2 Score: %.2f" % r2_score(y_true, y_pred))
+
+class OwnEstimatorClassification(OwnEstimator):
+
+    def __init__(self, clf, path, segment_length=10, overlap_amount=0.9, hr_threshold=10, data_folder='data_patients'):
+        super(OwnEstimatorClassification, self).__init__(clf, path, segment_length, overlap_amount, hr_threshold,
+                                                         data_folder)
+
+    def _train(self):
+        x1, x2, y1, y2, groups1, groups2 = self._get_patient_split()
+        mask_nan = x1.isna().any(axis=1)
+        y_true = self.target.loc[x1[~mask_nan].index]
+        self.clf.fit(x1.loc[~mask_nan], y_true)
+
+    def predict(self, x):
+        data_subset = self.features.loc[x.index].copy()
+        mask_nan = data_subset.isna().any(axis=1)
+        data_test = data_subset.loc[~mask_nan]
+        y_pred = self.clf.predict(data_test)
+        labels = pd.Series(index=data_subset.index, data=np.full((len(data_subset.index),), False), name='pred')
+        labels.loc[data_test.index] = pd.Series(y_pred, data_test.index,  dtype=bool)
         return labels
 
 
