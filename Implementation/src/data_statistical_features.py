@@ -610,11 +610,13 @@ class SegmentOwn(SegmentStatistical):
         if self.template_corrs_highest_sqi is not None:
             self.template_correlation_highest_sqi_mean = np.mean(self.template_corrs_highest_sqi)
             self.template_correlation_highest_sqi_std = np.std(self.template_corrs_highest_sqi)
-            self.template_correlation_median_sqi_mean = np.mean(self.template_corrs_median_sqi)
-            self.template_correlation_median_sqi_std = np.std(self.template_corrs_median_sqi)
         else:
             self.template_correlation_highest_sqi_mean = 0
             self.template_correlation_highest_sqi_std = np.nan
+        if self.template_corrs_median_sqi is not None:
+            self.template_correlation_median_sqi_mean = np.mean(self.template_corrs_median_sqi)
+            self.template_correlation_median_sqi_std = np.std(self.template_corrs_median_sqi)
+        else:
             self.template_correlation_median_sqi_mean = 0
             self.template_correlation_median_sqi_std = np.nan
 
