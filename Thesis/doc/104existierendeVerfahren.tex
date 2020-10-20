@@ -6,12 +6,12 @@ In diesem Kapitel werden die vorgestellten Daten näher untersucht. Das beinhalt
 
 Um Modelle zur Beurteilung der Signalqualität anzuwenden und zu untersuchen, müssen sowohl die verwendeten Merkmale extrahiert als auch die Ergebnisse evaluiert werden. In den hier durchgeführten Untersuchungen wurde die Segmentlänge standardmäßig auf 10\,Sekunden festgelegt und der Abstand der Segmente auf 1\,Sekunde, wodurch sich die Segmente zu je 90\,\% überlappen. Diese Segmentlänge wird zum einen häufiger verwendet\footcite[Vgl.][]{Yu2020, Sadek2016, Orphanidou2015}, zum anderen bietet sie eine ausreichend große Robustheit für die Annotation der Daten. Die für die Verfahren jeweils benötigten Merkmale werden segmentweise extrahiert und serialisiert. Zusätzlich zu den verwendeten Merkmalen werden allgemeine Informationen über die Segmente gespeichert. Dazu gehören Patient*innen-ID, EKG-Herzrate, BKG-Herzrate, absoluter und relativer Fehler, $E\textsubscript{HR}$ und die binäre Annotation. Für letztere wird als Standard $E\textsubscript{HR} = 10$ als Schwellwert verwendet.
 
-Diese Daten werden anschließend in Trainings- und Validierungsset aufgeteilt. Um diese beiden Gruppen inhaltlich vollständig zu trennen und auszuschließen, dass auf teilweise bekannten Daten validiert wird, geschieht die Trennung anhand der Patient*innen-IDs, sodass Segmente einer Person lediglich in einem der beiden Sets verwendet werden. Das Validierungsset in dieser Arbeit entspricht einem Drittel der Patient*innen, die restlichen zwei Drittel werden zur Datenexploration, zur Merkmalskonstruktion und zum Training verwendet. Die Verteilung von $E\textsubscript{HR}$ im Validierungsset ist in Abbildung \ref{fig:validation-set} gezeigt. Von den existierenden Verfahren benötigen zwei keine Trainingsphase; um vergleichbare Ergebnisse zu erhalten, wird auch bei diesen bei der Evaluation nur das Validierungsset betrachtet.
+Diese Daten werden anschließend in Trainings- und Testset aufgeteilt. Um diese beiden Gruppen inhaltlich vollständig zu trennen und auszuschließen, dass auf teilweise bekannten Daten validiert wird, geschieht die Trennung anhand der Patient*innen-IDs, sodass Segmente einer Person lediglich in einem der beiden Sets verwendet werden. Das Testset in dieser Arbeit entspricht einem Drittel der Patient*innen, die restlichen zwei Drittel werden zur Datenexploration, zur Merkmalskonstruktion und zum Training verwendet. Die Verteilung von $E\textsubscript{HR}$ im Testset ist in Abbildung \ref{fig:validation-set} gezeigt. Von den existierenden Verfahren benötigen zwei keine Trainingsphase; um vergleichbare Ergebnisse zu erhalten, wird auch bei diesen bei der Evaluation nur das Testset betrachtet.
 
 \begin{figure}[H]
 	\centering
 	\includegraphics{pic/mlp-statistical-testset.pdf}
-	\caption[Verteilung von $E\textsubscript{HR}$ auf dem Validierungsset]{Verteilung von $E\textsubscript{HR}$ auf dem Validierungsset}
+	\caption[Verteilung von $E\textsubscript{HR}$ auf dem Testset]{Verteilung von $E\textsubscript{HR}$ auf dem Testset}
 	\label{fig:validation-set}
 \end{figure}
 
@@ -33,21 +33,21 @@ Bei einer ersten Betrachtung von \ac{MAE}, Coverage und Accuracy wird sichtbar, 
  	\centering
  	\begin{tabular}{l || c | c | c}
  									& \ac{MAE}	& Coverage		& Accuracy\\ \hline
- 		insgesamt 					& 21{,}84	& -				& - \\
+ 		insgesamt 					& 21{,}85	& -				& - \\
  		annotiert					& 3{,}28		& 43{,}22\,\%	& - \\ \hline
  		$q_{th}=0{,}4, c_{th}=50$	& 12{,}30	& 20{,}95\,\%	& 0{,}65\\
  		$q_{th}=0{,}4, c_{th}=75$	& 9{,}57		& 11{,}78\,\%	& 0{,}63\\
- 		$q_{th}=0{,}4, c_{th}=100$	& 8{,}76		& 5{,}26\,\%		& 0{,}60\\ \hline
- 		$q_{th}=0{,}3, c_{th}=50$	& 21{,}35	& 58{,}73\,\%	& 0{,}55\\
+ 		$q_{th}=0{,}4, c_{th}=100$	& 8{,}77		& 5{,}26\,\%		& 0{,}60\\ \hline
+ 		$q_{th}=0{,}3, c_{th}=50$	& 21{,}36	& 58{,}73\,\%	& 0{,}55\\
  		$q_{th}=0{,}3, c_{th}=75$	& 17{,}97	& 37{,}87\,\%	& 0{,}62\\
- 		$q_{th}=0{,}3, c_{th}=100$	& 13{,}44	& 19{,}25\,\%	& 0{,}63\\ \hline
- 		$q_{th}=0{,}2, c_{th}=75$	& 21{,}38	& 96{,}43\,\%	& 0{,}44\\
+ 		$q_{th}=0{,}3, c_{th}=100$	& 13{,}45	& 19{,}25\,\%	& 0{,}63\\ \hline
+ 		$q_{th}=0{,}2, c_{th}=75$	& 21{,}39	& 96{,}43\,\%	& 0{,}44\\
  	\end{tabular}
  	\caption[Fehler und Coverage der Klassifikation nach der Ähnlichkeit der Intervallschätzer des CLIE-Algorithmus für verschiedene Schwellwerte im Vergleich zum gesamten Signal und der Annotation]{Fehler und Coverage für verschiedene Schwellwerte im Vergleich zum gesamten Signal und der Annotation}
  	\label{fig:brueser-sqi-MAE-Coverage}
  	\end{figure}
  	
- Die detailliertere Evaluation wird beispielhaft für die Schwellwerte $q_{th} = 0.4$ und $q_{th} = 0.3$ mit $c_{th}=75$ vorgestellt. Positiv hervorzuheben ist, dass bei beiden kein Signal als informativ klassifiziert wird, bei denen $E\textsubscript{HR}$ maximal ist. Allerdings ist bei über 20\,\% der mit $q_{th} = 0.4$ als informativ klassifizierten Segmenten $E\textsubscript{HR}$ größer als 20, mit $q_{th} = 0.3$ bei sogar mehr als 35\,\%, wie auch in Abbildung \ref{fig:brueser-positives} abgebildet. Das bedeutet, dass Falschklassifikationen nicht nur im Randbereich vorkommen. Dies wird noch deutlicher, wenn man sich den \ac{MAE} auf jeweils auf den Falsch-Positiven und Falsch-Negativen anschaut. So beträgt der \ac{MAE} für falsch-negative Segmente 3,64, ist also nah an dem \ac{MAE} aller informativen Segmente von 3,28.
+ Die detailliertere Evaluation wird beispielhaft für die Schwellwerte $q_{th} = 0.4$ und $q_{th} = 0.3$ mit $c_{th}=75$ vorgestellt. Positiv hervorzuheben ist, dass bei beiden kein Signal als informativ klassifiziert wird, bei denen $E\textsubscript{HR}$ maximal ist. Allerdings ist bei über 20\,\% der mit $q_{th} = 0.4$ als informativ klassifizierten Segmenten $E\textsubscript{HR}$ größer als 20, mit $q_{th} = 0.3$ bei sogar mehr als 35\,\%, wie auch in Abbildung \ref{fig:brueser-positives} abgebildet. Das bedeutet, dass Falschklassifikationen nicht nur im Randbereich vorkommen. Dies wird noch deutlicher, wenn man sich den \ac{MAE} auf jeweils auf den Falsch-Positiven und Falsch-Negativen anschaut. So beträgt der \ac{MAE} bei $q_{th} = 0.4$ für falsch-negative Segmente 3,65, ist also nah an dem \ac{MAE} aller informativen Segmente von 3,28.
  
 %  \begin{figure}[H]
 % 	\centering
@@ -83,16 +83,16 @@ Bei einer ersten Betrachtung von \ac{MAE}, Coverage und Accuracy wird sichtbar, 
  \end{figure}
  
  % TODO: Visualisierung Coverage
- Außerdem wurde untersucht, wie hoch die Coverage unter einem bestimmten Fehler $E\textsubscript{HR}$ auf dem gesamten Signal ist, wenn nur die als informativ klassifizierten Segmente verwendet werden. Hier wird besonders sichtbar, wie niedrig die erreichte Coverage ist. So werden mit $q_{th}=0{,}4$ und $c_{th}=75$ nur 5{,}42\,\% Coverage für $E\textsubscript{HR} < 5$ erreicht werden, obwohl das ganze Signal 32{,}61\,\% enthält. Mit $q_{th}=0{,}3$ und $c_{th}=75$ sind es immerhin 8{,}82\,\%, aber auch das liegt deutlich unter dem tatsächlichen Wert. Die Verteilung ist auch in Abbildung \ref{fig:brueser-coverage} gezeigt.
+ Außerdem wurde untersucht, wie hoch die Coverage unter einem bestimmten Fehler $E\textsubscript{HR}$ auf dem gesamten Signal ist, wenn nur die als informativ klassifizierten Segmente verwendet werden. Hier wird besonders sichtbar, wie niedrig die erreichte Coverage ist. So werden mit $q_{th}=0{,}4$ und $c_{th}=75$ nur 8{,}29\,\% Coverage für $E\textsubscript{HR} < 5$ erreicht werden, obwohl das ganze Signal 32{,}61\,\% enthält. Mit $q_{th}=0{,}3$ und $c_{th}=75$ sind es immerhin 18{,}32\,\%, aber auch das liegt deutlich unter dem tatsächlichen Wert. Die Verteilung ist auch in Abbildung \ref{fig:brueser-coverage} gezeigt.
  
  \begin{figure}[H]
  	\centering
   	\begin{tabular}{l || c | c | c}
  									& insgesamt 		& $q_{th}=0{,}3, c_{th}=75$ & $q_{th}=0{,}4, c_{th}=75$\\\hline
- 		$E\textsubscript{HR} < 5$ 	&  32{,}61\,\% 	& 8,82\,\% 					& 5,42\,\%	\\
- 		$E\textsubscript{HR} < 10$ 	&  43{,}22\,\% 	& 15,33\,\% 					& 7,39\,\%	\\
- 		$E\textsubscript{HR} < 15$ 	&  51{,}66\,\% 	& 20,44\,\% 					& 8,39\,\%	\\
- 		$E\textsubscript{HR} < 20$ 	&  59{,}40\,\% 	& 24,60\,\% 					& 9,18\,\%\\
+ 		$E\textsubscript{HR} < 5$ 	&  32{,}61\,\% 	& 18,32\,\% 					& 8,29\,\%	\\
+ 		$E\textsubscript{HR} < 10$ 	&  43{,}21\,\% 	& 21,34\,\% 					& 8,89\,\%	\\
+ 		$E\textsubscript{HR} < 15$ 	&  51{,}64\,\% 	& 23,35\,\% 					& 9,22\,\%	\\
+ 		$E\textsubscript{HR} < 20$ 	&  59{,}38\,\% 	& 25,12\,\% 					& 9,47\,\%\\
  	\end{tabular}
  	\caption[Coverage unter bestimmten Fehlern $E\textsubscript{HR}$ vor und nach Klassifikation]{Coverage unter bestimmten Fehlern $E\textsubscript{HR}$ vor und nach Klassifikation}
  	\label{fig:brueser-coverage}
@@ -109,7 +109,7 @@ Die Tests mit beiden Segmentlängen zeigen, dass dieses Verfahren für die in di
 
 \subsection{Maschinelles Lernen mittels statistischer Merkmale}
 
-Für das maschinellen Lernen mittels statistischer Merkmale werden die in Kapital \ref{ml-beschreibung} aufgezählten Merkmale extrahiert. Als Bibliothek für die Modelle des maschinellen Lernens wird \textit{scikit-learn}\footcite[]{scikit-learn} verwendet. Da die Daten sich grundlegend von den von \citeauthor{Sadek2016} untersuchten unterscheiden, werden die Hyperparameter der Modelle im Zuge dieser Arbeit erneut optimiert. Bei der dafür durchgeführten Kreuzvalidierung wird wie schon bei der Unterteilung in Trainings- und Validierungsset anhand der Patient*innen-ID geteilt, damit auch diese aussagekräftige Ergebnisse liefert.
+Für das maschinellen Lernen mittels statistischer Merkmale werden die in Kapital \ref{ml-beschreibung} aufgezählten Merkmale extrahiert. Als Bibliothek für die Modelle des maschinellen Lernens wird \textit{scikit-learn}\footcite[]{scikit-learn} verwendet. Da die Daten sich grundlegend von den von \citeauthor{Sadek2016} untersuchten unterscheiden, werden die Hyperparameter der Modelle im Zuge dieser Arbeit erneut optimiert. Bei der dafür durchgeführten Kreuzvalidierung wird wie schon bei der Unterteilung in Trainings- und Testset anhand der Patient*innen-ID geteilt, damit auch diese aussagekräftige Ergebnisse liefert.
 
 Insgesamt zeigen bereits Accuracy und \ac{MAE}, siehe Abbildung \ref{fig:ml-statistical-MAE-Coverage}, eindeutig, dass die Klassifikation mit keinem der Modelle sehr erfolgreich ist. Die Accuracy von im besten Fall 0,57 zeigt, dass die Klassifikation nur minimal besser als reines Raten ist. Teils ist der \ac{MAE} der als informativ klassifizierten Segmente sogar größer als der auf dem gesamten Signal. In der folgenden tiefergehenden Evaluation werden lediglich \ac{RF} und \ac{MLP} betrachtet. Zwar sind die Ergebnisse des \ac{DT} auf einem ähnlichen Nivea, aber da ein \ac{RF} lediglich ein Zusammenschluss mehrerer \ac{DT} ist, ist eine zusätzliche Analyse nicht lohnenswert. 
 

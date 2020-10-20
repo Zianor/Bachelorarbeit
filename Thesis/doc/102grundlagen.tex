@@ -16,7 +16,7 @@ Da in dieser Arbeit Methoden des Maschinellen Lernens verwendet werden, wird im 
 	
 	\begin{figure}[H]
 		\centering
-		\includegraphics[width=0.7\textwidth]{pic/SupervisedLearning.png}
+		\includegraphics[scale=0.9]{pic/SupervisedLearning.pdf}
 		\caption[Darstellung von überwachtem Lernen]{Darstellung von überwachtem Lernen}
 		\label{fig:supervisedLearning}
 	\end{figure}
@@ -63,44 +63,41 @@ Da in dieser Arbeit Methoden des Maschinellen Lernens verwendet werden, wird im 
 	
 	\subsection{Evaluation und Validierung}
 	
-	\begin{itemize}
-		\item Modell auf unbekannten Daten validieren
-		\item Hold-Out-Validierung: zufällige Verteilung in Trainings- und Testset
-		\item Kreuzvalidierung
-		\item Daten werden auf v gleich große Mengen (Folds) verteilt
-		\item V Modelle auf allen möglichen Folds trainiert
-		\item validierung auf ausgeschlossenem Fold
-		\item extrem: Leave-One-Out Kreuzvalidierung mit v = n (Menge der Datenpunkte)
-		\item üblich: v-fache Kreuzvalidierung
-		\item typische Werte v=5 oder 10
-		\item auch abhängig von verfügbarer Rechenleistung
-		\item Wofür
-		\item Schätzung von Fehler auf unbekannten Daten
-		\item Wahl von Modellen/Bestimmung von Hyperparametern
-		\item Parameter, die Modellarchitektur bestimmen
-		\item Parameter, die Lernalgorithmus betreffen
-		\item Regularisierungsparameter
-		\item Ergebnis: 3 Datensets
-		\item training, validierung, test
-		\item Validierungsset beeinflusst Lernalgorithmus
-		\item Testset nachdem alle Entscheidungen getroffen wurden
-		\item typisch: Validierung durch zB Kreuzvalidierung auf Testset
-		\item Retraining auf ganzem Trainingsset
-		\item Ablaufdiagramm
-		\item dafür evaluationsmetrik nötig -> Übergang
-		\item verschiedenste Metriken
-		\item begriffe TP, FP, TN, FN
-		\item Accuracy $ACC = \frac{TP + TN}{TP + TN + FN + FP}$ einfaches Gütemaß, problematisch bei ungleich großen Klassen, da eine hohe Genauigkeit erreicht wird, wenn immer die größere Klasse vorausgesagt wird
-		\item Precision, "bestraft" Falsch-Positive $PPV = \frac{TP}{TP + FP}$
-		\item Recall, auch Sensitivity genannt, "bestraft" Falsch-Negative $TPR = \frac{TP}{TP + FN}$
-		\item Oft Recall und Precision in einem Maß zusammengefasst: F1 score harmonisches Mittel aus beiden $F_1 = 2 * \frac{precision * recall}{precision + recall}$
-		\item nicht balancierte Datensets
-		\item balanced accuracy
-		\item roc kurz für Receiver Operating Characteristic. basiert auf True Positive Rate TPR und False Positive Rate FPR, charakterisiert, wie gut beide Verteilungen durch Schwellwert trennbar sind
-		\item auc Fläche unter der ROC Kurve
-	\end{itemize}
+	Ein erzeugtes Modell muss in jedem Fall auf Daten validiert werden, mit denen nicht trainiert wurde, um den Fehler auf unbekannten Daten abschätzen zu können. Eine Möglichkeit, dies zu tun, bietet die Hold-Out-Validierung, bei der die Daten zufällig in Trainings- und Testset aufgeteilt werden. Das Modell wird mit dem Trainingsset aufgebaut und auf dem Testset getestet und evaluiert. Eine andere übliche Technik ist die Kreuzvalidierung, bei der die Daten auf $v $ gleich große Mengen, im Englischen \textit{folds}, verteilt werden. Anschließend werden $v$ Modelle trainiert, wobei jeweils eine Menge ausgelassen wird, auf der anschließend getestet wird. Bei einer extremen Variante, der Leave-One-Out Kreuzvalididierung entspricht $v$ der Anzahl der Datenpunkte. Üblich ist jedoch v-fache Kreuzvalidierung mit $v=5$ oder $v=10$, auch abhängig von der Datenmenge und der verfügbaren Rechenleistung.
+	
+	Neben der Validierung des finalen Modells müssen auch bei der Modellauswahl Entscheidungen getroffen werden, vor allem welches Modell und welche Hyperparameter gewählt werden. Hyperparameter sind Parameter von Modellen maschinellen Lernens, die vor dem Training des Modells festgelegt werden und die Modellarchitektur bestimmen oder den Lernalgorithmus betreffen. Da auch die Wahl dieser validiert werden muss, werden insgesamt drei Datensets benötigt: Trainings-, Validierungs- und Testset, da sonst die Wahl der Hyperparameter durch das Testset beeinflusst würde und kein unabhängiger Test mehr möglich wäre. Das Testset wird also erst genutzt, nachdem alle Entscheidungen getroffen wurden. Typisch ist eine Validierung durch Kreuzvalidierung auf dem Trainingsset mit einem anschließenden Retraining mit dem gesamten Trainingset. Der Ablauf ist in \ref{fig:validation-ablauf} visualisiert.
+	
+	\begin{figure}[H]
+		\centering
+		\includegraphics[scale=0.8]{pic/validation-ablauf.pdf}
+		\caption{Ablauf von Training und Validierung}
+		\label{fig:validation-ablauf}
+	\end{figure}
+	
+	Um die Auswahl für ein Modell treffen zu können, werden Evaluationsmetriken benötigt. Für diese werden im Folgenden die englischen Bezeichnungen verwendet, da diese auch im Deutschen geläufiger sind.
+	
+	Vor allem für die Bewertung binärer Klassifikationen gibt es verschiedenste Metriken, die die richtigen und falschen Klassifikationen miteinander gewichten. Dafür wird zwischen Richtig-Positiven TP, Falsch-Positiven FP, Richtig-Negativen TN und Falsch-Negativen FP unterschieden. Eine Darstellung dieser vier nennt man Confusion Matrix und ermöglicht eine erste Einschätzung der Fehlerverteilung. Ein häufig verwendetes und einfaches Gütemaß ist die Accuracy $\text{ACC} = \frac{TP + TN}{TP + TN + FN + FP}$, die allerdings bei ungleich großen Klassen problematisch ist, da eine hohe Genauigkeit erreicht wird, wenn immer die größere Klasse vorausgesagt wird. In diesem Fall kann auch die Balanced Accuracy verwendet werden, die dieses Ungleichgewicht einbezieht:
+	\[
+		\text{balanced-accuracy} = \frac{1}{2}\left( \frac{TP}{TP + FN} + \frac{TN}{TN + FP}\right).
+	\]
+	 Bei der Precision $\text{PPV} = \frac{TP}{TP + FP}$ werden falsch-positive Klassifikationen \glqq bestraft\grqq{}; beim Recall $\text{TPR} = \frac{TP}{TP + FN}$, auch Sensitivity genannt, falsch-negative Klassifikationen. Letztere werden oft in einem Maß zusammengefasst, dem F1-Score, der das harmonische Mittel aus beiden bildet:
+	\[
+		F_1 = 2 \cdot \frac{\text{PPV} * \text{TPR}}{\text{PPV} + \text{TPR}}.
+	\]
+	
+	Eine weitere Möglichkeit, die Qualität eines binären Klassifikators zu evaluieren, ist die \ac{ROC}-Kurve, die  bei der die \ac{TPR} und die \ac{FPR} gegeneinander aufgetragen werden und so den Kompromiss zwischen \ac{TPR} und \ac{FPR} abhängig vom Schwellwert zeigt. Die Fläche unter dieser Kurve, die \ac{AUC}, beschreibt, wie gut das Modell die beiden Klassen trennt.
+	
+	Bei einer Regression werden üblicherweise der \ac{MAE} oder der \ac{MSE} betrachtet, die die Größe des Fehlers ausdrücken und wie folgt berechnet werden:
+	\begin{align*}
+		\text{MAE}(y, \hat{y}) &= \frac{1}{n_{\text{samples}}} \sum_{i=0}^{n_{\text{samples}}-1} \left| y_i - \hat{y}_i \right| \\
+		\text{MSE}(y, \hat{y}) &= \frac{1}{n_\text{samples}} \sum_{i=0}^{n_\text{samples} - 1} (y_i - \hat{y}_i)^2		
+	\end{align*}
+	
+	Die Auswahl der betrachteten Metriken ist von dem vorliegenden Problem abhängig.
 	
 	\subsection{Probleme maschinellen Lernens}
+	
+	Ein häufig beobachtetes Problem bei maschinellem Lernen ist das sogenannte Overfitting, auf Deutsch Überanpassung, wenn das Modell zwar die Trainingsdaten gut approximiert, aber keine gute Generalisierung für unbekannte Daten bildet, d.h. zu stark an die Trainingsdaten angepasst ist. Gründe dafür können eine zu hohe Komplexität des Lernmodells wie z.B. zu viel Training oder zu wenig Trainingsdaten sein. In beiden Fällen wird ungewollt ein Teil des \textit{noise} der Trainingsdaten in das Modell übernommen. Das Gegenteil von Overfitting ist Underfitting, das den Fall beschreibt, dass das Modell die Beziehung von Merkmalen und Ziel nicht ausreichend erfasst. 
 				
 		\begin{itemize}
 			\item offensichtich: Underfitting
@@ -247,7 +244,7 @@ Die vorliegende Arbeit beschäftigt sich mit der Beurteilung der Signalqualität
 	Neben Einflüssen der verwendeten Messachse und der Körperposition beeinflusst auch die Atmung die Signalform. Normale Atmung beeinflusst die Amplitude der \textit{ejection waves} I und J. Bei Atemstillstand dagegen werden die H und J Wellen verzerrt. Auch bei einer gesunden, sich nicht bewegenden Person, die ihre Atmung kontrolliert, wird kein exakt Schlag für Schlag reproduzierbares Signal erzeugt werden.\footcite[Vgl.][]{Pinheiro2010} Von \citeauthor{Zink2017} werden die Einflüsse der Atmung in der vertikalen Achse eines dorsoventralen \ac{BKG}s als große Schwingungen einer Wellenlänge von fünf bis zehn Sekunden beschrieben. Innerhalb dieser sind kleinere Schwingungen mit höherer Frequenz sichtbar, die jedoch keiner bestimmten Sequenz folgen.\footcite[Vgl.][]{Zink2017} Zusätzlich zu dieser schon beschriebenen Variabilität kommt es sehr leicht zum Entstehen von Artefakten. Ursprung ist entweder das Messsystem selbst oder Körperbewegungen. Insgesamt führt Bewegung der Patient*innen, auch die der Atmung, zu einem \textit{baseline drift}. Stärkere Bewegungen führen zu einer Massenverschiebung, die um ein Vielfaches größer als die gemessenen Vorgänge ist. Aufgrund dessen führt sie immer dazu, dass das Signal stark verzerrt oder sogar vollständig überlagert wird.
 
 	
-	Besonders im Vergleich zu anderen kardiorespiratorischen Signalen wie dem \ac{EKG} und \ac{PPG} wird deutlich, dass \ac{BKG}-Signale auch in konsekutiven Messungen deutlich variabler sind. Abbildung \ref{fig:variabilitaet} zeigt dies am Beispiel von \ac{BKG}-Aufnahmen eines im Bett integrierten Messsystems im Vergleich zum parallel aufgenommenen \ac{EKG}. Es zeigt sich, dass selbst nach Entfernung von Überlagerungen von Atmung  und Bewegung das \ac{BKG}-Signal eine höhere Variabilität in Bezug auf Amplitudenhöhe, Reihenfolge der Extremwerte und der gesamten Form aufweist.\footcite[Vgl.][]{Zink2017} Es wird allerdings angenommen, dass aufeinander folgende Herzschläge sich ähneln\footcite[Vgl.][]{Brueser2013}. Diese Eigenschaft wird Selbstähnlichkeit genannt. \citeauthor{Bruser2013} nennt als eine mögliche Ausnahme den Fall, dass ein unregelmäßiger Herzschlag mit sehr niedrigem Schlagvolumen einem regulären Herzschlag folgt. In dem Fall ist es möglich, dass die Amplitude im Vergleich so klein ist, dass sie verdeckt wird. Dies ist z.B. bei Vorhofflimmern möglich. Eine Untersuchung von \citeauthor{Rosales2012} zeigt dieses Verhalten der Selbstähnlichkeit nicht bei den kleineren Extremwerten die J umgeben. Dass die Ähnlichkeit um J am größten ist zeigt auch Abbildung \ref{fig:variabilitaet}.
+	Besonders im Vergleich zu anderen kardiorespiratorischen Signalen wie dem \ac{EKG} und \ac{PPG} wird deutlich, dass \ac{BKG}-Signale auch in konsekutiven Messungen deutlich variabler sind. Abbildung \ref{fig:variabilitaet} zeigt dies am Beispiel von \ac{BKG}-Aufnahmen eines im Bett integrierten Messsystems im Vergleich zum parallel aufgenommenen \ac{EKG}. Es zeigt sich, dass selbst nach Entfernung von Überlagerungen von Atmung  und Bewegung das \ac{BKG}-Signal eine höhere Variabilität in Bezug auf Amplitudenhöhe, Reihenfolge der Extremwerte und der gesamten Form aufweist.\footcite[Vgl.][]{Zink2017} Es wird allerdings angenommen, dass aufeinander folgende Herzschläge sich ähneln\footcite[Vgl.][]{Bruser2013}. Diese Eigenschaft wird Selbstähnlichkeit genannt. \citeauthor{Bruser2013} nennt als eine mögliche Ausnahme den Fall, dass ein unregelmäßiger Herzschlag mit sehr niedrigem Schlagvolumen einem regulären Herzschlag folgt. In dem Fall ist es möglich, dass die Amplitude im Vergleich so klein ist, dass sie verdeckt wird. Dies ist z.B. bei Vorhofflimmern möglich. Eine Untersuchung von \citeauthor{Rosales2012} zeigt dieses Verhalten der Selbstähnlichkeit nicht bei den kleineren Extremwerten die J umgeben. Dass die Ähnlichkeit um J am größten ist zeigt auch Abbildung \ref{fig:variabilitaet}.
 	
 	\begin{figure}[H]
 		\centering
