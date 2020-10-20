@@ -138,6 +138,9 @@ Implementation/data/*/ecg/
 Implementation/data/*/data_set*
 Implementation/data/*/images/
 
+# large file
+Thesis/pic/pairplot-statistical-all.pdf
+
 *.mat
 *.sav
 *.edf
