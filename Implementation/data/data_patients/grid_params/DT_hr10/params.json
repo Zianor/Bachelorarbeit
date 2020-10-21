@@ -1,1 +1,1 @@
-{"clf__splitter":"best","clf__criterion":"gini","clf__class_weight":"balanced"}
+{"clf__splitter":"best","clf__max_depth":4,"clf__criterion":"entropy","clf__class_weight":null}
