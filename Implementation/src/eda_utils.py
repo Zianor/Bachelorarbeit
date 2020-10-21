@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-import rfpimp
 
 
 def get_correlated_columns(df: pd.DataFrame, threshold):

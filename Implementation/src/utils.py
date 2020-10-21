@@ -150,9 +150,10 @@ def get_plt_settings():
         "text.usetex": True,
         "font.serif": "Times",
         "font.family": "serif",
+        'text.latex.preamble': r'\usepackage{mathptmx}',
         # Use 12pt font in plots, to match 12pt font in document
-        "axes.labelsize": 12,
-        "font.size": 12,
+        "axes.labelsize": 10,
+        "font.size": 10,
         # Make the legend/label fonts a little smaller
         "legend.fontsize": 10,
         "xtick.labelsize": 10,
