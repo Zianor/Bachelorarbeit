@@ -101,13 +101,13 @@ Bei einer ersten Betrachtung von \ac{MAE}, Coverage und Accuracy wird sichtbar, 
  Alles in allem zeigt sich, dass trotz einer sehr niedrigen erreichten Coverage der Fehler in der Klassifikation verhältnismäßig hoch ist. Dieses Verfahren ist also bei dem hier vorliegenden Signal nicht ausreichend. Wenn $q_{th}$ und $c_{th}$ nicht zu niedrig gewählt werden, kann ein Teil des nicht informativen Signals markiert und somit der Fehler in weiterer Verarbeitung insgesamt reduziert werden. 
  
 
-\subsection{Schwellwerte für Standardabweichung, Minimum und Maximum}
+\subsection{Schwellwertbasierte Artefakterkennung}
 
 Für das zweite getestete Verfahren werden lediglich zwei Schwellwerte $T_1$ und $T_2$ benötigt, die auf Standardabweichung, Minimum, Maximum und Durchschnitt des Signals beruhen. Die Klassifikation ist ein einfacher Vergleich. \citeauthor{Pino2015} verwenden sehr kleine Fenster, die hier aufgrund fehlender Robustheit der Annotation nicht verwendet werden können.\footcite[]{Pino2015} Stattdessen wird der Algorithmus sowohl auf 10\,Sekunden- als auch 4\,Sekunden-Segmenten getestet, damit sichtbar wird, ob die Segmentlänge einen Einfluss auf das Ergebnis hat.
 
 Die Tests mit beiden Segmentlängen zeigen, dass dieses Verfahren für die in dieser Arbeit untersuchten Daten nicht nutzbar ist, da bei beiden über 95\,\% der Daten als informativ klassifiziert werden, darunter auch Segmente, bei denen $E\textsubscript{HR}$ maximal ist. Weiterführende Evaluation bietet hier keine weiteren Erkenntnisse. Dieses Verfahren ist damit nicht weiter nutzbar.
 
-\subsection{Maschinelles Lernen mittels statistischer Merkmale}
+\subsection{Maschinelles Lernen mittels statistischer Merkmale}\label{res-statistical}
 
 Für das maschinellen Lernen mittels statistischer Merkmale werden die in Kapital \ref{ml-beschreibung} aufgezählten Merkmale extrahiert. Als Bibliothek für die Modelle des maschinellen Lernens wird \textit{scikit-learn}\footcite[]{scikit-learn} verwendet. Da die Daten sich grundlegend von den von \citeauthor{Sadek2016} untersuchten unterscheiden, werden die Hyperparameter der Modelle im Zuge dieser Arbeit erneut optimiert. Bei der dafür durchgeführten Kreuzvalidierung wird wie schon bei der Unterteilung in Trainings- und Testset anhand der Patient*innen-ID geteilt, damit auch diese aussagekräftige Ergebnisse liefert.
 
@@ -205,5 +205,24 @@ Da eine hohe Korrelation zwischen einzelnen Merkmalen, wie sie auch bei den stat
 	\caption{Wichtigkeit der Merkmale für den \ac{RF}-Klassifikator mit reduzierter Merkmalszahl}
 	\label{fig:rf-statistical-reduced}
 \end{figure}
+
+Die Ergebnisse dieses \acl{RF} mit reduzierter Merkmalsanzahl können mit dem in \ref{res-statistical} untersuchten \acl{RF} verglichen werden.
+
+ \begin{figure}[H]
+ 	\centering
+  	\begin{tabular}{l || c | c | c}
+ 									& insgesamt 		& RF mit 13 Merkmalen			& RF mit reduzierter Merkmalszeit\\\hline
+ 		$E\textsubscript{HR} < 5$ 		& 32{,}61\,\% 	& 17,35\,\%		& 16,07\,\%	\\
+ 		$E\textsubscript{HR} < 10$ 		& 43{,}22\,\% 	& 22,20\,\% 		& 20,82\,\%	\\
+ 		$E\textsubscript{HR} < 15$ 		& 51{,}66\,\% 	& 25,92\,\% 		& 24,34\,\%	\\
+ 		$E\textsubscript{HR} < 20$ 		& 59{,}40\,\% 	& 29,23\,\% 		& 27,45\,\%\\
+ 		MAE								& 21{,}85		& 	&\\
+ 		Coverage						& 43{,22}\,\%	&	&\\
+ 		Accuracy auf Testset				& -				&	&\\
+ 		Accuracy der Kreuzvalidierung 	& -				&	&\\
+ 	\end{tabular}
+ 	\caption{Random Forest mit reduzierter Merkmalszahl im Vergleich zu allen 13 Merkmalen}
+ 	\label{fig:ml-statistical-reduced-comparison}
+ \end{figure}
 
 Anhand der statistischen Merkmale kann also keine Klassifikation vorgenommen werden. Vermutlich sorgt die große Variation der in Betten aufgenommenen \ac{BKG}-Signale dafür, dass sich die Signale nicht statistisch verallgemeinern lassen. Auch die reine Betrachtung der Ähnlichkeit der Intervallschätzer ist nicht ausreichend. Es müssen also andere Merkmale gefunden werden, die allein oder ergänzend zu den bereits betrachteten eine Aussage zu der Signalqualität ermöglichen.
