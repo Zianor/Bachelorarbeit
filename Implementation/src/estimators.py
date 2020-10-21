@@ -488,7 +488,9 @@ class MLStatisticalEstimator(QualityEstimator):
 
 class OwnEstimator(QualityEstimator):
 
-    def __init__(self, clf, path, segment_length=10, overlap_amount=0.9, hr_threshold=10, data_folder='data_patients'):
+    def __init__(self, clf, path, segment_length=10, overlap_amount=0.9, hr_threshold=10, data_folder='data_patients',
+                 feature_selection=None):
+        self.feature_selection=feature_selection
         super(OwnEstimator, self).__init__(segment_length=segment_length, overlap_amount=overlap_amount,
                                            hr_threshold=hr_threshold, data_folder=data_folder)
         pd.options.mode.use_inf_as_na = True
@@ -513,6 +515,8 @@ class OwnEstimator(QualityEstimator):
             pickle.dump(self.clf, file=file)
 
     def _get_features(self):
+        if self.feature_selection is not None:
+            return self.data[self.feature_selection]
         to_remove = [np.any(Segment.get_feature_name_array()[:] == v)
                      for v in SegmentOwn.get_feature_name_array()]
         features = np.delete(SegmentOwn.get_feature_name_array(), to_remove)
@@ -538,9 +542,10 @@ class OwnEstimator(QualityEstimator):
 
 class OwnEstimatorRegression(OwnEstimator):
 
-    def __init__(self, clf, path, segment_length=10, overlap_amount=0.9, hr_threshold=10, data_folder='data_patients'):
+    def __init__(self, clf, path, segment_length=10, overlap_amount=0.9, hr_threshold=10, data_folder='data_patients',
+                 feature_selection=None):
         super(OwnEstimatorRegression, self).__init__(clf, path, segment_length, overlap_amount, hr_threshold,
-                                                     data_folder)
+                                                     data_folder, feature_selection=feature_selection)
 
     def _train(self):
         x1, x2, y1, y2, groups1, groups2 = self._get_patient_split()
@@ -573,11 +578,13 @@ class OwnEstimatorRegression(OwnEstimator):
         print("MSE: %.2f" % mean_squared_error(y_true, y_pred))
         print("R_2 Score: %.2f" % r2_score(y_true, y_pred))
 
+
 class OwnEstimatorClassification(OwnEstimator):
 
-    def __init__(self, clf, path, segment_length=10, overlap_amount=0.9, hr_threshold=10, data_folder='data_patients'):
+    def __init__(self, clf, path, segment_length=10, overlap_amount=0.9, hr_threshold=10, data_folder='data_patients',
+                 feature_selection=None):
         super(OwnEstimatorClassification, self).__init__(clf, path, segment_length, overlap_amount, hr_threshold,
-                                                         data_folder)
+                                                         data_folder, feature_selection=feature_selection)
 
     def _train(self):
         x1, x2, y1, y2, groups1, groups2 = self._get_patient_split()
