@@ -521,7 +521,7 @@ class SegmentOwn(SegmentStatistical):
         else:
             self.peak_frequency_data = np.nan
         if len(den_acf[np.isfinite(den_acf)]) > 0:
-            self.peak_frequency_acf = f_data[np.nanargmax(den_acf)]
+            self.peak_frequency_acf = f_acf[np.nanargmax(den_acf)]
         else:
             self.peak_frequency_acf = np.nan
         self.hf_ratio_data = self.bcg_hr / self.peak_frequency_data
