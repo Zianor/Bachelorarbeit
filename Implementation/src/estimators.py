@@ -5,7 +5,6 @@ import warnings
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix, classification_report, max_error, \
     mean_absolute_error, mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
@@ -18,6 +17,7 @@ from data_statistical_features import Segment, DataSetBrueser, DataSetStatistica
 class QualityEstimator:
 
     def __init__(self, segment_length=10, overlap_amount=0.9, hr_threshold=10, data_folder='data_patients'):
+        plt.rcParams.update(utils.get_plt_settings())
         self.data_folder = data_folder
         self.segment_length = segment_length
         self.overlap_amount = overlap_amount
