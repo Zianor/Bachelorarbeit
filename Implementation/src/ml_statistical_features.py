@@ -130,7 +130,7 @@ def get_dt_grid_params():
     parameters = {
         'clf__criterion': ("gini", "entropy"),
         'clf__splitter': ("best", "random"),
-        'clf_max_depth': [3, 4, 5],
+        'clf__max_depth': [3, 4, 5],
         'clf__class_weight': (None, 'balanced')
     }
 
@@ -146,9 +146,9 @@ def get_rf_grid_params():
     :return: base estimator and dict of parameters for grid search
     """
     parameters = {
-        'clf__n_estimators': [10, 30, 50, 75, 100, 150],
+        'clf__n_estimators': [25, 50, 75, 100, 150],
         'clf__criterion': ("gini", "entropy"),
-        'clf_max_depth': [3, 4, 5],
+        'clf__max_depth': [3, 5, 7, 10],
         'clf__class_weight': ("balanced", None)
     }
 
@@ -354,6 +354,8 @@ def reconstruct_models_paper(paths, grid_search: bool, patient_cv: bool, hr_thre
     x, y, patient_id, _ = load_data(segment_length=10, overlap_amount=0.9, hr_threshold=hr_threshold)
 
     for path, function in zip(paths, functions):
+        if path != 'RF_hr10':
+            continue
         clf, params = function()
         if not grid_search:
             params = None
@@ -381,5 +383,5 @@ def get_all_scores(reconstruct: bool, paths, data_folder='data_patients'):
 
 if __name__ == "__main__":
     paths_patient_cv = ['LDA_hr10', 'DT_hr10', 'RF_hr10', 'MLP_hr10', 'SVC_hr10']
-    reconstruct_models_paper(paths=paths_patient_cv, grid_search=False, patient_cv=True, hr_threshold=10)
+    reconstruct_models_paper(paths=paths_patient_cv, grid_search=True, patient_cv=True, hr_threshold=10)
     SystemExit(0)
