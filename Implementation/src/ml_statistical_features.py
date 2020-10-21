@@ -130,6 +130,7 @@ def get_dt_grid_params():
     parameters = {
         'clf__criterion': ("gini", "entropy"),
         'clf__splitter': ("best", "random"),
+        'clf_max_depth': [3, 4, 5],
         'clf__class_weight': (None, 'balanced')
     }
 
@@ -147,6 +148,7 @@ def get_rf_grid_params():
     parameters = {
         'clf__n_estimators': [10, 30, 50, 75, 100, 150],
         'clf__criterion': ("gini", "entropy"),
+        'clf_max_depth': [3, 4, 5],
         'clf__class_weight': ("balanced", None)
     }
 
