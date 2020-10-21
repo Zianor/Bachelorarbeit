@@ -12,7 +12,7 @@ Da in dieser Arbeit Methoden des Maschinellen Lernens verwendet werden, wird im 
 	Maschinelles Lernen ist die \glqq künstliche\grqq{} Generierung von Wissen auf Basis von Erfahrung: Aus Beispielen wird gelernt und dieses Wissen nach einer Trainingsphase verallgemeinert. Dafür wird mit Mustererkennung gearbeitet und ein statistisches Modell aufgebaut, das auf den Trainingsdaten beruht. Die Trainingsdaten $X$ bestehen aus Merkmalsvektoren  $x \in X \subseteq \mathbb{R}^n$. Gesucht ist eine Funktion $f$, die diese Daten beschreibt. Unterschieden wird bei dieser Beschreibung dieser Daten zwischen Klassifikation und Regression. Bei einer Klassifikation werden die Eingabedaten in verschiedene Klassen unterteilt. Bei einer Regression dagegen werden stetige Werte vorhergesagt, es wird die Verteilung der Daten beschrieben. Sie kann z.B. dafür genutzt werden, Verkaufszahlen vorauszusagen. Ein Sonderfall ist die logistische Regression, die die Wahrscheinlichkeit der Angehörigkeit zu einer Klasse benennt.
 	
 	% TODO: Eingabe-Ausgabe-Paare sinnvoller mit xi
-	Es wird zwischen verschiedenen Arten des maschinellen Lernens unterschieden, dem überwachten Lernen, dem unüberwachten Lernen und dem verstärkenden Lernen. Letzteres wird hier nicht betrachtet. Bei überwachtem Lernen bestehen die vorliegenden Daten aus Eingabe-Ausgabe-Paaren $(x_1, y_1), ...,(x_n, y_n), x_i \in X$. Demnach ist nur die Funktion $f: X \to Y$ ist unbekannt. Gesucht ist eine Funktion $g$, die $f$ aproximiert. Ein Lernalgorithmus ermittelt diese Funktion aus einem Hypothesenset. Dieses Vorgehen ist in Abbildung \ref{fig:supervisedLearning} visualisiert. Bei unüberwachtem Lernen dagegen ist $Y$ unbekannt; die Eingabedaten haben die Form $x_1, ..., x_n, x_i \in X$. Hier ist ein $f$ gesucht, das die Daten möglichst gut beschreibt und sie beispielsweise eigenständig in Kategorien einteilt.
+	Es wird zwischen verschiedenen Arten des maschinellen Lernens unterschieden, dem überwachten Lernen, dem unüberwachten Lernen und dem verstärkenden Lernen. Letzteres wird hier nicht betrachtet. Bei überwachtem Lernen bestehen die vorliegenden Daten aus Eingabe-Ausgabe-Paaren $(x_1, y_1), ...,(x_n, y_n), x_i \in X$. Demnach ist nur die Funktion $f: X \to Y$ ist unbekannt. Gesucht ist eine Funktion $g$, die $f$ aproximiert. Ein Lernalgorithmus ermittelt diese Funktion aus einem Hypothesenset. Dieses Vorgehen ist in Abbildung \ref{fig:supervisedLearning} visualisiert. Bei unüberwachtem Lernen dagegen ist $Y$ unbekannt; die Eingabedaten haben die Form $x_1, ..., x_n, x_i \in X$. Hier ist ein $f$ gesucht, das die Daten möglichst gut beschreibt und sie beispielsweise eigenständig in Kategorien einteilt. In dieser Arbeit wird allerdings ausschließlich überwachtes Lernen betrachtet.
 	
 	\begin{figure}[H]
 		\centering
@@ -20,8 +20,9 @@ Da in dieser Arbeit Methoden des Maschinellen Lernens verwendet werden, wird im 
 		\caption[Darstellung von überwachtem Lernen]{Darstellung von überwachtem Lernen}
 		\label{fig:supervisedLearning}
 	\end{figure}
+
 	
-	In dieser Arbeit wird überwachtes Lernen betrachtet, weshalb die untersuchten Daten annotiert werden müssen.
+	Ein häufig beobachtetes Problem bei maschinellem Lernen ist das sogenannte Overfitting, auf Deutsch Überanpassung, wenn das Modell zwar die Trainingsdaten gut approximiert, aber keine gute Generalisierung für unbekannte Daten bildet, d.h. zu stark an die Trainingsdaten angepasst ist. Gründe dafür können eine zu hohe Komplexität des Lernmodells wie z.B. zu viel Training oder zu wenig Trainingsdaten sein. In beiden Fällen wird ungewollt ein Teil des \textit{noise} der Trainingsdaten in das Modell übernommen. Das Gegenteil von Overfitting ist Underfitting, das den Fall beschreibt, dass das Modell die Beziehung von Merkmalen und Ziel nicht ausreichend erfasst. Das ist auch der Fall, wenn die zum Training verwendete Stichprobe verzerrt ist.
 	
 	\subsection{Mathematischer Hintergrund}
 	
@@ -94,20 +95,6 @@ Da in dieser Arbeit Methoden des Maschinellen Lernens verwendet werden, wird im 
 	\end{align*}
 	
 	Die Auswahl der betrachteten Metriken ist von dem vorliegenden Problem abhängig.
-	
-	\subsection{Probleme maschinellen Lernens}
-	
-	Ein häufig beobachtetes Problem bei maschinellem Lernen ist das sogenannte Overfitting, auf Deutsch Überanpassung, wenn das Modell zwar die Trainingsdaten gut approximiert, aber keine gute Generalisierung für unbekannte Daten bildet, d.h. zu stark an die Trainingsdaten angepasst ist. Gründe dafür können eine zu hohe Komplexität des Lernmodells wie z.B. zu viel Training oder zu wenig Trainingsdaten sein. In beiden Fällen wird ungewollt ein Teil des \textit{noise} der Trainingsdaten in das Modell übernommen. Das Gegenteil von Overfitting ist Underfitting, das den Fall beschreibt, dass das Modell die Beziehung von Merkmalen und Ziel nicht ausreichend erfasst. 
-				
-		\begin{itemize}
-			\item offensichtich: Underfitting
-			\item Overfitting -> gute Approximation aber schlechte Generalisierung auf unbekannte Daten
-			\item Einfluss von: Komplexität des Lernmodells, Datenmenge, Kontamination der Daten mit Rauschen
-			\item mehr Datenpunkte mehr gut, Rauschen und Komplexität schlecht
-			\item TODO: Bild
-			\item Regularisierung gegen Overvitting: TODO näher nachlesen
-			\item Stichprobenverzerrung
-		\end{itemize}
 
 	\subsection{Weitere Lernmodelle des Überwachten Lernens}
 	

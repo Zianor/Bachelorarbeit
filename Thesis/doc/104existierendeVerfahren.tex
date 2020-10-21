@@ -196,4 +196,14 @@ Da die Visualisierung hochdimensionaler Daten schwierig ist und auch Modelle mas
 	\label{fig:dim-red-statistical}
 \end{figure}
 
+%TODO: fix citation
+Da eine hohe Korrelation zwischen einzelnen Merkmalen, wie sie auch bei den statistischen Merkmalen vorliegt, dazu führen kann, dass die Interpretation der Wichtigkeit der Merkmale und die Qualität der Modelle generell eingeschränkt ist\footcite[Kapitel 8]{Harrison2019} wird außerdem die Abhängigkeit der Merkmale voneinander untersucht. Hierzu wird das Python-Paket \texttt{rfimp} verwendet, das ermittelt, welche Merkmale durch andere vorhergesagt werden können. Nach Reduktion der Merkmalsmenge um diese bleiben lediglich fünf Merkmale: die Standardabweichung, der Durchschnitt, die Anzahl der Nulldurchgänge, Schiefe und Kurtosis. Betracht man für diese die Wichtigkeit der einzelnen Merkmale bei einem \acl{RF}, zeigt sich, dass weiterhin der Durchschnitt am wenigsten Einfluss besitzt, wobei die Standardabweichung jetzt am Wichtigsten ist. Die gesamte Verteilung ist in Abbildung \ref{fig:rf-statistical-reduced} sichtbar.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.95]{pic/rf-reduced-statistical.pdf}
+	\caption{Wichtigkeit der Merkmale für den \ac{RF}-Klassifikator mit reduzierter Merkmalszahl}
+	\label{fig:rf-statistical-reduced}
+\end{figure}
+
 Anhand der statistischen Merkmale kann also keine Klassifikation vorgenommen werden. Vermutlich sorgt die große Variation der in Betten aufgenommenen \ac{BKG}-Signale dafür, dass sich die Signale nicht statistisch verallgemeinern lassen. Auch die reine Betrachtung der Ähnlichkeit der Intervallschätzer ist nicht ausreichend. Es müssen also andere Merkmale gefunden werden, die allein oder ergänzend zu den bereits betrachteten eine Aussage zu der Signalqualität ermöglichen.
