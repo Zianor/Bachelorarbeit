@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix, classification_report, max_error, \
-    mean_absolute_error, mean_squared_error, r2_score
+    mean_absolute_error, mean_squared_error, r2_score, plot_roc_curve
 from sklearn.model_selection import train_test_split
 
 import utils as utils
@@ -18,6 +18,7 @@ class QualityEstimator:
 
     def __init__(self, segment_length=10, overlap_amount=0.9, hr_threshold=10, data_folder='data_patients'):
         plt.rcParams.update(utils.get_plt_settings())
+        plt.rcParams['axes.grid'] = False
         self.data_folder = data_folder
         self.segment_length = segment_length
         self.overlap_amount = overlap_amount
@@ -485,17 +486,23 @@ class MLStatisticalEstimator(QualityEstimator):
         labels = self.model.predict(data_subset)
         return labels
 
+    def print_model_test_report(self, save_title=None):
+        x1, x2, y1, y2, groups1, groups2 = self._get_patient_split()
+        plt.figure(figsize=utils.get_plt_normal_size())
+        plot_roc_curve(self.model, x2, y2)
+        super(MLStatisticalEstimator, self).print_model_test_report(save_title=save_title)
+
+
 
 class OwnEstimator(QualityEstimator):
 
     def __init__(self, clf, path, segment_length=10, overlap_amount=0.9, hr_threshold=10, data_folder='data_patients',
                  feature_selection=None):
-        self.feature_selection=feature_selection
+        self.feature_selection = feature_selection
         super(OwnEstimator, self).__init__(segment_length=segment_length, overlap_amount=overlap_amount,
                                            hr_threshold=hr_threshold, data_folder=data_folder)
         pd.options.mode.use_inf_as_na = True
         self.error_target = self.data['error']
-        self.features['brueser_sqi'] = self.data['brueser_sqi']
         self.path = os.path.join(utils.get_data_set_folder(self.data_folder, self.segment_length, self.overlap_amount),
                                  path)
         if clf is not None:
