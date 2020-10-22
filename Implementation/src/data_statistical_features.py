@@ -503,13 +503,16 @@ class SegmentBrueserSQI(Segment):
         return np.concatenate((segment_array, own_array), axis=0)
 
 
-class SegmentOwn(SegmentStatistical):
+class SegmentOwn(Segment):
 
     def __init__(self, series: DataSeries, start, end, informative, ecg_hr, brueser_sqi, bcg_hr):
         self.filtered_data = series.bcg.filtered_data[start: end]
-        super(SegmentOwn, self).__init__(series.bcg.raw_data[start: end], series.patient_id, ecg_hr, bcg_hr,
-                                         brueser_sqi, series.bcg_sample_rate, informative,
-                                         coverage=series.bcg.get_coverage(start, end))
+        super(SegmentOwn, self).__init__(series.patient_id, ecg_hr, bcg_hr, brueser_sqi, informative, coverage=series.bcg.get_coverage(start, end))
+        self.mean = np.mean(self.filtered_data)
+        self.standard_deviation = np.std(self.filtered_data)
+        self.number_zero_crossings = (np.diff(np.sign(self.filtered_data)) != 0).sum()
+        self.kurtosis = kurtosis(self.filtered_data)
+        self.skewness = skew(self.filtered_data)
         self.interval_lengths = series.bcg.get_interval_lengths(start, end)  # in samples
         self.sqi_array = series.bcg.get_sqi_array(start, end)
         self.peak_values = series.bcg.get_unique_peak_values(start, end)
@@ -645,8 +648,13 @@ class SegmentOwn(SegmentStatistical):
 
     @staticmethod
     def get_feature_name_array():
-        segment_array = SegmentStatistical.get_feature_name_array()
+        segment_array = Segment.get_feature_name_array()
         own_array = np.array([
+            'mean',
+            'std',
+            'number_zero_crossings',
+            'kurtosis',
+            'skewness',
             'hf_ratio_acf',
             'hf_ratio_data',
             'hf_diff_acf',
@@ -685,6 +693,11 @@ class SegmentOwn(SegmentStatistical):
         """
         segment_array = super().get_feature_array()
         own_array = np.array([
+            self.mean,
+            self.standard_deviation,
+            self.number_zero_crossings,
+            self.kurtosis,
+            self.skewness,
             self.hf_ratio_acf,
             self.hf_ratio_data,
             self.hf_diff_acf,
