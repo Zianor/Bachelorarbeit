@@ -299,6 +299,8 @@ def eval_classifier(features, target, patient_id, pipe, grid_folder_name, test_s
         scores = ['accuracy', 'balanced_accuracy', 'f1', 'roc_auc', 'f1_weighted', 'precision', 'recall']
         grid_search = RandomizedSearchCV(estimator=pipe, param_distributions=grid_params, scoring=scores, cv=cv,
                                          n_jobs=-3, verbose=2, refit=scoring, n_iter=15)
+        # grid_search = GridSearchCV(estimator=pipe, param_grid=grid_params, scoring=scores, cv=cv,
+        #                            n_jobs=-3, verbose=2, refit=scoring)
         grid_search.fit(x_g1, y_g1, groups=groups1)
         # save fitted model
         with open(os.path.join(path, model_filename), 'wb') as file:
