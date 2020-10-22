@@ -121,7 +121,7 @@ Insgesamt zeigen bereits Accuracy und \ac{MAE}, siehe Abbildung \ref{fig:ml-stat
  		annotiert	& 3{,}28		& 43{,}22\,\%	& - 			& -\\ \hline
  		\acs{LDA}	& 21{,}84	& 84{,}81\,\%	& 0{,}49		& 0{,}51\\
  		\acs{SVM}	& 22{,}06	& 88{,}14\,\%	& 0{,}47		& 0{,}55\\
- 		\acs{DT}	& 19{,}39	& 47{,}20\,\%	& 0{,}53		& 0{,}52\\
+ 		\acs{DT}	& 19{,}47	& 47{,}20\,\%	& 0{,}55		& 0{,}55\\
  		\acs{RF}	& 17{,}66	& 44{,}20\,\%	& 0{,}57		& 0{,}52\\
  		\acs{MLP}	& 18{,}41	& 42{,}04\,\%	& 0{,}56		& 0{,}54\\
  	\end{tabular}
@@ -206,20 +206,20 @@ Da eine hohe Korrelation zwischen einzelnen Merkmalen, wie sie auch bei den stat
 	\label{fig:rf-statistical-reduced}
 \end{figure}
 
-Die Ergebnisse dieses \acl{RF} mit reduzierter Merkmalsanzahl können mit dem in \ref{res-statistical} untersuchten \acl{RF} verglichen werden.
+Die Ergebnisse dieses \acl{RF} mit reduzierter Merkmalsanzahl können mit dem in \ref{res-statistical} untersuchten \acl{RF} verglichen werden. Der \ac{MAE} ist bei reduzierter Merkmalszahl etwas höher, aber die Coverage ist bedeutend höher. Insgesamt sind die Klassifikatoren auf einem ähnlichen Niveau, auch dieser Vergleich bei der geringen Qualität schwierig ist. In Abbildung \ref{fig:ml-statistical-reduced-comparison} sind die beiden \acl{RF} gegenübergestellt.
 
  \begin{figure}[H]
  	\centering
   	\begin{tabular}{l || c | c | c}
- 									& insgesamt 		& RF mit 13 Merkmalen			& RF mit reduzierter Merkmalszeit\\\hline
- 		$E\textsubscript{HR} < 5$ 		& 32{,}61\,\% 	& 17,35\,\%		& 16,07\,\%	\\
- 		$E\textsubscript{HR} < 10$ 		& 43{,}22\,\% 	& 22,20\,\% 		& 20,82\,\%	\\
- 		$E\textsubscript{HR} < 15$ 		& 51{,}66\,\% 	& 25,92\,\% 		& 24,34\,\%	\\
- 		$E\textsubscript{HR} < 20$ 		& 59{,}40\,\% 	& 29,23\,\% 		& 27,45\,\%\\
- 		MAE								& 21{,}85		& 	&\\
- 		Coverage						& 43{,22}\,\%	&	&\\
- 		Accuracy auf Testset				& -				&	&\\
- 		Accuracy der Kreuzvalidierung 	& -				&	&\\
+ 									& insgesamt 		& RF mit 13 Merkmalen			& RF mit 5 Merkmalen\\\hline
+ 		$E\textsubscript{HR} < 5$ 		& 32{,}61\,\% 	& 17,35\,\%		& 28,00\,\%	\\
+ 		$E\textsubscript{HR} < 10$ 		& 43{,}22\,\% 	& 22,20\,\% 		& 36,25\,\%	\\
+ 		$E\textsubscript{HR} < 15$ 		& 51{,}66\,\% 	& 25,92\,\% 		& 42,53\,\%	\\
+ 		$E\textsubscript{HR} < 20$ 		& 59{,}40\,\% 	& 29,23\,\% 		& 48,25\,\%\\
+ 		MAE								& 21{,}85		& 17,66			& 19{,}49\\
+ 		Coverage						& 43{,22}\,\%	& 44,20\,\%		& 77{,}08\,\%\\
+ 		Accuracy (Testset)				& -				& 0,57			& 0,52\\
+ 		Accuracy (Kreuzvalidierung)	 	& -				& 0{,}52			& 0,57\\
  	\end{tabular}
  	\caption{Random Forest mit reduzierter Merkmalszahl im Vergleich zu allen 13 Merkmalen}
  	\label{fig:ml-statistical-reduced-comparison}
