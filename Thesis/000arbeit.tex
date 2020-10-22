@@ -1,4 +1,4 @@
-\documentclass[12pt,a4paper,twoside,index=totoc,listof=totoc,headinclude,headsepline,numbers=noenddot,headings=normal,parskip=half,fleqn]{scrbook}
+\documentclass[12pt,a4paper,ngerman,twoside,index=totoc,listof=totoc,headinclude,headsepline,numbers=noenddot,headings=normal,parskip=half,fleqn]{scrbook}
 
 %***********************************************************
 %* Pakete			 									   *
@@ -10,6 +10,7 @@
 \usepackage[dvipsnames]{xcolor}
 \usepackage{graphicx}
 \usepackage{tabularx}
+\usepackage{makecell} % Zeilenumbrüche in Tabellen
 \usepackage{multicol}
 \usepackage{subcaption}
                                     
@@ -75,6 +76,11 @@ doi=false
 \DeclareMathOperator*{\argmax}{argmax}
 \DeclareMathOperator*{\argmin}{argmin}
 
+%***********************************************************
+%* Einheiten		 									   *
+%***********************************************************
+\usepackage{siunitx}
+\sisetup{locale = DE}
 %***********************************************************
 %* Quellcode / Kommandozeileneingabe						   *
 %***********************************************************
