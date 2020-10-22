@@ -720,6 +720,7 @@ class SegmentOwn(SegmentStatistical):
 
 if __name__ == "__main__":
     # DataSet()
+    DataSetOwn(segment_length=30)
     DataSetOwn()
     # DataSetStatistical()
     # DataSetPino()
