@@ -2,12 +2,28 @@
 
 Die Untersuchungen in \ref{analyse} haben gezeigt, dass die existierenden untersuchten Verfahren nicht ausreichend sind, um die Qualität von \ac{BKG}-Signal aus Langzeitaufnahmen von Patient*innen zu beurteilen. Deshalb werden weitere Möglichkeiten untersucht und der Fokus dabei vor allem auf die Konstruktion der Eingabemerkmale gelegt. Des Weiteren wird der Einfluss der Segmentlänge und des Schwellwerts von $E\textsubscript{HR}$ analysiert. Dafür wird eine Auswahl gängiger Modelle maschinellen Lernens verwendet.
 
-\section{Eingabeform der Daten}
+\section{Merkmalskonstruktion}
 
 Grundsätzlich muss zwischen zwei Eingabeformen unterschieden werden: Der bisher betrachteten Eingabe von Merkmalen und die Eingabe des Signals selbst. Letzteres hat den Vorteil, dass keine Informationen verloren gehen können. Allerdings ist das Training so sehr rechen- und damit auch zeitaufwändig und die Merkmale, die zur Beurteilung der Signalqualität genutzt werden sind nur schwer nachvollziehbar. Aus diesen Gründen wird in dieser Arbeit die Eingabe von Merkmalen untersucht.
 
-Neben der Konstruktion von neuen Merkmalen können ebenfalls die Ergebnisse aus \ref{analyse} verwendet werden, das bedeutet das reduzierte Set statistischer Merkmale und der \ac{SQI} des \ac{CLIE}-Algorithmus, bzw. die Coverage durch Intervalle, deren \ac{SQI} über einem Schwellwert $q\textsubscript{th}$ liegt. Das Vorgehen bei der Konstruktion neuer Merkmale besteht darin, diese zunächst zu sammeln und anschließend zu untersuchen, Zusammenhänge zu ermitteln
+Neben der Konstruktion von neuen Merkmalen können ebenfalls die Ergebnisse aus \ref{analyse} verwendet werden, das bedeutet das reduzierte Set statistischer Merkmale und der \ac{SQI} des \ac{CLIE}-Algorithmus, bzw. die Coverage durch Intervalle, deren \ac{SQI} über einem Schwellwert $q\textsubscript{th}$ liegt. Das Vorgehen bei der Konstruktion neuer Merkmale besteht darin, diese zunächst zu sammeln und anschließend zu untersuchen, Zusammenhänge zu ermitteln und mit den gewonnenen Erkenntnisse die Merkmale zu reduzieren und in Relation zueinander zu setzen.
 
-\section{Evaluationsmetriken}
 
 \section{Modelle}
+
+\subsection{Regression vs. Klassifikation}
+
+\subsection{Auswahl der Modelle}
+
+\subsection{Einfluss von Segmentlänge und Schwellwert der Annotation}
+\begin{itemize}
+	\item Regression vs. Klassifikation: Vor- und Nachteile
+	\item für beides zunächst rf und xgboost verwendet -> warum: ensemble meist gut, weit verbreitet, gut nachvollziehbar
+	\item wegen nan werten vorklassifikation
+	\item 
+\end{itemize}
+
+
+
+
+
