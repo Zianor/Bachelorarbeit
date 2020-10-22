@@ -95,16 +95,16 @@ class QualityEstimator:
 
     def print_report_all_signal(self, test_indices, y_pred):
         print("\n Coverage bestimmter Fehler des genutzten Signals auf Gesamtsignal")
-        print(f"Fehler < 5 gesamt           : {self.get_5percent_coverage(test_indices, use_brueser_hr=False):.2f} %")
-        print(f"Fehler < 5 klassifiziert    : {self.get_5percent_coverage(test_indices, y_pred):.2f} %")
-        print(f"Fehler < 10 gesamt          : {self.get_10percent_coverage(test_indices, use_brueser_hr=False):.2f} %")
-        print(f"Fehler < 10 klassifiziert   : {self.get_10percent_coverage(test_indices, y_pred):.2f} %")
-        print(f"Fehler < 15 gesamt          : {self.get_15percent_coverage(test_indices, use_brueser_hr=False):.2f} %")
-        print(f"Fehler < 15 klassifiziert   : {self.get_15percent_coverage(test_indices, y_pred):.2f} %")
-        print(f"Fehler < 20 gesamt          : {self.get_20percent_coverage(test_indices, use_brueser_hr=False):.2f} %")
-        print(f"Fehler < 20 klassifiziert   : {self.get_20percent_coverage(test_indices, y_pred):.2f} %")
-        print(f"Fehler = 667 gesamt         : {self.get_unusable_percentage(test_indices, use_brueser_hr=False):.5f} %")
-        print(f"Fehler = 667 klassifiziert  : {self.get_unusable_percentage(test_indices, y_pred):.5f} %")
+        print(f"Fehler < 5 FE gesamt           : {self.get_5percent_coverage(test_indices, use_brueser_hr=False):.2f} %")
+        print(f"Fehler < 5 FE klassifiziert    : {self.get_5percent_coverage(test_indices, y_pred):.2f} %")
+        print(f"Fehler < 10 FE gesamt          : {self.get_10percent_coverage(test_indices, use_brueser_hr=False):.2f} %")
+        print(f"Fehler < 10 FE klassifiziert   : {self.get_10percent_coverage(test_indices, y_pred):.2f} %")
+        print(f"Fehler < 15 FE gesamt          : {self.get_15percent_coverage(test_indices, use_brueser_hr=False):.2f} %")
+        print(f"Fehler < 15 FE klassifiziert   : {self.get_15percent_coverage(test_indices, y_pred):.2f} %")
+        print(f"Fehler < 20 FE gesamt          : {self.get_20percent_coverage(test_indices, use_brueser_hr=False):.2f} %")
+        print(f"Fehler < 20 FE klassifiziert   : {self.get_20percent_coverage(test_indices, y_pred):.2f} %")
+        print(f"Fehler = 667 FE gesamt         : {self.get_unusable_percentage(test_indices, use_brueser_hr=False):.5f} %")
+        print(f"Fehler = 667 FE klassifiziert  : {self.get_unusable_percentage(test_indices, y_pred):.5f} %")
         # TODO: plot
 
     def print_report_informative_signal(self, test_indices, y_pred, path=None):
@@ -124,21 +124,21 @@ class QualityEstimator:
         data = pd.Series(arr, index=['$<5$', '$5-10$', '$10-15$', '$15-20$', '$20-666$', '$667$'])
         plt.figure(figsize=utils.get_plt_normal_size())
         plt.bar(x=data.index, height=data.values)
-        plt.xlabel('$E\\textsubscript{HR}$')
+        plt.xlabel('$E\\textsubscript{HR}$ in FE')
         if name:
             plt.title(name)
         if path is not None:
             plt.savefig(path, transparent=True, bbox_inches='tight', dpi=300)
         print(
-            f"Fehler < 5    : {percent_5:.2f} %")
+            f"Fehler < 5 FE   : {percent_5:.2f} %")
         print(
-            f"Fehler < 10   : {percent_10:.2f} %")
+            f"Fehler < 10 FE   : {percent_10:.2f} %")
         print(
-            f"Fehler < 15   : {percent_15:.2f} %")
+            f"Fehler < 15 FE   : {percent_15:.2f} %")
         print(
-            f"Fehler < 20   : {percent_20:.2f} %")
+            f"Fehler < 20 FE   : {percent_20:.2f} %")
         print(
-            f"Fehler = 667  : {percent_unusuable:.5f} %")
+            f"Fehler = 667 FE : {percent_unusuable:.5f} %")
 
     def print_model_test_report(self, save_title=None):
         y_pred, y_true = self.predict_test_set()
@@ -491,7 +491,6 @@ class MLStatisticalEstimator(QualityEstimator):
         plt.figure(figsize=utils.get_plt_normal_size())
         plot_roc_curve(self.model, x2, y2)
         super(MLStatisticalEstimator, self).print_model_test_report(save_title=save_title)
-
 
 
 class OwnEstimator(QualityEstimator):
