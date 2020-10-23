@@ -61,92 +61,56 @@ Da in dieser Arbeit Methoden des Maschinellen Lernens verwendet werden, wird im 
 
 	\subsection{Lernmodelle und deren mathematischer Hintergrund}
 	
-		Es gibt eine Vielzahl von Modellen des maschinellen Lernens, von denen eine Auswahl in dieser Arbeit betrachtet und vorgestellt wird. Alle verallgemeinern eine Verteilung von Trainingsdaten und haben das Ziel, eine Funktion zu finden, mit der $y$ ermittelt werden kann. Bei einer Klassifikation soll sie die verschiedenen Klassen möglichst genau separieren und bei einer Regression den Wert möglichst genau vorhersagen. Diese Funktion wird auch Entscheidungsfunktion genannt und minimiert eine gewählte Kostenfunktion, die beschreibt wie sehr die Vorhersagen von der Zielgröße abweichen.
+		Es gibt eine Vielzahl von Modellen des maschinellen Lernens, von denen eine Auswahl in dieser Arbeit betrachtet und vorgestellt wird. Alle verallgemeinern eine Verteilung von Trainingsdaten und haben das Ziel, eine Funktion $h$ zu finden, mit der die Zielgröße $y$ vorhergesagt werden kann. Bei einer Klassifikation sollen die verschiedenen Klassen möglichst genau separiert und bei einer Regression der Wert möglichst genau vorhergesagt werden. Diese Funktion wird auch Entscheidungsfunktion genannt und minimiert eine gewählte Kostenfunktion, die beschreibt wie sehr die Vorhersagen von der Zielgröße abweichen. Bei linearen Modellen beispielsweise ist die Vorhersage mit $\hat{y}_i = \theta x_i$ eine lineare Kombination der gewichteten Merkmale. $\hat{y}_i$ kann dabei entweder direkt die Vorhersage eines Wertes sein oder genutzt werden, um eine Klassenzugehörigkeit zu ermitteln. Bei einer binären Klassifikation kann dafür beispielsweise die Signum- oder die logistische Funktion genutzt werden. Die genutzte Funktion wird auch Aktivierungsfunktion genannt. Die Parameter der Entscheidungsfunktion, in diesem Fall die Koeffizienten des Merkmalsvektors, werden im Nachfolgenden allgemein $\theta$ genannt. Sie sind der Teil der Entscheidungsfunktion, der von den Daten gelernt werden muss.
 		
-		Grundsätzlich wird zwischen linearen und nicht linear zusammenhängenden bzw. separierbaren Daten unterschieden. Um die Grundprinzipien von Regression und Klassifikation darzustellen, wird für beide zunächst die Funktionsweise eines einfaches lineares Modell, das heißt die Daten werden linear kombiniert, vorgestellt. Das einfachste Modell für die Klassifikation von linear separierbaren Daten ist ein Perzeptron. Seine Idee besteht darin, die Komponenten des Merkmalsverktors $x \in X = \mathbb{R}^n$ unterschiedlich zu gewichten. Hierfür wird ein Gewichtungsvektor $w \in \mathbb{R}^n$ verwendet. Die Ausgabe ist ein binärer Klassifikator $y \in Y = \{-1, 1\}$.  Es soll nun ein Schwellwert $b$, auch Bias genannt, und $w_i$ ermittelt werden, mit dem gilt:		
-		\[
-			\begin{gathered}
-				y = +1, \text{ falls } \sum_{i=1}^{n} w_i \cdot x_i > b \\
-				y = -1, \text{ falls } \sum_{i=1}^{n} w_i \cdot x_i < b
-			\end{gathered}
-		\]
-		Wenn nun $w_0 = b$ und $x_0 = 1$ gewählt werden, ergibt sich durch Umformem als sogenannte Aktivierungsfunktion die Signumfunktion $h(x) = sign(w^Tx)$. Für die Ermittlung von $w$ müssen nun die Kosten minimiert werden. Bei einem Perzeptron entspricht die Kostenfunktion der Anzahl der falschen Klassifikationen. Die Signumfunktion hat den Nachteil, dass sie einen harter Schwellwert besitzt und alle Fehlklassifikation gleich bewertet, unabhängig davon wie nah $\sum_{i=1}^{n} w_i \cdot x_i$ an $b$ ist. Aus diesem Grund werden in der Praxis meist andere Aktivierungsfunktionen gewählt.
+		Während des Trainings werden die besten Parameter $\theta$ ermittelt. Dafür wird eine Funktion benötigt, die ausdrückt, wie gut das Modell den Trainingsdaten angepasst ist. Diese besteht allgemein aus zwei Teilen: der Kostenfunktion $L$ und der Regularisierung $\Omega$:
 		
-		Bei einer linearen Regression wird eine lineare Funktion $h(x) = w^Tx$ gesucht, die die Datenpunkte in die reellen Zahlen abbildet. Auch hier wird das $w_i$ gesucht, dass die Kosten minimiert. Die Kostenfunktion leitet sich aus der Methode der kleinsten Quadrate ab bei der die Summe der Fehlerquadrate minimiert wird:
 		\[
-			\text{cost} = \sum_{i=1}^{n} (y_i - h(x_i))^2
+			C(\theta)= L(\theta) + \Omega(\theta)
 		\]
-	\begin{itemize}
-		\item gesucht sind Koeffizienten $w$, \[\argmin_w \sum_{i=1}^{n} (w^T x_i - y_i)^2\]
-		\item durch Auflösen $w = (X^T X)^{-1} X^T$
-		\item bis jetzt nur lineare einfache Modelle betracht
-		\item bei komplexeren Minimierungsproblemen Methode kleinster Quadrate nicht ausreichend, andere Methoden zur Fehlerminimierung -> Gradientenabstiegsverfahren
-		\item graphische Vorstellung als Hügellandschaft
-		\item In jedem Schritt Ableitung der Kostenfunktion nach jedem Gewicht und Bias berechnet -> Schritt wählen, der Kostenfunktion am stärksten minimiert
-		\item wenn Daten nicht linear separierbar: Kerneltrick möglich
-		\item Transformation (Ersetzten) des Skalarprodukts transformiert implizit den Variablenraum
-		\item Beispiel Gaußscher RBF-Kernel \[K_{RBF} (x, x\prime) := exp(-\gamma \|x - x\prime\|^2) \text{ mit } \gamma > 0\]
-		\item lineare Trennung in höher-dimensionalem Variablenraum
-		\item Berücksichtigung aller Nicht-Linearitäten in der Transformation -> Trennfläche kann wiederum linear sein
-	\end{itemize} 
+		
+		Als Kostenfunktion wird vor allem für Regressionsprobleme häufig der \ac{MSE} verwendet. Bei binären Klassifikationsproblemen kann aber beispielsweise auch die Anzahl der falschen Klassifikationen verwendet werden. Die Regularisierung kontrolliert die Komplexität des Modells, um Overfitting zu vermeiden. Das Ziel des Trainings ist es demnach, die Anpassung des Modells zu optimieren, also $C$ zu minimieren. Dieses Minimierungsproblem wird abhängig von dem verwendeten Modell gelöst. Bei einer linearen Regression beispielsweise kann die Methode der kleinsten Quadrate verwendet werden, um die Fehlerquadrate zu minimieren, da eine Regularisierung bei einem linearen Modell nicht nötig ist. Der Gewichtungsvektor $\theta$ kann hier durch direktes Auflösen berechnet werden:
+		\[
+			\argmin_{\theta} \sum_{i=1}^{n} (\theta^T x_i - y_i)^2
+			\Rightarrow \theta = (X^T X)^{-1} X^T
+		\]
+		
+		Bei komplexeren Minimierungsproblemen ist die Methode kleinster Quadrate nicht ausreichend und es werden andere Methoden zur Fehlerminimierung benötigt. Eines davon ist davon ist das Gradientenabstiegsverfahren, bei dem in jedem Schritt die Ableitung der Kostenfunktion nach jedem der Gewichte berechnet wird und der Schritt gewählt wird, der die Funktion am stärksten minimiert.
+		
+		Eine andere Möglichkeit ist, nicht linear separierbare Daten mit dem sogenannten Kerneltrick linear separierbar zu machen. Dabei wird durch Ersetzen des Skalarproduktes implizit der Variablenraum transformiert. Eine Beispiel ist der Gaußsche RBF-Kernel:
+		\[
+			K_{RBF} (x, x\prime) := exp(-\gamma \|x - x\prime\|^2) \text{ mit } \gamma > 0
+		\]
+		In der Transformation werden alle Nicht-Linearitäten berücksichtigt, wodurch anschließend Linearität möglich ist.
+		
+		Im Folgenden werden die in dieser Arbeit genutzten Modelle näher vorgestellt.
+
 	
-		\subsubsection{Entscheidungsbäume}
+		\subsubsection{Classification And Regression Trees}
 		
-		\begin{itemize}
-			\item Bild mit Thresholds und Features
-			\item an jedem Knoten Entscheidung ob bestimmtes Feature über Threshold liegt
-			\item generiert z.B. durch rekursives binäres Teilen
-			\item bei Regression mittlere quadratische Abweichung $MSE$ minimieren, bei Klassifikationsbäumen Messung der "Unreinheit" der Blätter (Fehler = 0 wenn Blatt nur Punkte derselben Klasse, Fehler maximal wenn keine Klasse Mehrheit)
-			\item Optimierung rechnerisch nicht effizient lösbar
-			\item greedy den Schritt, also die Kombination aus Feature und Threshold wählen, der den Fehler am Stärksten reduziert
-			\item Abbruchkriterien: maximal erlaubte Tiefe, Mindestanzahl Datenpunkte in einem Blatt
-			\item keine Featureskalierung nötig
-		\end{itemize}
+		\ac{CART} sind nicht-lineare Modelle, die sowohl für Regression als auch Klassifikation verwendet werden können. Zwar sind sie oft anderen Lernmodellen unterlegen, werden aber in komplexeren Modellen verwendet und haben den Vorteil, sehr gut nachvollziehbar zu sein. Im Gegensatz zu vielen anderen Modellen benötigen sie keine Normalisierung der Merkmale und sind oft einfach zu interpretieren. An jedem Knoten wird unterschieden, ob ein bestimmtes Feature über einem Schwellwert liegt und somit ein Pfad im Baum durchlaufen. Die Kostenfunktion bei einer Regression ist der \ac{MSE}. Für die Kostenfunktion einer Klassifikaton wird häufig die \glqq{}Reinheit\grqq{} eines Knoten $m$ gemessen. Ein Möglichkeit diese zu berechnen ist der Gini-Index, wobei $k$ die möglichen Klassifikation beschreibt:
+		\begin{align*}
+			p_{mk} &= 1/ N_m \sum_{x_i \in R_m} I(y_i = k)\\
+			G &= \sum_k p_{mk} (1 - p_{mk})
+		\end{align*}
+		Eine andere ist die Entropie:
+		\[
+			E(X) = - \sum_k p_{mk} \log(p_{mk}) 
+		\]
+		
+		Für den Aufbau eines \ac{CART} wird häufig das zu den greedy Algorithmen gehörende rekursive binäre Teilen verwendet. Hierbei wird ein Baum von oben nach unten aufgebaut. In jedem Schritt wird das Merkmal gewählt, mit dem sich die Daten zu diesem Zeitpunkt am besten separieren lassen und der Schwellwert ermittelt. Abbruchkriterien unter anderem eine maximal erlaubte Tiefe oder eine Mindestanzahl von Datenpunkten in einem Blatt. Wenn diese zu viel Spielraum erlauben, neigen Bäume zum Overfitting.
 		
 		\subsubsection{Random Forest}
 		
-		\begin{itemize}
-			\item besteht aus mehreren unkorrelierten Entscheidungsbäumen
-			\item Randomisierung bei Erstellung der Bäume
-			\item Mehrheitsentscheidung aller Bäume
-			\item Nach Breiman für jeden Baum im Wald
-			\item n Bootstrap Samples ziehen, also mit Zurücklegen aus dem Trainings-Datensatz gezogen
-			\item von $M$ Merkmalen $m \ll M$ Merkmale zufällig gewählt, die als Kriterium für Split infrage kommen
-			\item voller Ausbau des Baums
-		\end{itemize}
+		Ein Zusammenschluss aus mehreren unkorrelierten Bäumen wird \ac{RF} genannt. Jeder dieser Bäume ist eigenständiges Modell, das ein Ergebnis liefert. Aus der Menge der Einzelergebnisse wird das endgültige Ergebnis ermittelt. Dadurch wird ein Teil der Nachvollziehbarkeit von Bäumen gegen eine bessere Generalisierung eingetauscht. Die einzelnen Bäume werden zufällig erzeugt, indem für jeden $n$ zufällige Datenpunkte ausgewählt werden. Von $M$ Merkmalen werden nun $m \ll M$ ebenfalls zufällig gewählt, die als Kriterium für den Aufbau des Baumes verwendet werden. Der darauf folgende Aufbau des Baumes entspricht dem zuvor beschriebenen. Bei einer Klassifikation ist das endgültige Ergebnis je nach Implementierung ein Mehrheitsentscheid oder eine Kombination aller Wahrscheinlichkeiten; bei einer Regression der Durchschnitt aller Werte.
 		
+		Ein Random Forest hat gegenüber anderen Modellen den Vorteil, dass er sehr schnell trainiert und somit sehr effizient für große Datenmenge ist. Gleichzeitig kann das Ergebnis einfach nachvollzogen werden.
 		
-		\subsubsection{Nächste Nachbarn Modelle}
+		\subsubsection{Gradient Boosted Trees}
 		
-		\begin{itemize}
-			\item sehr einfache Modelle, öfters zur Schätzung einer Baseline im Einsatz
-			\item Klassifikation anhand der Datenpunkte, die zu klassifierenden Datenpunkt am nächsten liegen
-			\item dafür Ähnlichkeit quantifizieren
-			\item kein Training, Modell direkt durch Trainingsdaten definiert
-			\item Voronoi-Regionen werden erzeugt: Menge aller Punkte die näher an einem Zentrum liegen als an allen anderen Zentren
-			\item daraus Voronoi-Diagramm (gesammelte Grenzen)
-			\item k-Nächste Nachbarn: das Label der Mehrheit der k nächsten Punkte wird zurückgegeben
-			\item Regression: Mittelwert-Bildung über die Label der k nächsten Nachbarn
-		\end{itemize}
+		Auch ein Gradient Boosted Tree kombiniert mehrere einfache Bäume. Im Gegensatz zum \ac{RF} hängt beim Gradient Boosted Tree jeder Baum von früheren Bäumen ab. Gestartet wird mit einem Baum, auf dessen Ergebnissen aufgebaut wird. Das endgültige Ergebnis wird auch hier aus der Menge an einzelnen Ergebnissen ermittelt, aber folgende Bäume konzentrieren sich jeweils darauf, die Schwächen der schon erzeugten Modelle auszugleichen.
 		
-		\subsubsection{Support Vector Machines}
-		
-		\begin{itemize}
-			\item Rauschen in Daten
-			\item statt einfache Gerade wie bei Perzeptron wird Hyperebene mit maximalem Rand gesucht, die Daten korrekt klassifiziert
-			\item TODO: Bild von Gerade mit Rand
-			\item Ausgangspunkt Perzeptron, Umformulierung in Optimierung mit Nebenbedingung, dass Hyperebene größten Rand besitzt
-			\item bei \ac{SVM}s oft oben schon erwähnter Kernel-Trick, also Transformation des Skalarprodukts, damit nicht-lineare Separierung möglich
-		\end{itemize}
-		
-		\subsubsection{Mehrlagiges Perzeptron}
-		
-		\begin{itemize}
-			\item Klasse von künstlichen neuronalen Netzwerken
-			\item 3 Schichten: Eingabe-Schicht, Versteckte Schicht, Ausgabe-Schicht
-			\item außer den Eingabeneuronen wird nicht-lineare Aktivierungsfunktion verwendet
-		\end{itemize}
-
+		Auch Gradient Boosted Trees ermöglichen eine nachvollziehbare Entscheidung. Meist erreichen sie etwas bessere Ergebnisse als die einfacheren \acl{RF}. %TODO: Plural
 
 \section{Medizinische Grundlagen}\label{med-grundlagen}
 
