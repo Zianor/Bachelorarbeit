@@ -207,7 +207,7 @@ class DataSetBrueser(DataSet):
             sample_rate=series.bcg_sample_rate,
             informative=informative,
             threshold=self.sqi_threshold,
-            medians=series.bcg.medians[indices],
+            medians=series.bcg.interval_lengths[indices],
             qualities=series.bcg.brueser_sqi[indices],
             length_samples=utils.seconds_to_frames(self.segment_length, series.bcg_sample_rate),
             coverage=brueser_coverage

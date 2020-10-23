@@ -16,14 +16,14 @@ class BCGSeries:
         self.bcg_id = bcg_id
         self.raw_data = raw_data
         self.filtered_data = utils.butter_bandpass_filter(raw_data, 1, 12, sample_rate)
-        self.sqi = sqi
-        self.bbi_bcg = bbi_bcg
-        self.bbi_ecg = bbi_ecg
-        self.indices = indices
+        self.loaded_intervals_sqi = sqi
+        self.loaded_intervals_bbi_bcg = bbi_bcg
+        self.loaded_intervals_bbi_ecg = bbi_ecg
+        self.loaded_intervals_indices = indices
         self.sample_rate = sample_rate
         self.length = len(raw_data) / sample_rate  # in seconds
         self.brueser_df = get_brueser_from_id(self.sample_rate, self.bcg_id, data_folder=data_folder).dropna()
-        self.medians = self.brueser_df['medians'].to_numpy()
+        self.interval_lengths = self.brueser_df['medians'].to_numpy()
         self.unique_peaks = self.brueser_df['unique_peaks'].to_numpy()
         self.brueser_sqi = self.brueser_df['qualities'].to_numpy()
 
@@ -32,7 +32,7 @@ class BCGSeries:
         """
         indices = np.where(np.logical_and(start <= self.unique_peaks, self.unique_peaks < end))
         if len(indices) > 0 and self.get_coverage(start, end) > self.coverage_threshold:
-            hr = 60 / (np.median(self.medians[indices]) / self.sample_rate)
+            hr = 60 / (np.median(self.interval_lengths[indices]) / self.sample_rate)
         else:
             hr = np.nan
         return hr
@@ -61,16 +61,12 @@ class BCGSeries:
         """Returns the values at the unique peaks in the given window"""
         return self.filtered_data[self.get_unique_peak_locations(start, end)]
 
-    def get_filtered_signal(self, start, end):
-        """Returns filtered bcg in given window"""
-        return self.filtered_data[start:end]
-
     def get_interval_lengths(self, start, end, sqi_threshold=None):
         """Returns estimated interval lengths in given window. Filters for NaN values in SQI"""
         indices = np.where(np.logical_and(start <= self.unique_peaks, self.unique_peaks < end))
         if sqi_threshold is not None:
             indices = np.where(self.brueser_sqi[indices] > sqi_threshold)
-        interval_lengths = self.medians[indices]
+        interval_lengths = self.interval_lengths[indices]
         return interval_lengths
 
     def get_coverage(self, start, end, sqi_threshold=None):
