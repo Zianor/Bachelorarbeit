@@ -121,7 +121,7 @@ Im folgenden Kapitel wird eine Einführung in das Thema der Signalverarbeitung u
 	Ein Algorithmus zur Beurteilung der Signalqualität mittels maschinellen Lernens wird von \citeauthor{Sadek2016} im Paper \citetitle{Sadek2016} beschrieben. Betrachtet werden \ac{BKG}-Signale, die in einem Massagesessel aufgenommen werden, also ebenfalls im Sitzen aufgenommenes Signal, bei dem eine geringere Variabilität als in dem hier untersuchten Anwendungsfall erwartet wird.
 	
 	Die vorliegenden Daten wurden manuell von Expert*innen als informativ oder nicht informativ klassifiziert und in 10-Sekunden-Segmente, die sich nicht überlappen, aufgeteilt. Insgesamt waren 58\,\% der Daten als informativ und 42\,\% als nicht-informativ gelabelt. Von diesen Segmenten wurden nach einer Bandpass-Filterung auf \numrange{1}{12}\,Hz 13 statistische Merkmale berechnet:
-	%\begin{multicols}{2}
+
 	\begin{itemize}
 		\item Minimun
 		\item Maximum
@@ -137,7 +137,6 @@ Im folgenden Kapitel wird eine Einführung in das Thema der Signalverarbeitung u
 		\item Varianz der lokalen Maxima
 		\item Mittelwerte der Signalhüllkurve\footnote{Die Signalhüllkurve ist eine glatte Kurve, die die Extrema des Signals umreißt.}
 	\end{itemize}
-	%\end{multicols}
 	
 	Für fünf verschiedene Modelle des maschinellen Lernens wurden jeweils die besten Hyperparameter über Kreuzvalidierung auf den Trainingsdaten ermittelt und die Modelle anschließend mit diesen Hyperparametern trainiert. Anschließend wurden die Modelle auf unbekannten Daten getestet. Das Training und Testen wurde mit getauschten Gruppen wiederholt. Das beste Ergebnis wurde mit einem Random Forest erreicht: Die durchschnittliche Accuracy der Kreuzvalidierung betrug \num{98,13}\,\% bzw. \num{100}\,\% bei getauschten Gruppen. Auf dem Testset wurde eine Genauigkeit von \num{92{,}3}\,\% bzw. \num{97{,}99}\,\% erreicht. Weitere Evaluationsmetriken außer eine Confusion Matrix für den besten Klassifikator sind nicht gegeben.
 	
@@ -169,7 +168,7 @@ Im folgenden Kapitel wird eine Einführung in das Thema der Signalverarbeitung u
 	
 	\begin{figure}[H]
 		\centering
-		\includegraphics[width=0.9\textwidth]{pic/data-prep-class.png}
+		\includegraphics[width=\textwidth]{pic/data-prep-classes.png}
 		\caption[Klassendiagramm der Datenstruktur für die Messdaten]{Klassendiagramm der Datenstruktur für die Messdaten}
 		\label{fig:data-prep-class}
 	\end{figure}
