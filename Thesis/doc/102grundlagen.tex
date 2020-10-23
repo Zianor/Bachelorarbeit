@@ -5,7 +5,7 @@ Zum Verständnis dieser Arbeit ist grundlegendes Wissen nötig, welches hier in 
 
 \section{Maschinelles Lernen}\label{ml-grundlagen}
 
-Da in dieser Arbeit Methoden des Maschinellen Lernens verwendet werden, wird im Folgenden eine Übersicht über Techniken, Hintergrund und verschiedene Lernmodelle gegeben.
+Da in dieser Arbeit Methoden des Maschinellen Lernens verwendet werden, wird im Folgenden eine Übersicht über seine Prinzipien, gängige Techniken und Evaluationsmetriken und verschiedene Lernmodelle und deren mathematischen Hintergrund gegeben.
 
 	\subsection{Grundprinzipien}
 	
@@ -23,46 +23,8 @@ Da in dieser Arbeit Methoden des Maschinellen Lernens verwendet werden, wird im 
 	
 	Ein häufig beobachtetes Problem bei maschinellem Lernen ist das sogenannte Overfitting, auf Deutsch Überanpassung, wenn das Modell zwar die Trainingsdaten gut approximiert, aber keine gute Generalisierung für unbekannte Daten bildet, d.h. zu stark an die Trainingsdaten angepasst ist. Gründe dafür können eine zu hohe Komplexität des Lernmodells wie z.B. zu viel Training oder zu wenig Trainingsdaten sein. In beiden Fällen wird ungewollt ein Teil des \textit{noise} der Trainingsdaten in das Modell übernommen. Das Gegenteil von Overfitting ist Underfitting, das den Fall beschreibt, dass das Modell die Beziehung von Merkmalen und Ziel nicht ausreichend erfasst. Das ist auch der Fall, wenn die zum Training verwendete Stichprobe verzerrt ist.
 	
-	\subsection{Mathematischer Hintergrund}
-	
-	Da für diese Arbeit ausschließlich überwachtes Lernen von Bedeutung ist, wird auch hier nur für dieses der mathematische Hintergrund vorgestellt.
-	
-	\begin{itemize}
-		\item auch hier nur supervised betrachtet
-		\item Verteilung der Daten
-		\item linear separierbar oder nicht: 3 Fälle (linear, linear mit Rauschen, nicht linear)
-		\item Abbildung dazu?
-		\item Ziel ist, eine Funktion zu finden, die die verschiedenen Klassen voneinander möglichst genau separiert, wodurch $y$ ermittelt werden kann bzw. bei einer Regression den Wert möglichst genau vorhersagt, Entscheidungsfunktion genannt
-		\item Lineare Modelle kombinieren Merkmale linear miteinander
-		\item einfachstes Modell für Klassifikation von linear separierbare Daten: Perzeptron
-		\item Komponenten Merkmalsvektor x unterschiedlich gewicheten
-		\item mit Gewichtungsvektor $w \in \mathbb{R}^n$
-		\item Ausgabe binärer Klassifikator $y \in Y = \{-1, 1\}$
-		\item Ermittlung Schwellwert \textit{Bias} $b$ mit \[
-\begin{gathered}
-	y = +1, \text{ falls } \sum_{i=1}^{n} w_i \cdot x_i > b \\
-	y = -1, \text{ falls } \sum_{i=1}^{n} w_i \cdot x_i < b
-\end{gathered}
-\]
-		\item wenn $w_0 = b$ und $x_0 =1$ durch Umformen Perzeptron Entscheidungsfunktion $h(x) = sign(w^Tx)$
-		\item $w$ so gewählt, dass Daten korrekt klassifiziert
-		\item wenn Perzeptron künstliches Neuron in Neuronalem Netz wird diese Funktion auch Aktivierungsfunktion genannt und kann variiert werden
-		\item Signum Funktion hat Nachteil des "harten" Schwellwerts, oft Funktionen wie logistische Funktion mit "weichem" Schwellwert besser
-		\item Lineare Regression: Gerade $h(x)$ finden, die Datenpunkte beschreibt
-		\item Methode der kleinsten Quadrate, also quadratische Abweichungen zwischen Gerade und Punkten minimieren
-		\item gesucht sind Koeffizienten $w$, \[\argmin_w \sum_{i=1}^{n} (w^T x_i - y_i)^2\]
-		\item durch Auflösen $w = (X^T X)^{-1} X^T$
-		\item bis jetzt nur lineare einfache Modelle betracht
-		\item bei komplexeren Minimierungsproblemen Methode kleinster Quadrate nicht ausreichend, andere Methoden zur Fehlerminimierung -> Gradientenabstiegsverfahren
-		\item graphische Vorstellung als Hügellandschaft
-		\item In jedem Schritt Ableitung der Kostenfunktion nach jedem Gewicht und Bias berechnet -> Schritt wählen, der Kostenfunktion am stärksten minimiert
-		\item wenn Daten nicht linear separierbar: Kerneltrick möglich
-		\item Transformation (Ersetzten) des Skalarprodukts transformiert implizit den Variablenraum
-		\item Beispiel Gaußscher RBF-Kernel \[K_{RBF} (x, x\prime) := exp(-\gamma \|x - x\prime\|^2) \text{ mit } \gamma > 0\]
-		\item lineare Trennung in höher-dimensionalem Variablenraum
-		\item Berücksichtigung aller Nicht-Linearitäten in der Transformation -> Trennfläche kann wiederum linear sein
-	\end{itemize} 
-	
+	Zum Prozess des maschinellen Lernens gehört ebenfalls das Sammeln der Daten und die Transformation in Merkmale, die dem Lernalgorithmus als Eingabe dienen. Dieser Prozess ist entscheidend für den Erfolg des Lernprozesses, da nur aus aussagekräftigen Daten ein gutes Modell erzeugt werden kann.
+
 	\subsection{Evaluation und Validierung}
 	
 	Ein erzeugtes Modell muss in jedem Fall auf Daten validiert werden, mit denen nicht trainiert wurde, um den Fehler auf unbekannten Daten abschätzen zu können. Eine Möglichkeit, dies zu tun, bietet die Hold-Out-Validierung, bei der die Daten zufällig in Trainings- und Testset aufgeteilt werden. Das Modell wird mit dem Trainingsset aufgebaut und auf dem Testset getestet und evaluiert. Eine andere übliche Technik ist die Kreuzvalidierung, bei der die Daten auf $v $ gleich große Mengen, im Englischen \textit{folds}, verteilt werden. Anschließend werden $v$ Modelle trainiert, wobei jeweils eine Menge ausgelassen wird, auf der anschließend getestet wird. Bei einer extremen Variante, der Leave-One-Out Kreuzvalididierung entspricht $v$ der Anzahl der Datenpunkte. Üblich ist jedoch v-fache Kreuzvalidierung mit $v=5$ oder $v=10$, auch abhängig von der Datenmenge und der verfügbaren Rechenleistung.
@@ -97,7 +59,36 @@ Da in dieser Arbeit Methoden des Maschinellen Lernens verwendet werden, wird im 
 	
 	Die Auswahl der betrachteten Metriken ist von dem vorliegenden Problem abhängig.
 
-	\subsection{Weitere Lernmodelle des Überwachten Lernens}
+	\subsection{Lernmodelle und deren mathematischer Hintergrund}
+	
+		Es gibt eine Vielzahl von Modellen des maschinellen Lernens, von denen eine Auswahl in dieser Arbeit betrachtet und vorgestellt wird. Alle verallgemeinern eine Verteilung von Trainingsdaten und haben das Ziel, eine Funktion zu finden, mit der $y$ ermittelt werden kann. Bei einer Klassifikation soll sie die verschiedenen Klassen möglichst genau separieren und bei einer Regression den Wert möglichst genau vorhersagen. Diese Funktion wird auch Entscheidungsfunktion genannt und minimiert eine gewählte Kostenfunktion, die beschreibt wie sehr die Vorhersagen von der Zielgröße abweichen.
+		
+		Grundsätzlich wird zwischen linearen und nicht linear zusammenhängenden bzw. separierbaren Daten unterschieden. Um die Grundprinzipien von Regression und Klassifikation darzustellen, wird für beide zunächst die Funktionsweise eines einfaches lineares Modell, das heißt die Daten werden linear kombiniert, vorgestellt. Das einfachste Modell für die Klassifikation von linear separierbaren Daten ist ein Perzeptron. Seine Idee besteht darin, die Komponenten des Merkmalsverktors $x \in X = \mathbb{R}^n$ unterschiedlich zu gewichten. Hierfür wird ein Gewichtungsvektor $w \in \mathbb{R}^n$ verwendet. Die Ausgabe ist ein binärer Klassifikator $y \in Y = \{-1, 1\}$.  Es soll nun ein Schwellwert $b$, auch Bias genannt, und $w_i$ ermittelt werden, mit dem gilt:		
+		\[
+			\begin{gathered}
+				y = +1, \text{ falls } \sum_{i=1}^{n} w_i \cdot x_i > b \\
+				y = -1, \text{ falls } \sum_{i=1}^{n} w_i \cdot x_i < b
+			\end{gathered}
+		\]
+		Wenn nun $w_0 = b$ und $x_0 = 1$ gewählt werden, ergibt sich durch Umformem als sogenannte Aktivierungsfunktion die Signumfunktion $h(x) = sign(w^Tx)$. Für die Ermittlung von $w$ müssen nun die Kosten minimiert werden. Bei einem Perzeptron entspricht die Kostenfunktion der Anzahl der falschen Klassifikationen. Die Signumfunktion hat den Nachteil, dass sie einen harter Schwellwert besitzt und alle Fehlklassifikation gleich bewertet, unabhängig davon wie nah $\sum_{i=1}^{n} w_i \cdot x_i$ an $b$ ist. Aus diesem Grund werden in der Praxis meist andere Aktivierungsfunktionen gewählt.
+		
+		Bei einer linearen Regression wird eine lineare Funktion $h(x) = w^Tx$ gesucht, die die Datenpunkte in die reellen Zahlen abbildet. Auch hier wird das $w_i$ gesucht, dass die Kosten minimiert. Die Kostenfunktion leitet sich aus der Methode der kleinsten Quadrate ab bei der die Summe der Fehlerquadrate minimiert wird:
+		\[
+			\text{cost} = \sum_{i=1}^{n} (y_i - h(x_i))^2
+		\]
+	\begin{itemize}
+		\item gesucht sind Koeffizienten $w$, \[\argmin_w \sum_{i=1}^{n} (w^T x_i - y_i)^2\]
+		\item durch Auflösen $w = (X^T X)^{-1} X^T$
+		\item bis jetzt nur lineare einfache Modelle betracht
+		\item bei komplexeren Minimierungsproblemen Methode kleinster Quadrate nicht ausreichend, andere Methoden zur Fehlerminimierung -> Gradientenabstiegsverfahren
+		\item graphische Vorstellung als Hügellandschaft
+		\item In jedem Schritt Ableitung der Kostenfunktion nach jedem Gewicht und Bias berechnet -> Schritt wählen, der Kostenfunktion am stärksten minimiert
+		\item wenn Daten nicht linear separierbar: Kerneltrick möglich
+		\item Transformation (Ersetzten) des Skalarprodukts transformiert implizit den Variablenraum
+		\item Beispiel Gaußscher RBF-Kernel \[K_{RBF} (x, x\prime) := exp(-\gamma \|x - x\prime\|^2) \text{ mit } \gamma > 0\]
+		\item lineare Trennung in höher-dimensionalem Variablenraum
+		\item Berücksichtigung aller Nicht-Linearitäten in der Transformation -> Trennfläche kann wiederum linear sein
+	\end{itemize} 
 	
 		\subsubsection{Entscheidungsbäume}
 		
@@ -223,7 +214,7 @@ Die vorliegende Arbeit beschäftigt sich mit der Beurteilung der Signalqualität
 	
 	\begin{figure}[H]
 		\centering
-		\includegraphics[width=0.5\textwidth]{pic/bcg2postures.png}
+		\includegraphics[width=0.6\textwidth]{pic/bcg2postures.png}
 		\caption[\ac{BKG}-Aufnahmen in Rücken- und Seitenlage]{Hochpass-gefilterte \ac{BKG}-Aufnahmen von zwei Herzschlägen zwei verschiedener Personen, jeweils in Rücken- und Seitenlage gemessen. Die vertikalen Linien markieren die R-Peaks der EKG-Referenz.\protect\footnotemark}
 		\label{fig:bcg2postures}
 	\end{figure}
