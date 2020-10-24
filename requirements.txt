@@ -67,3 +67,4 @@ kiwisolver~=1.2.0
 cvxopt~=1.2.5
 zipp~=3.1.0
 yellowbrick~=1.2
+xgboost
