@@ -15,7 +15,7 @@ Da in dieser Arbeit Methoden des Maschinellen Lernens verwendet werden, wird im 
 	
 	\begin{figure}[H]
 		\centering
-		\includegraphics[scale=0.9]{pic/SupervisedLearning.pdf}
+		\includegraphics{pic/SupervisedLearning.pdf}
 		\caption[Darstellung von überwachtem Lernen]{Darstellung von überwachtem Lernen}
 		\label{fig:supervisedLearning}
 	\end{figure}
@@ -33,7 +33,7 @@ Da in dieser Arbeit Methoden des Maschinellen Lernens verwendet werden, wird im 
 	
 	\begin{figure}[H]
 		\centering
-		\includegraphics[scale=0.8]{pic/validation-ablauf.pdf}
+		\includegraphics[scale=0.85]{pic/validation-ablauf.pdf}
 		\caption{Ablauf von Training und Validierung}
 		\label{fig:validation-ablauf}
 	\end{figure}
@@ -83,7 +83,7 @@ Da in dieser Arbeit Methoden des Maschinellen Lernens verwendet werden, wird im 
 		\]
 		In der Transformation werden alle Nicht-Linearitäten berücksichtigt, wodurch anschließend Linearität möglich ist.
 		
-		Im Folgenden werden die in dieser Arbeit genutzten Modelle näher vorgestellt.
+		Im Folgenden werden die in dieser Arbeit genutzten Modelle näher vorgestellt. Die Nachimplementierung von existierenden Algorithmen umfasst drei Modelle, die hier nicht detailliert vorgestellt werden: die \ac{SVM}, die \ac{LDA} und das \ac{MLP}. Wichtig für die Einordnung ist, dass es sich bei \ac{LDA} und \ac{SVM} um zunächst lineare Modelle handelt und die \ac{SVM} häufig mit dem Kerneltrick verwendet wird, um die Daten zu transformieren. Beim \ac{MLP} handelt es sich um ein Neuronales Netz, dass Nichtlinearität ermöglicht.
 
 	
 		\subsubsection{Classification And Regression Trees}
@@ -153,8 +153,8 @@ Die vorliegende Arbeit beschäftigt sich mit der Beurteilung der Signalqualität
 	Durch diese Beschreibung wird schon deutlich, dass \ac{BKG} anders als das sehr bekannte \ac{EKG} ist. Der entscheidende Vorteil des \ac{BKG}s liegt darin, dass kein einschränkender Körperkontakt wie z.B. durch aufgeklebte Elektroden nötig ist: Es lässt sich in Alltagsgegenständen wie Stühlen aber vor allem auch Betten implementieren, ohne dass es während der Messung zu Einschränkungen im alltäglichen Leben kommt oder medizinisches Fachpersonal anwesend sein muss. Damit gehört es zu den \textit{unobtrusive} Messmethoden und eignet sich gut zur Langzeit- und Trendbeobachtung des Gesundheitszustandes - sowohl im klinischen Kontext als auch Zuhause. Besonders für Patient*innen mit chronischen Krankheiten und zur Früherkennung krankhafter Veränderungen bietet eine gesundheitliche Überwachung von Zuhause großes Potential.\footcite[Vgl.][]{Inan2015} Je nach Aufbau des Messsystems verändert sich auch die Art der Informationen, die aus dem \ac{BKG}-Signal gewonnen werden können. Sehr genaue, kontrolliert aufgenommene \ac{BKG}-Signale ermöglichen eine aussagekräftige Analyse der Morphologie wobei beispielsweise in Betten eingebautes \ac{BKG} zunächst nur Aussagen zu Herzrate und Herzratenvariabilität bietet. Zusätzlich zu Informationen der Herzaktivitäten ermöglichen Bettsysteme aber auch Informationen über das allgemeine Aktivitätslevel und somit auch über die Schlafqualität. \footcite[Vgl.][]{Bruser2011} In dieser Arbeit wird es um die Aufzeichnung von \ac{BKG}-Signalen in Betten gehen. Der Aufbau eines solchen Bettsystems ist in Abbildung \ref{fig:bcgbed} gezeigt.
 	
 	 \begin{figure}[H]
-	 	\centering
-		\includegraphics[width=0.5\textwidth]{pic/bcgBed.png}
+	 	%\centering
+		\includegraphics[width=0.6\textwidth]{pic/bcgBed.png}
 		\caption[Übersicht über die Funktionsweise eines allgemeinen im Bett eingebetteten \ac{BKG}-Systems]{Übersicht über die Funktionsweise eines allgemeinen im Bett eingebetteten \ac{BKG}-Systems.\protect\footnotemark}
 		\label{fig:bcgbed}
 	\end{figure}
@@ -168,7 +168,7 @@ Die vorliegende Arbeit beschäftigt sich mit der Beurteilung der Signalqualität
 	
 	\begin{figure}[H]
 		\centering
-		\includegraphics[width=0.5\textwidth]{pic/bcgWaveform.png}
+		\includegraphics[width=0.7\textwidth]{pic/bcgWaveform.png}
 		\caption[Beispiel eines typischen \ac{BKG}-Signals mit Nomenklatur]{Beispiel eines typischen \ac{BKG}-Signals mit Nomenklatur\protect\footnotemark}
 		\label{fig:bcgwaveform}
 	\end{figure}
@@ -178,7 +178,7 @@ Die vorliegende Arbeit beschäftigt sich mit der Beurteilung der Signalqualität
 	
 	\begin{figure}[H]
 		\centering
-		\includegraphics[width=0.6\textwidth]{pic/bcg2postures.png}
+		\includegraphics[width=0.7\textwidth]{pic/bcg2postures.png}
 		\caption[\ac{BKG}-Aufnahmen in Rücken- und Seitenlage]{Hochpass-gefilterte \ac{BKG}-Aufnahmen von zwei Herzschlägen zwei verschiedener Personen, jeweils in Rücken- und Seitenlage gemessen. Die vertikalen Linien markieren die R-Peaks der EKG-Referenz.\protect\footnotemark}
 		\label{fig:bcg2postures}
 	\end{figure}
@@ -191,7 +191,7 @@ Die vorliegende Arbeit beschäftigt sich mit der Beurteilung der Signalqualität
 	
 	\begin{figure}[H]
 		\centering
-		\includegraphics[width=0.5\textwidth]{pic/Variabilitaet.jpg}
+		\includegraphics[width=0.6\textwidth]{pic/Variabilitaet.jpg}
 		\caption[Visualisierung der Variabilität des \ac{BKG}-Signals]{Diagramm aus 128 konsekutiven Herzschlagen im EKG (A) und BKG (B,C), segmentiert durch das EKG. Die Farben dienen der besseren Visualisierung der Amplituden. (A) EKG-Signal; (B) BKG-Signal mit Überlagerungen durch Atmung und Bewegung; (C) \ac{BKG}-Signal ohne Bewegungsartefakte und Atmung.\protect\footnotemark}
 		\label{fig:variabilitaet}
 	\end{figure}
