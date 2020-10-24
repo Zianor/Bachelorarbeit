@@ -8,14 +8,72 @@ Grundsätzlich muss zwischen zwei Eingabeformen unterschieden werden: Der bisher
 
 Neben der Konstruktion von neuen Merkmalen können ebenfalls die Ergebnisse aus Kapitel \ref{analyse} verwendet werden, das bedeutet das reduzierte Set statistischer Merkmale und der \ac{SQI} des \ac{CLIE}-Algorithmus, bzw. die Coverage durch Intervalle, deren \ac{SQI} über einem Schwellwert $q\textsubscript{th}$ liegt. Das Vorgehen bei der Konstruktion neuer Merkmale besteht darin, diese zunächst zu sammeln und anschließend zu untersuchen, Zusammenhänge zu ermitteln und mit den gewonnenen Erkenntnisse die Merkmale zu reduzieren und in Relation zueinander zu setzen.
 
+Da die Untersuchung in Kapitel \ref{eval-brueser} gezeigt hat, dass die Ergebnisse stark abhängig von der Auswahl des Schwellwerts $q\textsubscript{th}$ für den \ac{SQI} sind, wurde die Coverage für die Schwellwerte $q\textsubscript{th} = 0.3$, $q\textsubscript{th} = 0.4$ und $q\textsubscript{th} = 0.4$ als Merkmal ausgewählt. Da die Verteilung des \ac{SQI} auf dem Segment womöglich weitere Erkenntnisse ermöglicht, wurden außerdem Merkmale zu der Verteilung der \ac{SQI} aller ermittelten Intervalle berechnet:
+\begin{itemize}
+	\item Minimum $\text{SQI}\textsubscript{min}$
+	\item Maximum $\text{SQI}\textsubscript{max}$
+	\item Standardabweichung $\text{SQI}\textsubscript{std}$
+	\item Mittelwert $\text{SQI}\textsubscript{mean}$
+	\item Median $\text{SQI}\textsubscript{median}$
+\end{itemize}
+
+Auch die geschätzten Intervalllängen können womöglich Aufschluss über die Signalqualität geben. Hier muss allerdings auch beachtet werden, dass dadurch auch die Gefahr von physiologischen Einschränkungen besteht, was \acl{HR} und \acl{HRV} betrifft, wenn die Trainingsdaten nicht variabel genug sind. Es muss also bei einer Verwendung geprüft werden, wie diese Werte einbezogen werden. Die serialisierten Merkmale mit Bezug auf die geschätzten Intervalllängen sind:
+
+\begin{itemize}
+	\item Mittelwert $\text{IL}\textsubscript{mean}$
+	\item Spannweite $\text{IL}\textsubscript{range}$
+	\item Standardabweichung $\text{IL}\textsubscript{std}$
+\end{itemize}
+
+Bei \ac{PPG}-Signalen verwenden \citeauthor{Yu2020} erfolgreich herzratenbezogene Merkmale, indem die maximale Frequenz des Spektogramm der Autokorrelation über das Segment in Verhältnis zur geschätzten Herzrate setzt.\footcite{Yu2020} Sei $f\textsubscript{ACF}$ die maximale Frequenz und $f\textsubscript{HR}$ die Frequenz der geschätzten Herzrate, werden zwei Merkmale daraus abgeleitet:
+\begin{itemize}
+ 	\item $\texttt{ratio}\textsubscript{ACF} = \frac{f\textsubscript{HR}}{f\textsubscript{ACF}}$
+ 	\item $\texttt{diff}\textsubscript{ACF} = f\textsubscript{HR} - f\textsubscript{ACF}$
+\end{itemize}
+ 
+ Da auch das Spektogramm der gefilterten Daten des Segments Informationen liefern kann, wurden diese Merkmale analog mit der maximalen Frequenz der Daten $f\textsubscript{data}$ berechnet:
+ \begin{itemize}
+ 	\item $\texttt{ratio}\textsubscript{data} = \frac{f\textsubscript{HR}}{f\textsubscript{data}}$
+ 	\item $\texttt{diff}\textsubscript{data} = f\textsubscript{HR} - f\textsubscript{data}$
+ \end{itemize}
+
+Bei weiteren Merkmalen wird versucht, die Eigenschaft der Selbstähnlichkeit der Intervalle zueinander zu beschreiben. Dafür werden zunächst die Hochpunkte betrachtet, an denen der \ac{CLIE}-Algorithmus die Herzschläge verortet. Von diesen werden folgende Merkmale serialisiert:
+\begin{itemize}
+	\item Minimum $\texttt{P}\textsubscript{min}$
+	\item Maximum $\texttt{P}\textsubscript{max}$
+	\item Mittelwert $\texttt{P}\textsubscript{mean}$
+	\item Standardabweichung $\text{P}\textsubscript{std}$
+\end{itemize}
+
+In weiteren Merkmalen wird versucht, die Selbstähnlichkeit durch statistische Merkmale zu erfassen. Hierzu wird von den vom \ac{CLIE}-Algorithmus erkannten Herzschläge jeweils Mittelwert, Standardabweichung und Spannweite berechnet. Von dieser Menge an Intervallen wird jeweils die Standardabweichung als Merkmal extrahiert, um die Variation über das Segment einzufangen:
+\begin{itemize}
+	\item Standardabweichung alle Mittelwerte $\texttt{mean}\textsubscript{std}$
+	\item Standardabweichung aller Spannweiten $\texttt{range}\textsubscript{std}$
+	\item Standardabweichung aller Standarabweichungen $\texttt{std}\textsubscript{std}$
+\end{itemize}
+
+Häufig werden für die Beurteilung von Signalqualität Templates verwendet. Bei \ac{BKG}-Signalen werden diese durch beispielsweise Positionsänderungen obsolet, allerdings entspricht ein Segment nur einem sehr kurzen Zeitraum, weshalb Templates in diesem Fall verwendet werden können. Es werden zwei verschiedene Templates betrachtet: Zunächst das geschätzte Schlag-zu-Schlag-Intervall mit dem höchsten \ac{SQI}, $T\textsubscript{SQI}$ genannt, und der Herzschlag mit der mittleren Intervalllänge, $T\textsubscript{median}$, dessen Länge auch für die Schätzung der Herzrate verwendet wird. Es werden beide betrachtet, da ein sehr hoher \ac{SQI} auch bei rhythmischen Artefakten auftreten kann. Zu diesen beiden Templates wird für jeden geschätzten Herzschlag die Kreuzkorrelation berechnet. Von dieser Menge an Korrelationen wird jeweils Mittelwert und Standardabweichung als Merkmal verwendet:
+\begin{itemize}
+	\item $\texttt{mean}\textsubscript{T\textsubscript{median}}$
+	\item $\texttt{std}\textsubscript{T\textsubscript{median}}$
+	\item $\texttt{mean}\textsubscript{T\textsubscript{SQI}}$
+	\item $\texttt{std}\textsubscript{T\textsubscript{SQI}}$
+\end{itemize}
+
+Außerdem wird die absolute Energie des Segmentes berechnet:
+\[
+	E\textsubscript{abs} = \sum_t s(t)^2
+\]
 
 \section{Explorative Datenanalyse}
 
-\subsection{Reduktion der Merkmale}
+Durch die Extraktion mehrerer Merkmale pro betrachteter Eigenschaft entstehen korrelierte Merkmale, bei denen es nötig ist, sie zu reduzieren oder zusammenzufassen. Dies geschieht im Zuge der explorativen Datenanalyse.
 
-\subsection{Auswahl der Modelle}
+\section{Reduktion der Merkmale}
 
-\subsection{Aufbau des entwickelten Basisklassifikators}
+\section{Auswahl der Modelle}
+
+\section{Aufbau des entwickelten Basisklassifikators}
 \begin{itemize}
 	\item Regression vs. Klassifikation: Vor- und Nachteile
 	\item für beides zunächst rf und xgboost verwendet -> warum: ensemble meist gut, weit verbreitet, gut nachvollziehbar
