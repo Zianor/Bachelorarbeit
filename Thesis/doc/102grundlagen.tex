@@ -40,7 +40,7 @@ Da in dieser Arbeit Methoden des Maschinellen Lernens verwendet werden, wird im 
 	
 	Um die Auswahl für ein Modell treffen zu können, werden Evaluationsmetriken benötigt. Für diese werden im Folgenden die englischen Bezeichnungen verwendet, da diese auch im Deutschen geläufiger sind.
 	
-	Vor allem für die Bewertung binärer Klassifikationen gibt es verschiedenste Metriken, die die richtigen und falschen Klassifikationen miteinander gewichten. Dafür wird zwischen Richtig-Positiven TP, Falsch-Positiven FP, Richtig-Negativen TN und Falsch-Negativen FP unterschieden. Eine Darstellung dieser vier nennt man Confusion Matrix und ermöglicht eine erste Einschätzung der Fehlerverteilung. Ein häufig verwendetes und einfaches Gütemaß ist die Accuracy $\text{ACC} = \frac{TP + TN}{TP + TN + FN + FP}$, die allerdings bei ungleich großen Klassen problematisch ist, da eine hohe Genauigkeit erreicht wird, wenn immer die größere Klasse vorausgesagt wird. In diesem Fall kann auch die Balanced Accuracy verwendet werden, die dieses Ungleichgewicht einbezieht:
+	Vor allem für die Bewertung binärer Klassifikationen gibt es verschiedenste Metriken, die die richtigen und falschen Klassifikationen miteinander gewichten. Dafür wird zwischen Richtig-Positiven TP, Falsch-Positiven FP, Richtig-Negativen TN und Falsch-Negativen FN unterschieden. Eine Darstellung dieser vier nennt man Confusion Matrix und ermöglicht eine erste Einschätzung der Fehlerverteilung. Ein häufig verwendetes und einfaches Gütemaß ist die Accuracy $\text{ACC} = \frac{TP + TN}{TP + TN + FN + FP}$, die allerdings bei ungleich großen Klassen problematisch ist, da eine hohe Genauigkeit erreicht wird, wenn immer die größere Klasse vorausgesagt wird. In diesem Fall kann auch die Balanced Accuracy verwendet werden, die dieses Ungleichgewicht einbezieht:
 	\[
 		\text{balanced-accuracy} = \frac{1}{2}\left( \frac{TP}{TP + FN} + \frac{TN}{TN + FP}\right).
 	\]
@@ -106,7 +106,7 @@ Da in dieser Arbeit Methoden des Maschinellen Lernens verwendet werden, wird im 
 		
 		Ein Random Forest hat gegenüber anderen Modellen den Vorteil, dass er sehr schnell trainiert und somit sehr effizient für große Datenmenge ist. Gleichzeitig kann das Ergebnis einfach nachvollzogen werden.
 		
-		\subsubsection{Gradient Boosted Trees}
+		\subsubsection{Gradient Boosting Trees}
 		
 		Auch ein Gradient Boosted Tree kombiniert mehrere einfache Bäume. Im Gegensatz zum \ac{RF} hängt beim Gradient Boosted Tree jeder Baum von früheren Bäumen ab. Gestartet wird mit einem Baum, auf dessen Ergebnissen aufgebaut wird. Das endgültige Ergebnis wird auch hier aus der Menge an einzelnen Ergebnissen ermittelt, aber folgende Bäume konzentrieren sich jeweils darauf, die Schwächen der schon erzeugten Modelle auszugleichen.
 		

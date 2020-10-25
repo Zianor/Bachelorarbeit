@@ -39,8 +39,7 @@ Bei \ac{PPG}-Signalen verwenden \citeauthor{Yu2020} erfolgreich herzratenbezogen
 
 Bei weiteren Merkmalen wird versucht, die Eigenschaft der Selbstähnlichkeit der Intervalle zueinander zu beschreiben. Dafür werden zunächst die Hochpunkte betrachtet, an denen der \ac{CLIE}-Algorithmus die Herzschläge verortet. Von diesen werden folgende Merkmale serialisiert:
 \begin{itemize}
-	\item Minimum $\texttt{P}\textsubscript{min}$
-	\item Maximum $\texttt{P}\textsubscript{max}$
+	\item Spannweite $\texttt{P}\textsubscript{range}$
 	\item Mittelwert $\texttt{P}\textsubscript{mean}$
 	\item Standardabweichung $\text{P}\textsubscript{std}$
 \end{itemize}
@@ -61,25 +60,40 @@ Häufig werden für die Beurteilung von Signalqualität Templates verwendet. Bei
 \end{itemize}
 
 Außerdem wird die absolute Energie des Segmentes berechnet:
-\[
-	E\textsubscript{abs} = \sum_t s(t)^2
-\]
-
-\section{Explorative Datenanalyse}
-
-Durch die Extraktion mehrerer Merkmale pro betrachteter Eigenschaft entstehen korrelierte Merkmale, bei denen es nötig ist, sie zu reduzieren oder zusammenzufassen. Dies geschieht im Zuge der explorativen Datenanalyse.
-
-\section{Reduktion der Merkmale}
-
-\section{Auswahl der Modelle}
-
-\section{Aufbau des entwickelten Basisklassifikators}
 \begin{itemize}
-	\item Regression vs. Klassifikation: Vor- und Nachteile
-	\item für beides zunächst rf und xgboost verwendet -> warum: ensemble meist gut, weit verbreitet, gut nachvollziehbar
-	\item wegen nan werten vorklassifikation
-	\item 
+	\item $E\textsubscript{abs} = \sum_t s(t)^2$
 \end{itemize}
+
+Da die Berechnung aller Merkmale für die Menge der Daten zeit- und rechenaufwändig ist, werden diese einmalig berechnet und anschließend in einer csv-Datei gespeichert.
+
+\section{Explorative Datenanalyse und Merkmalsreduktion}
+
+Durch die Extraktion mehrerer Merkmale pro betrachteter Eigenschaft entstehen korrelierte Merkmale, bei denen es nötig ist, sie zu reduzieren oder zusammenzufassen. Dies geschieht im Zuge der explorativen Datenanalyse. Die Korrelationen sind in dem erzeugten Korrelationsdiagramm, dass in Abbildung \ref{fig:corr-heatmap-own} gezeigt ist, deutlich sichtbar.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics{pic/corr-heatmap-own.pdf}
+	\caption{Korrelationsdiagramm aller entwickelten Merkmale, $E\textsubscript{HR}$ und der binären Annotation}
+	\label{fig:corr-heatmap-own}
+\end{figure}
+ 
+Auch bei diesen Merkmalen wir mit dem Python-Paket \texttt{rfimp} ermittelt, welche Merkmale durch andere vorhergesagt werden können. Es zeigt sich, dass $\texttt{P}\textsubscript{min}$ und $\texttt{P}\textsubscript{max}$ sehr stark
+
+\section{Auswahl der Modelle und Aufbau eines Basisklassifikators}
+
+Nachdem die Merkmale entwickelt sind, werden nun Modelle ausgewählt, mit denen die Untersuchung durchgeführt wird.
+
+Die Auswahl der Modelle beschränkt sich auf zwei Modelle, den \acl{RF} und den Gradient Boosting Tree. Beide sind ein Ensemble aus schwächeren \ac{CART}s und ermöglichen schnell trainierende, robuste Modelle, deren Entscheidung sich leicht nachvollziehen lässt und erzielen meist gute Ergebnisse. Dadurch wird eine Untersuchung der Merkmale, anhand derer die Signalqualität beurteilt werden kann, möglich.
+
+Beide Modelle eignen sich sowohl für Regression als auch Klassifikation. Dies wird genutzt, um die Unterschiede der Ergebnisse und der Wichtigkeit der einzelnen Merkmale für beide Arten von Algorithmen zu vergleichen. Bei einer Regression kann der vorhergesagte Fehler $E\textsubscript{HR}$ mit einem Schwellwert in eine binäre Klassifikation umgewandelt werden. Dies ermöglicht einen einfachen Vergleich von Klassifikation und Regression. Damit ergeben sich insgesamt vier Lernmodelle: Jeweils Regression und Klassifikation mit einem \ac{RF} und einem Gradient Boosting Tree.
+
+Um die Evaluation der verschiedenen Modelle zu vereinfachen, wird ein eigenständiges Basismodell entwickelt, dass das Laden der Daten, die Umwandlung der Regressionsergebnisse in eine binäre Klassifikation, das Hyperparameter-Tuning und die Evaluation der Ergebnisse bündelt.  Außerdem werden um Zuge dessen die Modelle nach dem Training serialisiert, um sie für eine  spätere Verwendung zu speichern. Dem Konstruktor dieses Basismodells werden Lernmodell, Dateiname zum Laden oder Speichern des Modells und die Hyperaramater, von denen die optimale Auswahl getroffen wird, übergeben. Wenn kein Lernmodell übergeben wird, wird automatisch versucht, die Datei mit dem übergebenen Namen zu laden. Optional kann eine Featureauswahl angegeben werden, die für das Modell verwendet werden soll. Des Weiteren werden die Eigenschaften des Datensets übergeben, das bedeutet die verwendete Segmentlänge, der Abstand in dem die Segmente erzeugt werden und der verwendete Threshold. Wurde das Datenset noch nicht erzeugt, wird dies nachgeholt. 
+
+Sind Hyperparameter angegeben, wird das Hyperparameter-Tuning mit einer Kreuzvalidierung auf dem Trainingsset durchgeführt, wobei jeweils ein*e Patient*in zum Testen ausgelassen wird. Bei dem Hyperparameter-Tuning für die statistischen Merkmale wurde die Accuracy optimiert. Da diese bei nicht balancierten Datensets an Aussagekraft verliert und nicht zwischen Falsch-Positiven und Falsch-Negativen unterscheidet, wird hier der F1-Score optimiert.
+
+Da bei der Erzeugung der Merkmale Lücken entstehen können, wenn für das Segment keine Intervallschätzungen existieren, werden diese Segmente unabhängig von dem verwendeten Lernmodell als nicht informativ klassifiziert. Auch beim Training werden Datenpunkte, deren Merkmale lückenhaft sind, ausgeschlossen.
+
+Das entwickelte Basismodell ermöglicht also Hyperparameter-Tuning, Training, Vorhersage und Evaluation. Damit können auch andere Modelle und andere Daten einfach untersucht werden.
 
 
 
