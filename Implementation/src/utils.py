@@ -150,7 +150,7 @@ def get_plt_settings():
         "text.usetex": True,
         "font.serif": "Times",
         "font.family": "serif",
-        'text.latex.preamble': r'\usepackage{mathptmx}',
+        'text.latex.preamble': [r'\usepackage{mathptmx}', r'\usepackage{amsmath}'],
         # Use 12pt font in plots, to match 12pt font in document
         "axes.labelsize": 10,
         "font.size": 10,
