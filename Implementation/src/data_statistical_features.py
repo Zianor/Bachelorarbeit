@@ -527,14 +527,14 @@ class SegmentOwn(Segment):
             self.peak_frequency_acf = f_acf[np.nanargmax(den_acf)]
         else:
             self.peak_frequency_acf = np.nan
-        self.hf_ratio_data = self.bcg_hr / self.peak_frequency_data
-        self.hf_diff_data = self.bcg_hr - self.peak_frequency_data
+        self.hf_ratio_data = (self.bcg_hr/60) / self.peak_frequency_data
+        self.hf_diff_data = (self.bcg_hr/60) - self.peak_frequency_data
         if not np.isfinite(self.hf_ratio_data):
             self.hf_ratio_data = 0
         if not np.isfinite(self.hf_diff_data):
             self.hf_diff_data = 0
-        self.hf_ratio_acf = self.bcg_hr / self.peak_frequency_acf
-        self.hf_diff_acf = self.bcg_hr - self.peak_frequency_acf
+        self.hf_ratio_acf = (self.bcg_hr/60) / self.peak_frequency_acf
+        self.hf_diff_acf = (self.bcg_hr/60) - self.peak_frequency_acf
         if not np.isfinite(self.hf_ratio_acf):
             self.hf_ratio_acf = 0
         if not np.isfinite(self.hf_diff_acf):
@@ -555,7 +555,7 @@ class SegmentOwn(Segment):
                 if curr_end > end - start:
                     curr_end = end - start
                 curr_interval_data = self.filtered_data[
-                                     int(peak_location - start): ]
+                                     int(peak_location - start): curr_end]
                 if len(curr_interval_data) > 0:
                     self.interval_means[i] = np.mean(curr_interval_data)
                     self.interval_stds[i] = np.std(curr_interval_data)
@@ -578,7 +578,7 @@ class SegmentOwn(Segment):
             self.sqi_median = np.median(self.sqi_array)
             self.sqi_mean = np.mean(self.sqi_array)
             self.peak_max = np.max(self.peak_values)
-            self.peak_min = np.max(self.peak_values)
+            self.peak_min = np.min(self.peak_values)
             self.peak_std = np.std(self.peak_values)
             self.peak_mean = np.mean(self.peak_values)
             self.template_corrs_highest_sqi = self.get_template_correlations(series.get_best_est_int(start, end),
@@ -659,8 +659,6 @@ class SegmentOwn(Segment):
             'hf_ratio_data',
             'hf_diff_acf',
             'hf_diff_data',
-            'peak_frequency_acf',
-            'peak_frequency_data',
             'abs_energy',
             'interval_lengths_std',
             'interval_lengths_range',
@@ -702,8 +700,6 @@ class SegmentOwn(Segment):
             self.hf_ratio_data,
             self.hf_diff_acf,
             self.hf_diff_data,
-            self.peak_frequency_acf,
-            self.peak_frequency_data,
             self.abs_energy,
             self.interval_lengths_std,
             self.interval_lengths_range,
@@ -733,9 +729,10 @@ class SegmentOwn(Segment):
 
 if __name__ == "__main__":
     # DataSet()
+    DataSetOwn(segment_length=10)
+    DataSetOwn(segment_length=30)
     DataSetOwn(segment_length=20)
-    DataSetOwn(segment_length=5)
-    # DataSetOwn()
+    DataSetOwn(segment_length=5, overlap_amount=0.8)
     # DataSetStatistical()
     # DataSetPino()
     # DataSetPino(4, 0.75)
