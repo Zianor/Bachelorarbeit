@@ -20,7 +20,6 @@ Da die Untersuchung in Kapitel \ref{eval-brueser} gezeigt hat, dass die Ergebnis
 Auch die geschätzten Intervalllängen können womöglich Aufschluss über die Signalqualität geben. Hier muss allerdings auch beachtet werden, dass dadurch auch die Gefahr von physiologischen Einschränkungen besteht, was \acl{HR} und \acl{HRV} betrifft, wenn die Trainingsdaten nicht variabel genug sind, sodass medizinische Abnormalitäten als Signal schlechter Qualität eingeordnet werden. Es muss also bei einer Verwendung geprüft werden, wie diese Werte einbezogen werden. Die serialisierten Merkmale mit Bezug auf die geschätzten Intervalllängen sind:
 
 \begin{itemize}
-	\item Mittelwert $\text{IL}\textsubscript{mean}$
 	\item Spannweite $\text{IL}\textsubscript{range}$
 	\item Standardabweichung $\text{IL}\textsubscript{std}$
 \end{itemize}
@@ -83,21 +82,37 @@ Es zeigt sich, dass Standardabweichung und Spannweite der Werte jeweils die Vorh
 
 Nach Reduktion um diese Merkmale wird die Berechnung der Abhängigkeiten wiederholt. Es zeigen sich weitere Abhängigkeiten zwischen $\texttt{P}\textsubscript{mean}$ und der Standardabweichung und $\texttt{std}\textsubscript{std}$ und $\texttt{P}\textsubscript{std}$, weshalb Standardabweichung und $\texttt{std}\textsubscript{std}$ verworfen werden. Keine der erkannten Abhängigkeiten ist unerwartet. Dieser Prozess erlaubt jedoch, vermutete Abhängigkeiten zu bestätigen und die Merkmale zu verwenden, die einen höheren Informationsgehalt haben.
 
-Die verbleibenden 21 Merkmale
+Damit verbleiben insgesamt 20 Merkmale. Die Reduktion der Merkmale ermöglicht schnelleres Training und durch die weniger stark korrelierten Merkmale stabilere Modelle. Dennoch muss bei der Evaluation der Modelle untersucht werden, wie sich die Reduktion der Merkmale auswirkt.
+
+Eine andere Möglichkeit der Merkmalsreduktion ist die Transformation in einen neuen Merkmalsraum, beispielsweise durch eine \ac{PCA}. Die graphische Darstellung einer Reduktion in einen zweidimensionalen Merkmalsraum, siehe Abbildung \ref{fig:pca-own-reduced} zeigt, dass die Daten so nicht linear separierbar sind.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{pic/pca-own-reduced.pdf}
+	\caption{Transformation der Merkmale mittels PCA in einen zweidimensionalen Merkmalsraum}
+	\label{fig:pca-own-reduced}
+\end{figure}
+
+Eine Untersuchung, welche Merkmale Mutual Information mit der Annotation teilen (Abbildung \ref{fig:mutual-inf-own}), zeigt, dass $\text{SQI}\textsubscript{min}$ mit Abstand am meisten davon besitzt. auch die anderen Merkmale, die Informationen über den \ac{SQI} beinhalten, zählen zu den Merkmalen mit mehr Mutual Information mit der Annotation der Daten. Zu diesen zählen auch die beiden herzratenbezogenen Merkmale $\texttt{diff}\textsubscript{data}$ und $\texttt{diff}\textsubscript{acf}$. Die übernommenen noch verbleibenden vier statistischen Merkmale sind die, die am wenigsten Mutual Information mit dem Ziel teilen.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{pic/mutual-inf-own.pdf}
+	\caption{Transformation der Merkmale mittels PCA in einen zweidimensionalen Merkmalsraum}
+	\label{fig:mutual-inf-own}
+\end{figure}
 
 \section{Auswahl der Modelle und Aufbau eines Basisklassifikators}
 
 Nachdem die Merkmale entwickelt sind, werden nun Modelle ausgewählt, mit denen die Untersuchung durchgeführt wird.
 
-Die Auswahl beschränkt sich auf zwei Modelle, den \acl{RF} und den Gradient Boosting Tree. Beide sind ein Ensemble aus schwächeren \ac{CART}s und ermöglichen schnell trainierende, robuste Modelle, deren Entscheidung sich leicht nachvollziehen lässt, und erzielen meist gute Ergebnisse. Dadurch wird eine Untersuchung der Merkmale, anhand derer die Signalqualität beurteilt werden kann, möglich.
+Die Auswahl beschränkt sich auf zwei Modelle, den \acl{RF} und den Gradient Boosting Tree. Da die durchgeführte \ac{PCA} vermuten lässt, dass die Daten nicht linear separierbar sind, wurden diese nicht-linearen Modelle gewählt. Beide sind ein Ensemble aus schwächeren \ac{CART}s und ermöglichen schnell trainierende, robuste Modelle, deren Entscheidung sich leicht nachvollziehen lässt, und erzielen meist gute Ergebnisse. Dadurch wird eine Untersuchung der Merkmale, anhand derer die Signalqualität beurteilt werden kann, möglich.
 
 Beide Modelle eignen sich sowohl für Regression als auch Klassifikation. Dies wird genutzt, um die Unterschiede der Ergebnisse und der Wichtigkeit der einzelnen Merkmale für beide Arten von Algorithmen zu vergleichen. Bei einer Regression kann der vorhergesagte Fehler $E\textsubscript{HR}$ mit einem Schwellwert in eine binäre Klassifikation umgewandelt werden. Dies ermöglicht einen einfachen Vergleich von Klassifikation und Regression. Damit ergeben sich insgesamt vier Lernmodelle: Jeweils Regression und Klassifikation mit einem \ac{RF} und einem Gradient Boosting Tree.
 
-Um die Evaluation der verschiedenen Modelle zu vereinfachen, wird ein eigenständiges Basismodell entwickelt, dass das Laden der Daten, die Umwandlung der Regressionsergebnisse in eine binäre Klassifikation, das Hyperparameter-Tuning und die Evaluation der Ergebnisse bündelt.  Außerdem werden im Zuge dessen die Modelle nach dem Training serialisiert, um sie für eine  spätere Verwendung zu speichern. Dem Konstruktor dieses Basismodells werden Lernmodell, Dateiname zum Laden oder Speichern des Modells und die Hyperaramater, von denen die optimale Auswahl getroffen wird, übergeben. Wenn kein Lernmodell übergeben wird, wird automatisch versucht, die Datei mit dem übergebenen Namen zu laden. Optional kann eine Featureauswahl angegeben werden, die für das Modell verwendet werden soll. Des Weiteren werden die Eigenschaften des Datensets übergeben; das bedeutet die verwendete Segmentlänge, der Abstand in dem die Segmente erzeugt werden, und der verwendete Threshold. Wurde das Datenset noch nicht erzeugt, wird dies nachgeholt. 
+Um die Evaluation der verschiedenen Modelle zu vereinfachen, wird ein eigenständiges Basismodell entwickelt, dass das Laden der Daten, die Umwandlung der Regressionsergebnisse in eine binäre Klassifikation, das Hyperparameter-Tuning und die Evaluation der Ergebnisse bündelt.  Außerdem werden im Zuge dessen die Modelle nach dem Training serialisiert, um sie für eine  spätere Verwendung zu speichern. Dem Konstruktor dieses Basismodells werden Lernmodell, Dateiname zum Laden oder Speichern des Modells und die Hyperaramater, von denen die optimale Auswahl getroffen wird, übergeben. Wenn kein Lernmodell übergeben wird, wird automatisch versucht, die Datei mit dem übergebenen Namen zu laden. Optional kann eine Featureauswahl angegeben werden, die für das Modell verwendet werden soll. Des Weiteren werden die Eigenschaften des Datensets übergeben; das bedeutet die verwendete Segmentlänge, der Abstand in dem die Segmente erzeugt werden, und der verwendete Threshold. Wurde das Datenset noch nicht erzeugt, wird dies nachgeholt. Sind Hyperparameter angegeben, wird das Hyperparameter-Tuning mit einer Kreuzvalidierung auf dem Trainingsset durchgeführt, wobei jeweils ein*e Patient*in zum Testen ausgelassen wird. Bei dem Hyperparameter-Tuning für die statistischen Merkmale wurde die Accuracy optimiert. Da diese bei nicht balancierten Datensets an Aussagekraft verliert und nicht zwischen Falsch-Positiven und Falsch-Negativen unterscheidet, wird hier der F1-Score optimiert.
 
-Sind Hyperparameter angegeben, wird das Hyperparameter-Tuning mit einer Kreuzvalidierung auf dem Trainingsset durchgeführt, wobei jeweils ein*e Patient*in zum Testen ausgelassen wird. Bei dem Hyperparameter-Tuning für die statistischen Merkmale wurde die Accuracy optimiert. Da diese bei nicht balancierten Datensets an Aussagekraft verliert und nicht zwischen Falsch-Positiven und Falsch-Negativen unterscheidet, wird hier der F1-Score optimiert.
-
-Da bei der Erzeugung der Merkmale Lücken entstehen können, wenn für das Segment keine Intervallschätzungen existieren, werden diese Segmente unabhängig von dem verwendeten Lernmodell als nicht informativ klassifiziert. Auch beim Training werden Datenpunkte, deren Merkmale lückenhaft sind, ausgeschlossen.
+Da bei der Erzeugung der Merkmale Lücken entstehen können, wenn für das Segment keine Intervallschätzungen existieren, werden diese Segmente unabhängig von dem verwendeten Lernmodell als nicht informativ klassifiziert. Auch beim Training werden Datenpunkte, deren Merkmale lückenhaft sind, ausgeschlossen. Damit trotzdem eine vollständige Evaluation der Modell mitsamt \ac{ROC}-Kurve möglich ist, werden zwei Klassifikatoren implementiert, die von dem Basisklassifikator des genutzten Python-Pakets \texttt{sklearn} erben; einen für die Umwandlung der Regressionsergebnisse und einen um die lückenhaften Datensätze in Training und Klassifikation zu integrieren.
 
 Das entwickelte Basismodell ermöglicht also Hyperparameter-Tuning, Training, Vorhersage und Evaluation. Damit können auch andere Modelle und andere Daten einfach untersucht werden.
 

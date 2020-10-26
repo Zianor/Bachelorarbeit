@@ -14,7 +14,7 @@ Da in dieser Arbeit Methoden des Maschinellen Lernens verwendet werden, wird im 
 	Es wird zwischen verschiedenen Arten des maschinellen Lernens unterschieden, dem überwachten Lernen, dem unüberwachten Lernen und dem verstärkenden Lernen. Letzteres wird hier nicht betrachtet. Bei überwachtem Lernen bestehen die vorliegenden Daten aus Eingabe-Ausgabe-Paaren $(x_1, y_1), ...,(x_n, y_n) \text{ mit } x_i \in X$.%TODO 3 punkte
 	 Demnach ist nur die Funktion $f: X \to Y$ ist unbekannt. Gesucht ist eine Funktion $g$, die $f$ aproximiert. Ein Lernalgorithmus ermittelt diese Funktion aus einem Hypothesenset. Dieses Vorgehen ist in Abbildung \ref{fig:supervisedLearning} visualisiert. Bei unüberwachtem Lernen dagegen ist $Y$ unbekannt; die Eingabedaten haben die Form $x_1, ..., x_n, x_i \in X$. Hier ist ein $f$ gesucht, das die Daten möglichst gut beschreibt und sie beispielsweise eigenständig in Kategorien einteilt. In dieser Arbeit wird allerdings ausschließlich überwachtes Lernen betrachtet.
 	
-	\begin{figure}[H] % TODO: fix Typo in Hypothesenset
+	\begin{figure}[H]
 		\centering
 		\includegraphics{pic/SupervisedLearning.pdf}
 		\caption[Darstellung von überwachtem Lernen]{Darstellung von überwachtem Lernen}
@@ -32,7 +32,7 @@ Da in dieser Arbeit Methoden des Maschinellen Lernens verwendet werden, wird im 
 	
 	Neben der Validierung des finalen Modells müssen auch bei der Modellauswahl Entscheidungen getroffen werden, vor allem welches Modell und welche Hyperparameter gewählt werden. Hyperparameter sind Parameter von Modellen maschinellen Lernens, die vor dem Training des Modells festgelegt werden und die Modellarchitektur bestimmen oder den Lernalgorithmus betreffen. Da auch die Wahl dieser validiert werden muss, werden insgesamt drei Datensets benötigt: Trainings-, Validierungs- und Testset, da sonst die Wahl der Hyperparameter durch das Testset beeinflusst würde und kein unabhängiger Test mehr möglich wäre. Das Testset wird also erst genutzt, nachdem alle Entscheidungen getroffen wurden. Typisch ist ein Hyperparameter-Tuning durch Kreuzvalidierung auf dem Trainingsset mit einem anschließenden Retraining mit den ermittelten Parametern auf dem gesamten Trainingsset. Der Ablauf ist in Abbildung \ref{fig:validation-ablauf} visualisiert.
 	
-	\begin{figure}[H] % TODO: fix Typo in Trainingsset -> 2 s
+	\begin{figure}[H]
 		\centering
 		\includegraphics[scale=0.85]{pic/validation-ablauf.pdf}
 		\caption{Ablauf von Training und Validierung}
