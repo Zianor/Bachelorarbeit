@@ -77,7 +77,13 @@ Durch die Extraktion mehrerer Merkmale pro betrachteter Eigenschaft entstehen ko
 	\label{fig:corr-heatmap-own}
 \end{figure}
  
-Auch bei diesen Merkmalen wir mit dem Python-Paket \texttt{rfimp} ermittelt, welche Merkmale durch andere vorhergesagt werden können. Es zeigt sich, dass $\texttt{P}\textsubscript{min}$ und $\texttt{P}\textsubscript{max}$ sehr stark
+Auch bei diesen Merkmalen wir mit dem Python-Paket \texttt{rfimp} ermittelt, welche Merkmale durch andere vorhergesagt werden können. Im Zuge der Merkmalskonstruktion werden Merkmale verworfen, die sich durch ein einzelnes anderes Merkmal vorhersagen lassen.
+
+Es zeigt sich, dass Standardabweichung und Spannweite der Werte jeweils die Vorhersage des anderen Wertes ermöglichen. Aus diesem Grund werden $\texttt{P}\textsubscript{range}$, $\texttt{range}\textsubscript{std}$ und $\text{IL}\textsubscript{range}$ als Merkmale verworfen. Das gleiche gilt für $\text{SQI}\textsubscript{max}$. Auch bietet $E\textsubscript{abs}$ keinen Mehrgewinn zu der Standardabweichung des Segments. Die Merkmale $\texttt{ratio}\textsubscript{acf}$ und $\texttt{diff}\textsubscript{acf}$ sind durch ihre Definition stark miteinander korreliert und da die Untersuchung zeigt, dass $\texttt{diff}\textsubscript{acf}$ schlechter vorhergesagt werden kann, wird $\texttt{ratio}\textsubscript{acf}$. Das gleiche gilt für $\texttt{ratio}\textsubscript{data}$. Wie zu erwarten war, sind auch $\text{SQI}\textsubscript{median}$ und $\text{SQI}\textsubscript{mean}$ stark korreliert. Die mit \texttt{rfpimp} berechneten Abhängigkeiten zeigen. dass dar Median schlechter vorhergesagt werden kann, weshalb $\text{SQI}\textsubscript{mean}$ verworfen wird.
+
+Nach Reduktion um diese Merkmale wird die Berechnung der Abhängigkeiten wiederholt. Es zeigen sich weitere Abhängigkeiten zwischen $\texttt{P}\textsubscript{mean}$ und der Standardabweichung und $\texttt{std}\textsubscript{std}$ und $\texttt{P}\textsubscript{std}$, weshalb Standardabweichung und $\texttt{std}\textsubscript{std}$ verworfen werden. Keine der erkannten Abhängigkeiten ist unerwartet. Dieser Prozess erlaubt jedoch, vermutete Abhängigkeiten zu bestätigen und die Merkmale zu verwenden, die einen höheren Informationsgehalt haben.
+
+Die verbleibenden 21 Merkmale
 
 \section{Auswahl der Modelle und Aufbau eines Basisklassifikators}
 

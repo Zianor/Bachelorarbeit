@@ -111,7 +111,7 @@ Die Tests mit beiden Segmentlängen zeigen, dass dieses Verfahren für die in di
 
 Für das maschinellen Lernen mittels statistischer Merkmale werden die in Kapital \ref{ml-beschreibung} aufgezählten Merkmale extrahiert. Als Bibliothek für die Modelle des maschinellen Lernens wird \textit{scikit-learn}\footcite[]{scikit-learn} verwendet. Da die Daten sich grundlegend von den von \citeauthor{Sadek2016} untersuchten unterscheiden, werden die Hyperparameter der Modelle im Zuge dieser Arbeit erneut optimiert. Bei der dafür durchgeführten Kreuzvalidierung wird wie schon bei der Unterteilung in Trainings- und Testset anhand der Patient*innen-ID geteilt, damit auch diese aussagekräftige Ergebnisse liefert.
 
-Insgesamt zeigen bereits Accuracy und \ac{MAE}, siehe Tabelle \ref{fig:ml-statistical-MAE-Coverage}, eindeutig, dass die Klassifikation mit keinem der Modelle den Ergebnissen des Papers von \citeauthor{Sadek2016}\footcite{Sadek2016} entspricht. Die Accuracy und AUC von je unter 0,6 zeigen, dass die Klassifikation nur minimal besser als reines Raten ist. Teils ist der \ac{MAE} der als informativ klassifizierten Segmente sogar größer als der auf dem gesamten Signal. In der folgenden tiefergehenden Evaluation werden lediglich \ac{RF} und \ac{MLP} betrachtet. Zwar sind die Ergebnisse des \ac{DT} auf einem ähnlichen Niveau, aber da ein \ac{RF} lediglich ein Zusammenschluss mehrerer \ac{DT} ist, ist eine zusätzliche Analyse nicht lohnenswert. 
+Insgesamt zeigen bereits Accuracy und \ac{MAE}, siehe Tabelle \ref{fig:ml-statistical-MAE-Coverage}, eindeutig, dass die Klassifikation vom keinem der Modelle den Ergebnissen des Papers von \citeauthor{Sadek2016}\footcite{Sadek2016} entspricht. Die Accuracy und AUC von je unter 0,6 zeigen, dass die Klassifikation nur minimal besser als reines Raten ist. Teils ist der \ac{MAE} der als informativ klassifizierten Segmente sogar größer als der auf dem gesamten Signal. In der folgenden tiefergehenden Evaluation werden lediglich \ac{RF} und \ac{MLP} betrachtet. Zwar sind die Ergebnisse des \ac{DT} auf einem ähnlichen Niveau, aber da ein \ac{RF} lediglich ein Zusammenschluss mehrerer \ac{DT} ist, ist eine zusätzliche Analyse nicht lohnenswert. 
 
 \begin{table}[H]
 	\centering
@@ -147,7 +147,7 @@ Bei einer ähnlich hohen, beziehungsweise höheren Coverage wie die der Annotati
  	\label{fig:ml-statistical-positives}
  \end{figure}
  
- Auch für diese Modelle wird untersucht, wie hoch die Coverage unter einem bestimmten Fehler $E\textsubscript{HR}$ bei der Betrachtung des als informativ klassifizierten Signals auf dem ganzen Signal ist. Auffallend ist, dass die Werte knapp beim \ac{MLP} halb so hoch wie die tatsächliche Coverage sind. Das zeigt ergänzend zu der gemessen Accuracy, dass ca. die Hälfte der Segmente, unabhängig von ihren tatsächlichen Qualität, als informativ klassifiziert werden. Der \ac{RF} ist näher an der tatsächlichen Coverage, aber es wird auch mehr nicht-informatives Signal falsch-positiv klassifiziert. Die Werte sind in Tabelle \ref{fig:ml-statistical-coverage} aufgelistet.
+ Auch für diese Modelle wird untersucht, wie hoch die Coverage unter einem bestimmten Fehler $E\textsubscript{HR}$ bei der Betrachtung des als informativ klassifizierten Signals auf dem ganzen Signal ist. Auffallend ist, dass die Werte beim \ac{MLP} knapp halb so hoch wie die tatsächliche Coverage sind. Das zeigt ergänzend zu der gemessen Accuracy, dass ca. die Hälfte der Segmente, unabhängig von ihren tatsächlichen Qualität, als informativ klassifiziert werden. Der \ac{RF} ist näher an der tatsächlichen Coverage, aber es wird auch mehr nicht-informatives Signal falsch-positiv klassifiziert. Die Werte sind in Tabelle \ref{fig:ml-statistical-coverage} aufgelistet.
  
   \begin{table}[H]
  	\centering
@@ -168,9 +168,9 @@ Bei einer ähnlich hohen, beziehungsweise höheren Coverage wie die der Annotati
 
 Obwohl keines der Verfahren sehr gute Ergebnisse für die vorliegenden Daten liefert, ist besonders bei den Modellen maschinellen Lernens interessant, welchen Einfluss und welchen Informationsgewinn die jeweiligen Merkmale haben. Aus diesem Grund wird im Folgenden eine explorative Datenanalyse durchgeführt.
 
-Zunächst wird betrachtet, ob die Merkmale untereinander und mit $E\textsubscript{HR}$ und der Annotation korreliert sind. Da die Merkmale das Segment gemeinschaftlich statistisch beschreiben ist eine hohe Korrelation untereinander erwartet und zeigt sich auch. Eine Ausnahme bilden Kurtosis, Mittelwert und Schiefe. Die Anzahl der Nulldurchgänge ist ebenfalls nur schwächer mit den restlichen Mermalen korreliert. Außerdem zeigt sich bei der Betrachtung des in Abbildung \ref{fig:corr-heatmap-statistical} abgebildeten Korrelationsdiagramm, dass die Korrelation zu $E\textsubscript{HR}$ und der Annotation nicht signifikant ist. Auch bei paarweiser Visualisierung zeigt sich, dass sich anhand keines untersuchten Merkmalspaares informative von nicht informativen unterscheiden lassen.
+Zunächst wird betrachtet, ob die Merkmale untereinander und mit $E\textsubscript{HR}$ und der Annotation korreliert sind. Da die Merkmale das Segment gemeinschaftlich statistisch beschreiben ist eine hohe Korrelation untereinander erwartet und zeigt sich auch. Eine Ausnahme bilden Kurtosis, Mittelwert und Schiefe. Die Anzahl der Nulldurchgänge ist ebenfalls nur schwächer mit den restlichen Mermalen korreliert. Außerdem zeigt sich bei der Betrachtung des in Abbildung \ref{fig:corr-heatmap-statistical} abgebildeten Korrelationsdiagramms, dass die Korrelation zu $E\textsubscript{HR}$ und der Annotation nicht signifikant ist. Auch bei paarweiser Visualisierung zeigt sich, dass sich anhand keines untersuchten Merkmalspaares informative von nicht informativen unterscheiden lassen.
 
-\begin{figure}[H]
+\begin{figure}[H] %TODO: Label rotiert, jedes label in x-Achse
 	\centering
 	\includegraphics[scale=0.95]{pic/corr-heatmap-statistical.pdf}
 	\caption{Korrelationsdiagramm der statistischen Merkmale, $E\textsubscript{HR}$ und der binären Annotation}
@@ -186,7 +186,7 @@ Weiteren Einblick ermöglicht die Analyse des \ac{RF}, da bei diesem ermittelt w
 	\label{fig:rf-statistical-importances}
 \end{figure}
 
-Da die Visualisierung hochdimensionaler Daten schwierig ist und auch Modelle maschinellen Lernens bei einer hohen Merkmalszahl aufwändiger zu trainieren sind, wurde ebenfalls untersucht, wie sich die Daten bei einer Transformation in einen niedriger dimensionierten Raum verhalten. Untersuchte Transformationen umfassen sowohl unüberwachte Verfahren wie eine \ac{PCA} mit verschiedenen Kernel als auch überwachte Verfahren wie eine Dimensionsreduktion mit einer \ac{LDA}. Auch die transformierten Daten lassen sich nicht voneinander trennen, wie auch in Abbildung \ref{fig:dim-red-statistical} beispielhaft für eine \ac{PCA} mit linearem Kernel gezeigt ist.
+Da die Visualisierung hochdimensionaler Daten schwierig ist und auch Modelle maschinellen Lernens bei einer hohen Merkmalszahl aufwändiger zu trainieren sind, wurde ebenfalls untersucht, wie sich die Daten bei einer Transformation in einen niedriger dimensionierten Raum verhalten. Untersuchte Transformationen umfassen sowohl unüberwachte Verfahren wie eine \ac{PCA} mit verschiedenen Kerneln als auch überwachte Verfahren wie eine Dimensionsreduktion mit einer \ac{LDA}. Auch die transformierten Daten lassen sich nicht voneinander trennen, wie auch in Abbildung \ref{fig:dim-red-statistical} beispielhaft für eine \ac{PCA} mit linearem Kernel gezeigt ist.
 
 
  \begin{figure}[H]
@@ -206,7 +206,7 @@ Da eine hohe Korrelation zwischen einzelnen Merkmalen, wie sie auch bei den stat
 	\label{fig:rf-statistical-reduced}
 \end{figure}
 
-Die Ergebnisse dieses \acl{RF} mit reduzierter Merkmalsanzahl können mit dem in Kapitel \ref{res-statistical} untersuchten \acl{RF} verglichen werden. Der \ac{MAE} und die Coverage sind bei reduzierter Merkmalszahl geringfügig niedriger, die AUC deutlich. Insgesamt sind die Klassifikatoren auf einem ähnlichen Niveau, auch dieser Vergleich bei der geringen Qualität schwierig ist. In Tabelle \ref{fig:ml-statistical-reduced-comparison} sind die beiden \acl{RF} gegenübergestellt.
+Die Ergebnisse dieses \acl{RF} mit reduzierter Merkmalsanzahl können mit dem in Kapitel \ref{res-statistical} untersuchten \acl{RF} verglichen werden. Der \ac{MAE} und die Coverage sind bei reduzierter Merkmalszahl geringfügig niedriger, die AUC deutlich. Insgesamt sind die Klassifikatoren auf einem ähnlichen Niveau, auch wenn dieser Vergleich bei der geringen Qualität schwierig ist. In Tabelle \ref{fig:ml-statistical-reduced-comparison} sind die beiden \acl{RF} gegenübergestellt.
 
  \begin{table}[H]
  	\centering
