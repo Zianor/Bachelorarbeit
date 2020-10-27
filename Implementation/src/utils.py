@@ -48,8 +48,12 @@ def get_drift_path(data_folder='data_patients') -> Path:
     return os.path.join(get_data_path(data_folder), 'drift_compensation')
 
 
+def get_data_root_path() -> Path:
+    return os.path.join(get_project_root(), 'data')
+
+
 def get_data_path(data_folder='data_patients') -> Path:
-    return os.path.join(get_project_root(), 'data', data_folder)
+    return os.path.join(get_data_root_path(), data_folder)
 
 
 def get_data_object_path(data_folder='data_patients') -> Path:
