@@ -501,10 +501,100 @@ class MLStatisticalEstimator(QualityEstimator):
         super(MLStatisticalEstimator, self).print_model_test_report(save_title=save_title)
 
 
+class RegressionClassifier(BaseEstimator, ClassifierMixin):
+
+    def __init__(self, model=None, threshold=10):
+        self.model = model
+        self.threshold = threshold
+
+    def fit(self, X, y):
+        """Fits the underlying model
+        :param y: needs to be continuous target
+        """
+        self.model.fit(X, y)
+        self.classes_ = [False, True]  # order important for AUC?
+        return self
+
+    def predict(self, X):
+        y_continuous = self.model.predict(X)
+        y = [False if curr > self.threshold else True for curr in y_continuous]
+        return y
+
+    def get_params(self, deep=True):
+        return {'model': self.model,
+                'threshold': self.threshold}
+
+    def set_params(self, **params):
+        self.model.set_params(**params)
+        return self
+
+    def predict_proba(self, X):
+        y_continuous = self.model.predict(X)
+        proba_true = np.array([np.math.exp(np.log(0.5)/10 * y) for y in y_continuous])  # e function with f(th)=0.5
+        proba_false = 1 - proba_true
+        ret = np.ones(shape=(len(y_continuous), 2))
+        ret[:, 0] = proba_false  # TODO: clean up
+        ret[:, 1] = proba_true
+        return ret
+
+    def score(self, X, y):
+        return accuracy_score(y, self.predict(X))
+
+
+class OwnClassifier(BaseEstimator, ClassifierMixin):
+
+    def __init__(self, model=None, threshold=10, **params):
+        self.model = model
+        self.model.set_params(**params)
+        self.threshold = threshold
+
+    def fit(self, X, y):
+        if type(X) is not pd.DataFrame:
+            X = pd.DataFrame(X)
+        if type(y) is not pd.Series:
+            y = pd.Series(y, index=X.index)
+        mask_nan = X.isna().any(axis=1)
+        y_true = y.loc[X[~mask_nan].index]
+        self.model.fit(X.loc[~mask_nan], y_true)
+        self.classes_ = [False, True]  # order important for AUC?
+        return self
+
+    def predict(self, X):
+        if type(X) is not pd.DataFrame:
+            X = pd.DataFrame(X)
+        mask_nan = X.isna().any(axis=1)
+        X_not_na = X.loc[~mask_nan]
+        y_pred = self.model.predict(X_not_na)
+        y = pd.Series(index=X.index, data=np.full((len(X.index),), False), name='pred')
+        y.loc[X_not_na.index] = pd.Series(y_pred, X_not_na.index, dtype=bool)
+        return y.to_numpy()
+
+    def get_params(self, deep=True):
+        return {'model': self.model,
+                'threshold': self.threshold}
+
+    def set_params(self, **params):
+        self.model.set_params(**params)
+        return self
+
+    def predict_proba(self, X):
+        if type(X) is not pd.DataFrame:
+            X = pd.DataFrame(X)
+        mask_nan = X.isna().any(axis=1)
+        X_not_na = X.loc[~mask_nan]
+        y_proba_not_na = self.model.predict_proba(X_not_na)
+        y_proba = pd.DataFrame(index=X.index, columns=self.model.classes_)
+        y_proba.loc[mask_nan, True] = np.array([0])
+        y_proba.loc[mask_nan, False] = np.array([1])
+        y_proba.loc[X_not_na.index, self.model.classes_[0]] = y_proba_not_na[:, 0]
+        y_proba.loc[X_not_na.index, self.model.classes_[1]] = y_proba_not_na[:, 1]
+        return y_proba.to_numpy()
+
+
 class OwnEstimator(QualityEstimator):
 
     def __init__(self, clf, path, segment_length=10, overlap_amount=0.9, hr_threshold=10, data_folder='data_patients',
-                 feature_selection=None):
+                 feature_selection=None, hyperparameter=None, log=True):
         self.feature_selection = feature_selection
         super(OwnEstimator, self).__init__(segment_length=segment_length, overlap_amount=overlap_amount,
                                            hr_threshold=hr_threshold, data_folder=data_folder)
@@ -513,20 +603,69 @@ class OwnEstimator(QualityEstimator):
         self.path = os.path.join(utils.get_data_set_folder(self.data_folder, self.segment_length, self.overlap_amount),
                                  path)
         if clf is not None:
-            self.clf = clf
-            print("Modell is trained, this may need some time")
-            self._train()
+            self.clf = OwnClassifier(model=clf, threshold=self.hr_threshold)
+            if not os.path.isdir(self.path):
+                os.mkdir(path=self.path)
+            if hyperparameter is not None:
+                print("Hyperparameter optimization, this may need some time")
+                self.optimize_hyperparameter(hyperparameter)
+            else:
+                print("Model is trained, this may need some time")
+                self._train()
             self._save_model()
         else:
-            if os.path.isfile(self.path):
-                with open(self.path, 'rb') as file:
-                    self.clf = pickle.load(file)
-            else:
-                raise Exception("No model given and not found at given path")
+            self._load_model()
+
+    def optimize_hyperparameter(self, hyperparameter):
+        x_g1, x_g2, y_g1, y_g2, groups1, groups2 = self._get_patient_split()
+        cv = LeaveOneGroupOut()
+        # grid_search = GridSearchCV(
+        #     estimator=self.clf, param_grid=hyperparameter, scoring=['accuracy', 'balanced_accuracy', 'f1', 'roc_auc',
+        #                                                             'f1_weighted', 'precision', 'recall'], cv=cv,
+        #     n_jobs=-2, verbose=2, refit='roc_auc')
+        grid_search = RandomizedSearchCV(
+            estimator=self.clf, param_distributions=hyperparameter, scoring=['accuracy', 'balanced_accuracy', 'f1',
+                                                                             'roc_auc', 'f1_weighted', 'precision',
+                                                                             'recall'],
+            cv=cv, n_jobs=-2, verbose=2, refit='roc_auc', n_iter=10)
+        grid_search.fit(x_g1, y_g1, groups=groups1)
+        self.clf = grid_search.best_estimator_
+        params = grid_search.best_params_
+        with open(os.path.join(self.path, 'grid.sav'), 'wb') as file:
+            pickle.dump(grid_search, file=file)
+        with open(os.path.join(self.path, 'params.json'), 'w') as file:
+            file.write(json.dumps(params))
+            file.flush()
+        self._get_dataframe_from_cv_results(grid_search.cv_results_).to_csv(os.path.join(self.path, 'grid.csv'))
+
+    def _train(self):
+        x1, x2, y1, y2, groups1, groups2 = self._get_patient_split()
+        self.clf.fit(x1, y1)
+
+    @staticmethod
+    def _get_dataframe_from_cv_results(res):
+        data = pd.DataFrame(res)
+        scores = ['accuracy', 'balanced_accuracy', 'f1', 'roc_auc', 'f1_weighted', 'precision', 'recall']
+        columns = ['params']
+        for scoring in scores:
+            rank = 'rank_test_' + scoring
+            mean = 'mean_test_' + scoring
+            columns.append(rank)
+            columns.append(mean)
+        return data.filter(items=columns, axis='columns')
 
     def _save_model(self):
-        with open(self.path, 'wb') as file:
+        model_file = os.path.join(self.path, 'model.sav')
+        with open(model_file, 'wb') as file:
             pickle.dump(self.clf, file=file)
+
+    def _load_model(self):
+        model_file = os.path.join(self.path, 'model.sav')
+        if os.path.isfile(model_file):
+            with open(model_file, 'rb') as file:
+                self.clf = pickle.load(file)
+        else:
+            raise Exception("No model given and not found at given path")
 
     def _get_features(self):
         if self.feature_selection is not None:
@@ -553,67 +692,28 @@ class OwnEstimator(QualityEstimator):
                            hr_threshold=self.hr_threshold)
         return pd.read_csv(path_hr, index_col=False)
 
+    def predict(self, x):
+        return self.clf.predict(x)
+
+    def print_model_test_report(self, save_title=None):
+        _, x2, _, y2, _, _ = self._get_patient_split()
+        print("AUC: %.2f" % roc_auc_score(y2, self.clf.predict_proba(x2)[:, 1]))
+        super(OwnEstimator, self).print_model_test_report(save_title=save_title)
+
 
 class OwnEstimatorRegression(OwnEstimator):
 
     def __init__(self, clf, path, segment_length=10, overlap_amount=0.9, hr_threshold=10, data_folder='data_patients',
-                 feature_selection=None):
+                 feature_selection=None, hyperparameter=None, log=True):
+        if clf is not None:
+            clf = RegressionClassifier(model=clf, threshold=10)
         super(OwnEstimatorRegression, self).__init__(clf, path, segment_length, overlap_amount, hr_threshold,
-                                                     data_folder, feature_selection=feature_selection)
+                                                     data_folder, feature_selection=feature_selection,
+                                                     hyperparameter=hyperparameter, log=log)
 
     def _train(self):
         x1, x2, y1, y2, groups1, groups2 = self._get_patient_split()
-        mask_nan = x1.isna().any(axis=1)
-        y_true_error = self.error_target.loc[x1[~mask_nan].index]
-        self.clf.fit(x1.loc[~mask_nan], y_true_error)
-
-    def predict_test_set_error(self):
-        x1, x2, y1, y2, groups1, groups2 = self._get_patient_split()
-        return self.predict(x2), self.error_target.loc[y2.index]
-
-    def predict_error(self, x):
-        data_subset = self.features.loc[x.index].copy()
-        mask_nan = data_subset.isna().any(axis=1)
-        data_test = data_subset.loc[~mask_nan]
-        y_pred_error = self.clf.predict(data_test)
-        return data_test.index, y_pred_error
-
-    def predict(self, x):
-        data_subset = self.features.loc[x.index].copy()
-        index, y_pred_error = self.predict_error(x)
-        labels = pd.Series(index=data_subset.index, data=np.full((len(data_subset.index),), False), name='pred')
-        labels.loc[index] = pd.Series(np.array([err < self.hr_threshold for err in y_pred_error]), index,  dtype=bool)
-        return labels
-
-    def print_regression_test_report(self):
-        y_pred, y_true = self.predict_test_set_error()
-        print("Max Error: %.2f" % max_error(y_true, y_pred))
-        print("MAE: %.2f" % mean_absolute_error(y_true, y_pred))
-        print("MSE: %.2f" % mean_squared_error(y_true, y_pred))
-        print("R_2 Score: %.2f" % r2_score(y_true, y_pred))
-
-
-class OwnEstimatorClassification(OwnEstimator):
-
-    def __init__(self, clf, path, segment_length=10, overlap_amount=0.9, hr_threshold=10, data_folder='data_patients',
-                 feature_selection=None):
-        super(OwnEstimatorClassification, self).__init__(clf, path, segment_length, overlap_amount, hr_threshold,
-                                                         data_folder, feature_selection=feature_selection)
-
-    def _train(self):
-        x1, x2, y1, y2, groups1, groups2 = self._get_patient_split()
-        mask_nan = x1.isna().any(axis=1)
-        y_true = self.target.loc[x1[~mask_nan].index]
-        self.clf.fit(x1.loc[~mask_nan], y_true)
-
-    def predict(self, x):
-        data_subset = self.features.loc[x.index].copy()
-        mask_nan = data_subset.isna().any(axis=1)
-        data_test = data_subset.loc[~mask_nan]
-        y_pred = self.clf.predict(data_test)
-        labels = pd.Series(index=data_subset.index, data=np.full((len(data_subset.index),), False), name='pred')
-        labels.loc[data_test.index] = pd.Series(y_pred, data_test.index,  dtype=bool)
-        return labels
+        self.clf.fit(x1, self.informative_info.loc[y1.index, 'error'])
 
 
 if __name__ == "__main__":
