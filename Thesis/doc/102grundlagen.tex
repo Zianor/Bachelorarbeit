@@ -5,37 +5,39 @@ Zum Verständnis dieser Arbeit ist grundlegendes Wissen nötig, welches hier in 
 
 \section{Maschinelles Lernen}\label{ml-grundlagen}
 
-Da in dieser Arbeit Methoden des Maschinellen Lernens verwendet werden, wird im Folgenden eine Übersicht über seine Prinzipien, gängige Techniken und Evaluationsmetriken und verschiedene Lernmodelle und deren mathematischen Hintergrund gegeben.
+Da in dieser Arbeit Methoden des Maschinellen Lernens verwendet werden, wird im Folgenden eine Übersicht über seine Prinzipien, gängige Techniken und Evaluationsmetriken sowie verschiedene Lernmodelle und deren mathematischen Hintergrund gegeben.
 
 	\subsection{Grundprinzipien}
 	
-	Maschinelles Lernen ist die \glqq künstliche\grqq{} Generierung von Wissen auf Basis von Erfahrung: Aus Beispielen wird gelernt und dieses Wissen nach einer Trainingsphase verallgemeinert. Dafür wird mit Mustererkennung gearbeitet und ein statistisches Modell aufgebaut, das auf den Trainingsdaten beruht. Die Trainingsdaten $X$ bestehen aus Merkmalsvektoren  $x \in X \subseteq \mathbb{R}^n$. Gesucht ist eine Funktion $f$, die diese Daten beschreibt. Unterschieden wird bei dieser Beschreibung dieser Daten zwischen Klassifikation und Regression. Bei einer Klassifikation werden die Eingabedaten in verschiedene Klassen unterteilt. Bei einer Regression dagegen werden stetige Werte vorhergesagt, es wird die Verteilung der Daten beschrieben. Sie kann z.B. dafür genutzt werden, Verkaufszahlen vorauszusagen. Ein Sonderfall ist die logistische Regression, die die Wahrscheinlichkeit der Angehörigkeit zu einer Klasse benennt.
+	Maschinelles Lernen ist die \glqq künstliche\grqq{} Generierung von Wissen auf Basis von Erfahrung: Aus Beispielen wird gelernt und dieses Wissen nach einer Trainingsphase verallgemeinert. Dafür wird mit Mustererkennung gearbeitet und ein statistisches Modell aufgebaut, das auf den Trainingsdaten beruht. Die Trainingsdaten $X$ bestehen aus Merkmalsvektoren  $x \in X \subseteq \mathbb{R}^n$. %TODO: Hogi fragt was n ist
+	Gesucht ist eine Funktion $f$, die diese Daten beschreibt. Unterschieden wird bei der Beschreibung dieser Daten zwischen Klassifikation und Regression. Bei einer Klassifikation werden die Eingabedaten in verschiedene Klassen unterteilt. Bei einer Regression dagegen werden stetige Werte vorhergesagt, es wird die Verteilung der Daten beschrieben. Sie kann z.B. dafür genutzt werden, Verkaufszahlen vorauszusagen. Bei einigen Klassifikationsverfahren wird außerdem die Wahrscheinlichkeit der Angehörigkeit zu einer Klasse benannt.
 	
 	Es wird zwischen verschiedenen Arten des maschinellen Lernens unterschieden, dem überwachten Lernen, dem unüberwachten Lernen und dem verstärkenden Lernen. Letzteres wird hier nicht betrachtet. Bei überwachtem Lernen bestehen die vorliegenden Daten aus Eingabe-Ausgabe-Paaren $(x_1, y_1), ...,(x_n, y_n) \text{ mit } x_i \in X$.%TODO 3 punkte
-	 Demnach ist nur die Funktion $f: X \to Y$ ist unbekannt. Gesucht ist eine Funktion $g$, die $f$ aproximiert. Ein Lernalgorithmus ermittelt diese Funktion aus einem Hypothesenset. Dieses Vorgehen ist in Abbildung \ref{fig:supervisedLearning} visualisiert. Bei unüberwachtem Lernen dagegen ist $Y$ unbekannt; die Eingabedaten haben die Form $x_1, ..., x_n, x_i \in X$. Hier ist ein $f$ gesucht, das die Daten möglichst gut beschreibt und sie beispielsweise eigenständig in Kategorien einteilt. In dieser Arbeit wird allerdings ausschließlich überwachtes Lernen betrachtet.
+	 Demnach ist nur die Funktion $f: X \to Y$ ist unbekannt. Gesucht ist eine Funktion $g$, die $f$ aproximiert. Ein Lernalgorithmus ermittelt diese Funktion aus einem Hypothesenset. Dieses Vorgehen ist in Abbildung\,\ref{fig:supervisedLearning} visualisiert. Bei unüberwachtem Lernen dagegen ist $Y$ unbekannt; die Eingabedaten haben die Form $x_1, ..., x_n, x_i \in X$. Hier ist ein $f$ gesucht, das die Daten möglichst gut beschreibt und sie beispielsweise eigenständig in Kategorien einteilt. In dieser Arbeit wird allerdings ausschließlich überwachtes Lernen betrachtet.
 	
 	\begin{figure}[H]
 		\centering
-		\includegraphics{pic/SupervisedLearning.pdf}
+		\includegraphics[scale=1]{pic/SupervisedLearning.pdf}
 		\caption[Darstellung von überwachtem Lernen]{Darstellung von überwachtem Lernen}
 		\label{fig:supervisedLearning}
 	\end{figure}
 
 	
 	Ein häufig beobachtetes Problem bei maschinellem Lernen ist das sogenannte Overfitting, auf Deutsch Überanpassung, wenn das Modell zwar die Trainingsdaten gut approximiert, aber keine gute Generalisierung für unbekannte Daten bildet, d.h. zu stark an die Trainingsdaten angepasst ist. Gründe dafür können eine zu hohe Komplexität des Lernmodells wie z.B. zu viel Training oder zu wenig Trainingsdaten sein. %TODO: Satz fixen
-	In beiden Fällen wird ungewollt ein Teil des \textit{noise} der Trainingsdaten in das Modell übernommen. Das Gegenteil von Overfitting ist Underfitting, das den Fall beschreibt, dass das Modell die Beziehung von Merkmalen und Ziel nicht ausreichend erfasst. Dies ist unter anderem der Fall, wenn die zum Training verwendete Stichprobe verzerrt ist.
+	In beiden Fällen wird ungewollt ein Teil des \textit{noise} %TODO: evtl. einführen
+	der Trainingsdaten in das Modell übernommen. Das Gegenteil von Overfitting ist Underfitting, das den Fall beschreibt, in dem das Modell die Beziehung von Merkmalen und Ziel nicht ausreichend erfasst. Dies ist unter anderem der Fall, wenn die zum Training verwendete Stichprobe verzerrt ist.
 	
 	Zum Prozess des maschinellen Lernens gehört ebenfalls das Sammeln der Daten und die Transformation in Merkmale, die dem Lernalgorithmus als Eingabe dienen. Dieser Prozess ist entscheidend für den Erfolg des Lernprozesses, da nur aus aussagekräftigen Daten ein gutes Modell erzeugt werden kann.
 
 	\subsection{Evaluation und Validierung}
 	
-	Ein erzeugtes Modell muss in jedem Fall auf Daten validiert werden, mit denen nicht trainiert wurde, um den Fehler auf unbekannten Daten abschätzen zu können. Eine Möglichkeit, dies zu tun, bietet die Hold-Out-Validierung, bei der die Daten zufällig in Trainings- und Testset aufgeteilt werden. Das Modell wird mit dem Trainingsset aufgebaut und auf dem Testset getestet und evaluiert. Eine andere übliche Technik ist die Kreuzvalidierung, bei der die Daten auf $v $ gleich große Mengen, im Englischen \textit{folds}, verteilt werden. Anschließend werden $v$ Modelle trainiert, wobei jeweils eine Menge ausgelassen wird, auf der anschließend getestet wird. Bei einer extremen Variante, der Leave-One-Out Kreuzvalididierung entspricht $v$ der Anzahl der Datenpunkte. Üblich ist jedoch v-fache Kreuzvalidierung mit $v=5$ oder $v=10$, auch abhängig von der Datenmenge und der verfügbaren Rechenleistung.
+	Ein erzeugtes Modell muss in jedem Fall auf Daten validiert werden, mit denen nicht trainiert wurde, um den Fehler auf unbekannten Daten abschätzen zu können. Eine Möglichkeit, dies zu tun, bietet die Hold-Out-Validierung, bei der die Daten zufällig in Trainings- und Testset aufgeteilt werden. Das Modell wird mit dem Trainingsset aufgebaut und auf dem Testset getestet und evaluiert. Eine andere übliche Technik ist die Kreuzvalidierung, bei der die Daten auf $v $ gleich große Mengen, im Englischen \textit{folds}, verteilt werden. Anschließend werden $v$ Modelle trainiert, wobei jeweils eine Menge ausgelassen wird, auf der anschließend getestet wird. Bei einer extremen Variante, der Leave-One-Out Kreuzvalididierung entspricht $v$ der Anzahl der Datenpunkte. Üblich ist jedoch $v$-fache Kreuzvalidierung mit $v=5$ oder $v=10$, auch abhängig von der Datenmenge und der verfügbaren Rechenleistung.
 	
 	Neben der Validierung des finalen Modells müssen auch bei der Modellauswahl Entscheidungen getroffen werden, vor allem welches Modell und welche Hyperparameter gewählt werden. Hyperparameter sind Parameter von Modellen maschinellen Lernens, die vor dem Training des Modells festgelegt werden und die Modellarchitektur bestimmen oder den Lernalgorithmus betreffen. Da auch die Wahl dieser validiert werden muss, werden insgesamt drei Datensets benötigt: Trainings-, Validierungs- und Testset, da sonst die Wahl der Hyperparameter durch das Testset beeinflusst würde und kein unabhängiger Test mehr möglich wäre. Das Testset wird also erst genutzt, nachdem alle Entscheidungen getroffen wurden. Typisch ist ein Hyperparameter-Tuning durch Kreuzvalidierung auf dem Trainingsset mit einem anschließenden Retraining mit den ermittelten Parametern auf dem gesamten Trainingsset. Der Ablauf ist in Abbildung \ref{fig:validation-ablauf} visualisiert.
 	
 	\begin{figure}[H]
 		\centering
-		\includegraphics[scale=0.85]{pic/validation-ablauf.pdf}
+		\includegraphics[scale=1]{pic/validation-ablauf.pdf}
 		\caption{Ablauf von Training und Validierung}
 		\label{fig:validation-ablauf}
 	\end{figure}
@@ -46,12 +48,12 @@ Da in dieser Arbeit Methoden des Maschinellen Lernens verwendet werden, wird im 
 	\[
 		\text{balanced-accuracy} = \frac{1}{2}\left( \frac{TP}{TP + FN} + \frac{TN}{TN + FP}\right).
 	\]
-	 Bei der Precision $\text{PPV} = \frac{TP}{TP + FP}$ werden falsch-positive Klassifikationen \glqq bestraft\grqq{}; beim Recall $\text{TPR} = \frac{TP}{TP + FN}$, auch Sensitivity genannt, falsch-negative Klassifikationen. Letztere werden oft in einem Maß zusammengefasst, dem F1-Score, der das harmonische Mittel aus beiden bildet:
+	 Bei der Precision, auch Positive Predictive Value, $\text{PPV} = \frac{TP}{TP + FP}$ werden falsch-positive Klassifikationen \glqq bestraft\grqq{}; beim Recall $\text{TPR} = \frac{TP}{TP + FN}$, auch Sensitivity genannt, falsch-negative Klassifikationen. Letztere werden oft in einem Maß zusammengefasst, dem F1-Score, der das harmonische Mittel aus beiden bildet:
 	\[
-		F_1 = 2 \cdot \frac{\text{PPV} * \text{TPR}}{\text{PPV} + \text{TPR}}.
+		F_1 = 2 \cdot \frac{\text{PPV} \cdot \text{TPR}}{\text{PPV} + \text{TPR}}.
 	\]
 	
-	Eine weitere Möglichkeit, die Qualität eines binären Klassifikators zu evaluieren, ist die \ac{ROC}-Kurve, bei der die \ac{TPR} und die \ac{FPR} gegeneinander aufgetragen werden und so den Kompromiss zwischen \ac{TPR} und \ac{FPR} abhängig vom Schwellwert zeigt. Die Fläche unter dieser Kurve, die \ac{AUC}, beschreibt, wie gut das Modell die beiden Klassen trennt.
+	Eine weitere Möglichkeit, die Qualität eines binären Klassifikators zu evaluieren, ist die \ac{ROC}-Kurve, bei der die \ac{TPR}, also der Recall, und die \ac{FPR} gegeneinander aufgetragen werden und so den Kompromiss zwischen \ac{TPR} und \ac{FPR} abhängig vom Schwellwert zeigt. Die Fläche unter dieser Kurve, die \ac{AUC}, beschreibt, wie gut das Modell die beiden Klassen trennt. Eine perfekte Trennung wird führt zu $\text{AUC} = 1$.
 	
 	Bei einer Regression werden üblicherweise der \ac{MAE} oder der \ac{MSE} betrachtet, die die Größe des Fehlers von $\hat{y}$ im Vergleich zur Zielgröße $y$ ausdrücken und wie folgt berechnet werden:
 	\begin{align*}
@@ -63,7 +65,7 @@ Da in dieser Arbeit Methoden des Maschinellen Lernens verwendet werden, wird im 
 
 	\subsection{Lernmodelle und deren mathematischer Hintergrund}
 	
-		Es gibt eine Vielzahl von Modellen des maschinellen Lernens, von denen eine Auswahl in dieser Arbeit betrachtet und vorgestellt wird. Alle verallgemeinern eine Verteilung von Trainingsdaten und haben das Ziel, eine Funktion $g$ zu finden, mit der die Zielgröße $y$ vorhergesagt werden kann. Bei einer Klassifikation sollen die verschiedenen Klassen möglichst genau separiert und bei einer Regression der Wert möglichst genau vorhergesagt werden. Diese Funktion wird auch Entscheidungsfunktion genannt und minimiert eine gewählte Kostenfunktion, die beschreibt, wie sehr die Vorhersagen von der Zielgröße abweichen. Bei linearen Modellen beispielsweise ist die Vorhersage mit $\hat{y}_i = \theta x_i$ eine lineare Kombination der gewichteten Merkmale. $\hat{y}_i$ kann dabei entweder direkt die Vorhersage eines Wertes sein oder genutzt werden, um eine Klassenzugehörigkeit zu ermitteln. Bei einer binären Klassifikation kann dafür beispielsweise die Signum- oder die logistische Funktion genutzt werden. Die genutzte Funktion wird auch Aktivierungsfunktion genannt. Die Parameter der Entscheidungsfunktion, in diesem Fall die Koeffizienten des Merkmalsvektors, werden im Nachfolgenden allgemein $\theta$ genannt. Sie sind der Teil der Entscheidungsfunktion, der von den Daten gelernt werden muss.
+		Es gibt eine Vielzahl von Modellen des maschinellen Lernens, von denen eine Auswahl in dieser Arbeit betrachtet und vorgestellt wird. Alle verallgemeinern eine Verteilung von Trainingsdaten und haben das Ziel, eine Funktion $g$ zu finden, mit der die Zielgröße $y$ vorhergesagt werden kann. Bei einer Klassifikation sollen die verschiedenen Klassen möglichst genau separiert und bei einer Regression der Wert möglichst genau vorhergesagt werden. Diese Funktion wird auch Entscheidungsfunktion genannt und minimiert eine gewählte Kostenfunktion, die beschreibt, wie sehr die Vorhersagen von der Zielgröße abweichen. Bei linearen Modellen beispielsweise ist die Vorhersage mit $\hat{y}_i = \theta x_i$ eine lineare Kombination der gewichteten Merkmale für Datenpunkt $x_i \in X$. $\hat{y}_i$ kann dabei entweder direkt die Vorhersage eines Wertes sein oder genutzt werden, um eine Klassenzugehörigkeit zu ermitteln. Bei einer binären Klassifikation kann dafür beispielsweise die Signum- oder die logistische Funktion mit einem Schwellwert genutzt werden. Die genutzte Funktion wird auch Aktivierungsfunktion genannt. Die Parameter der Entscheidungsfunktion, in diesem Fall die Koeffizienten des Merkmalsvektors, werden im Nachfolgenden allgemein $\theta$ genannt. Sie sind der Teil der Entscheidungsfunktion, der von den Daten gelernt werden muss.
 		
 		Während des Trainings werden die besten Parameter $\theta$ ermittelt. Dafür wird eine Funktion benötigt, die ausdrückt, wie gut das Modell den Trainingsdaten angepasst ist. Diese besteht allgemein aus zwei Teilen: der Kostenfunktion $L$ und der Regularisierung $\Omega$:
 		
@@ -74,39 +76,31 @@ Da in dieser Arbeit Methoden des Maschinellen Lernens verwendet werden, wird im 
 		Als Kostenfunktion wird vor allem für Regressionsprobleme häufig der \ac{MSE} verwendet. Bei binären Klassifikationsproblemen kann aber beispielsweise auch die Anzahl der falschen Klassifikationen verwendet werden. Die Regularisierung kontrolliert die Komplexität des Modells, um Overfitting zu vermeiden. Das Ziel des Trainings ist es demnach, die Anpassung des Modells zu optimieren, also $C$ zu minimieren. Dieses Minimierungsproblem wird abhängig von dem verwendeten Modell gelöst. Bei einer linearen Regression beispielsweise kann die Methode der kleinsten Quadrate verwendet werden, um die Fehlerquadrate zu minimieren, da eine Regularisierung bei einem linearen Modell nicht nötig ist. Der Gewichtungsvektor $\theta$ kann hier durch direktes Auflösen berechnet werden:
 		\[
 			\argmin_{\theta} \sum_{i=1}^{n} (\theta^T x_i - y_i)^2
-			\Rightarrow \theta = (X^T X)^{-1} X^T
+			\Rightarrow \theta = (X^T X)^{-1} X^Ty
 		\]
 		
 		Bei komplexeren Minimierungsproblemen ist die Methode kleinster Quadrate nicht ausreichend und es werden andere Methoden zur Fehlerminimierung benötigt. Eines davon ist das Gradientenabstiegsverfahren, bei dem in jedem Schritt die Ableitung der Kostenfunktion nach jedem der Gewichte berechnet wird und der Schritt gewählt wird, der die Funktion am stärksten minimiert.
 		
-		Eine andere Möglichkeit ist, nicht linear separierbare Daten mit dem sogenannten Kerneltrick linear separierbar zu machen, statt nicht-lineare, komplexere Verfahren zu verwenden. Dabei wird durch Ersetzen des Skalarproduktes implizit der Variablenraum transformiert. Eine Beispiel ist der Gaußsche RBF-Kernel:
+		Eine andere Möglichkeit ist, nicht linear separierbare Daten mit dem sogenannten Kerneltrick linear separierbar zu machen, statt nicht-lineare, komplexere Verfahren zu verwenden. Dabei wird durch Ersetzen des Skalarproduktes implizit der Variablenraum transformiert. Eine Beispiel ist der Gaußsche RBF-Kernel, wobei RBF für radial basis function steht. Sind $x$ und $x'$ Merkmalsvektoren, ist der RBF-Kernel wie folgt definiert:
 		\[
-			K_{RBF} (x, x\prime) := exp(-\gamma \|x - x\prime\|^2) \text{ mit } \gamma > 0
+			K_{RBF} (x, x\prime) := \text{exp}(-\gamma \|x - x\prime\|^2) \text{ mit } \gamma > 0
 		\]
 		In der Transformation werden alle Nicht-Linearitäten berücksichtigt, wodurch anschließend Linearität möglich ist. %TODO: möglich besser formulieren
 		
-		Im Folgenden werden die in dieser Arbeit genutzten Modelle näher vorgestellt. Die Nachimplementierung von existierenden Algorithmen umfasst drei Modelle, die hier nicht detailliert vorgestellt werden: die \ac{SVM}, die \ac{LDA} und das \ac{MLP}. Wichtig für die Einordnung ist, dass es sich bei \ac{LDA} und \ac{SVM} um zunächst lineare Modelle handelt und die \ac{SVM} häufig mit dem Kerneltrick verwendet wird, um die Daten zu transformieren. Beim \ac{MLP} handelt es sich um ein Neuronales Netz, das Nichtlinearität ermöglicht.
+		Im Folgenden werden die in dieser Arbeit genutzten Modelle näher vorgestellt. Die Nachimplementierung von existierenden Algorithmen umfasst außerdem drei Modelle, die hier nicht detailliert vorgestellt werden: die \ac{SVM}, die \ac{LDA} und das \ac{MLP}. Wichtig für die Einordnung ist, dass es sich bei \ac{LDA} und \ac{SVM} um zunächst lineare Modelle handelt und die \ac{SVM} häufig mit dem Kerneltrick verwendet wird, um die Daten zu transformieren. Beim \ac{MLP} handelt es sich um ein Neuronales Netz, das Nichtlinearität ermöglicht.
 
 	
 		\subsubsection{Classification And Regression Trees}
 		
-		\ac{CART} sind nicht-lineare Modelle, die einem Binärbaum entsprechen. Sie können sowohl für Regression als auch für Klassifikation verwendet werden. Zwar sind sie hinsichtlich ihrer Performance oft anderen Lernmodellen unterlegen, werden aber als Teil komplexeren Modellen genutzt und haben den Vorteil, sehr gut nachvollziehbar zu sein. Im Gegensatz zu vielen anderen Modellen benötigen sie keine Normalisierung der Merkmale. Es wird ein Pfad in einem Baum durchlaufen, indem an jedem Knoten unterschieden wird, ob ein bestimmtes Feature über oder unter einem Schwellwert liegt. Die Kostenfunktion bei einer Regression ist der \ac{MSE}. Für die Kostenfunktion einer Klassifikaton wird häufig die \glqq{}Reinheit\grqq{} eines Knoten $m$ gemessen. Ein Möglichkeit diese zu berechnen ist der Gini-Index $G$, wobei $k$ die möglichen Klassifikation beschreibt und $R_m$ die Menge der Datenpunkte des Knotens: %TODO: was ist I
-		\begin{align*}
-			p_{mk} &= 1/ N_m \sum_{x_i \in R_m} I(y_i = k)\\
-			G &= \sum_k p_{mk} (1 - p_{mk})
-		\end{align*}
-		Eine andere ist die Entropie:
-		\[
-			E(X) = - \sum_k p_{mk} \log(p_{mk}) 
-		\]
+		\ac{CART} sind nicht-lineare Modelle, die einem Binärbaum entsprechen. Sie können sowohl für Regression als auch für Klassifikation verwendet werden. Zwar sind sie hinsichtlich ihrer Performance oft anderen Lernmodellen unterlegen, werden aber als Teil komplexeren Modellen genutzt und haben den Vorteil, sehr gut nachvollziehbar zu sein. Im Gegensatz zu vielen anderen Modellen benötigen sie keine Normalisierung der Merkmale. Es wird ein Pfad in einem Baum durchlaufen, indem an jedem Knoten unterschieden wird, ob ein bestimmtes Merkmal über oder unter einem Schwellwert liegt. Die Kostenfunktion bei einer Regression ist in der Regel der \ac{MSE}. Für die Kostenfunktion einer Klassifikaton wird häufig die \glqq{}Reinheit\grqq{} eines Knoten $m$ gemessen. Sie beschreibt, wie deutlich die Mehrheit einer einzelnen Klasse in $m$ ist.
 		
 		Für den Aufbau eines \ac{CART} wird häufig das zu den greedy Algorithmen gehörende rekursive binäre Teilen verwendet. Hierbei wird ein Baum von oben nach unten aufgebaut. In jedem Schritt wird das Merkmal gewählt, mit dem sich die Daten zu diesem Zeitpunkt am besten separieren lassen und der Schwellwert ermittelt. Abbruchkriterien sind unter anderem eine maximal erlaubte Tiefe oder eine Mindestanzahl von Datenpunkten in einem Blatt. Wenn diese zu viel Spielraum erlauben, neigen Bäume zum Overfitting.
 		
 		\subsubsection{Random Forest}
 		
-		Ein Zusammenschluss aus mehreren unkorrelierten Bäumen wird \ac{RF} genannt. Jeder dieser Bäume ist eigenständiges Modell, das ein Ergebnis liefert. Aus der Menge der Einzelergebnisse wird das endgültige Ergebnis ermittelt. Dadurch wird ein Teil der Nachvollziehbarkeit von Bäumen gegen eine bessere Generalisierung eingetauscht. Die einzelnen Bäume werden zufällig erzeugt, indem für jeden Baum $n$ zufällige Datenpunkte ausgewählt werden. Von $M$ Merkmalen werden nun $m \ll M$ ebenfalls zufällig gewählt, die als Kriterium für den Aufbau des Baumes verwendet werden. Der darauf folgende Aufbau des Baumes entspricht dem zuvor beschriebenen. Bei einer Klassifikation ist das endgültige Ergebnis je nach Implementierung ein Mehrheitsentscheid oder eine Kombination aller Wahrscheinlichkeiten; bei einer Regression der Durchschnitt aller Werte.
+		Ein Zusammenschluss aus mehreren unkorrelierten Bäumen wird \ac{RF} genannt. Jeder dieser Bäume ist ein eigenständiges Modell, das ein Ergebnis liefert. Aus der Menge der Einzelergebnisse wird das endgültige Ergebnis ermittelt. Dadurch wird ein Teil der Nachvollziehbarkeit von Bäumen gegen eine bessere Generalisierung eingetauscht. Die einzelnen Bäume werden zufällig erzeugt, indem für jeden Baum $n$ zufällige Datenpunkte ausgewählt werden. Von $M$ Merkmalen werden nun $m \ll M$ ebenfalls zufällig gewählt, die als Kriterium für den Aufbau des Baumes verwendet werden. Der darauf folgende Aufbau des Baumes entspricht dem zuvor beschriebenen. Bei einer Klassifikation ist das endgültige Ergebnis je nach Implementierung ein Mehrheitsentscheid oder eine Kombination aller Wahrscheinlichkeiten; bei einer Regression der Durchschnitt aller Werte.
 		
-		Ein Random Forest hat gegenüber anderen Modellen den Vorteil, dass er sehr schnell trainiert und somit sehr effizient für große Datenmenge ist. Gleichzeitig kann das Ergebnis einfach nachvollzogen werden.
+		Ein Random Forest hat gegenüber anderen Modellen den Vorteil, dass er sehr schnell trainiert und somit sehr effizient für große Datenmenge ist. Gleichzeitig kann das Ergebnis relativ einfach nachvollzogen werden.
 		
 		\subsubsection{Gradient Boosting Trees}
 		
@@ -156,7 +150,7 @@ Die vorliegende Arbeit beschäftigt sich mit der Beurteilung der Signalqualität
 	
 	 \begin{figure}[H]
 	 	\centering
-		\includegraphics[width=0.6\textwidth]{pic/bcgBed.png}
+		\includegraphics[width=0.7\textwidth]{pic/bcgBed.png}
 		\caption[Übersicht über die Funktionsweise eines allgemeinen im Bett eingebetteten \ac{BKG}-Systems]{Übersicht über die Funktionsweise eines allgemeinen im Bett eingebetteten \ac{BKG}-Systems.\protect\footnotemark}
 		\label{fig:bcgbed}
 	\end{figure}
