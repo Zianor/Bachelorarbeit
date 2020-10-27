@@ -1,9 +1,9 @@
-from pathlib import Path
 import os
+from pathlib import Path
 
-from scipy.signal import lfilter, butter
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+from scipy.signal import lfilter, butter
 
 
 def get_project_root() -> Path:
@@ -85,7 +85,8 @@ def get_statistical_features_csv_path(data_folder, segment_length, overlap_amoun
     return os.path.join(get_data_set_folder(data_folder, segment_length, overlap_amount), filename)
 
 
-def get_brueser_features_csv_path(data_folder, segment_length, overlap_amount, sqi_threshold, hr_threshold=None) -> Path:
+def get_brueser_features_csv_path(data_folder, segment_length, overlap_amount, sqi_threshold,
+                                  hr_threshold=None) -> Path:
     if hr_threshold:
         filename = 'data_brueser_features_sqi' + str(sqi_threshold) + '_hr' + str(hr_threshold) + '.csv'
     else:
@@ -203,3 +204,6 @@ def bland_altman_plot(hr1, hr2, title=None, color=None):
     if title is not None:
         plt.title(title)
 
+
+if __name__ == "__main__":
+    pass
