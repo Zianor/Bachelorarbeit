@@ -571,14 +571,12 @@ class SegmentOwn(Segment):
 
             self.interval_lengths_std = np.std(self.interval_lengths)
             self.interval_lengths_range = np.max(self.interval_lengths) - np.min(self.interval_lengths)
-            self.interval_lengths_mean = np.mean(self.interval_lengths)
             self.sqi_std = np.std(self.sqi_array)
             self.sqi_max = np.max(self.sqi_array)
             self.sqi_min = np.min(self.sqi_array)
             self.sqi_median = np.median(self.sqi_array)
             self.sqi_mean = np.mean(self.sqi_array)
-            self.peak_max = np.max(self.peak_values)
-            self.peak_min = np.min(self.peak_values)
+            self.peak_range = np.max(self.peak_values) - np.min(self.peak_values)
             self.peak_std = np.std(self.peak_values)
             self.peak_mean = np.mean(self.peak_values)
             self.template_corrs_highest_sqi = self.get_template_correlations(series.get_best_est_int(start, end),
@@ -598,14 +596,12 @@ class SegmentOwn(Segment):
             self.sqi_coverage_05 = 0
             self.interval_lengths_std = np.nan
             self.interval_lengths_range = np.nan
-            self.interval_lengths_mean = np.nan
             self.sqi_std = np.nan
             self.sqi_max = np.nan
             self.sqi_min = np.nan
             self.sqi_median = np.nan
             self.sqi_mean = np.nan
-            self.peak_max = np.nan
-            self.peak_min = np.nan
+            self.peak_range = np.nan
             self.peak_std = np.nan
             self.peak_mean = np.nan
             self.template_corrs_highest_sqi = None
@@ -633,17 +629,8 @@ class SegmentOwn(Segment):
                 correlations[i] = 0
             else:
                 heartbeat = series.bcg.filtered_data[peak_location: int(peak_location + interval_length)]
-                try:
-                    curr_corr = correlate(template, heartbeat, method='auto')
-                    correlations[i] = np.sum(curr_corr) / len(curr_corr)
-                except:
-                    print(template)
-                    print(heartbeat)
-                    print(self.interval_lengths)
-                    print(peak_location)
-                    import traceback
-                    traceback.print_exc()
-                    SystemExit(-1)
+                curr_corr = correlate(template, heartbeat, method='auto')
+                correlations[i] = np.sum(curr_corr) / len(curr_corr)
         return correlations
 
     @staticmethod
@@ -662,14 +649,12 @@ class SegmentOwn(Segment):
             'abs_energy',
             'interval_lengths_std',
             'interval_lengths_range',
-            'interval_lengths_mean',
             'sqi_std',
             'sqi_min',
             'sqi_max',
             'sqi_median',
             'sqi_mean',
-            'peak_max',
-            'peak_min',
+            'peak_range',
             'peak_mean',
             'peak_std',
             'template_corr_highest_sqi_mean',
@@ -703,14 +688,12 @@ class SegmentOwn(Segment):
             self.abs_energy,
             self.interval_lengths_std,
             self.interval_lengths_range,
-            self.interval_lengths_mean,
             self.sqi_std,
             self.sqi_min,
             self.sqi_max,
             self.sqi_median,
             self.sqi_mean,
-            self.peak_max,
-            self.peak_min,
+            self.peak_range,
             self.peak_mean,
             self.peak_std,
             self.template_correlation_highest_sqi_mean,
