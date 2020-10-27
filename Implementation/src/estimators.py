@@ -1,13 +1,16 @@
+import jsonplus as json
 import os
 import pickle
 import warnings
 
 import numpy as np
+import xgboost as xgb
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix, classification_report, max_error, \
-    mean_absolute_error, mean_squared_error, r2_score, plot_roc_curve
-from sklearn.model_selection import train_test_split
+    mean_absolute_error, mean_squared_error, r2_score, plot_roc_curve, accuracy_score, roc_auc_score, f1_score
+from sklearn.model_selection import train_test_split, GridSearchCV, LeaveOneGroupOut, RandomizedSearchCV
+from sklearn.base import BaseEstimator, ClassifierMixin
 
 import utils as utils
 from data_statistical_features import Segment, DataSetBrueser, DataSetStatistical, DataSetPino, SegmentStatistical, \
@@ -153,6 +156,8 @@ class QualityEstimator:
         fn_indices = y_true[np.logical_and(y_true, ~y_pred)].index
         fn_labels = y_pred.loc[fn_indices]
 
+        print("F1-Score: %.2f" % f1_score(y_true, y_pred))
+
         print("\n Testset insgesamt")
         if save_title is not None:
             file = save_title + '-testset.pdf'
@@ -227,8 +232,11 @@ class QualityEstimator:
             file = None
         self.print_report_coverage(fn_indices, ~fn_labels, name="Falsch-Negative", path=file)
 
-    def _get_patient_split(self, test_size=0.33):
+    def _get_patient_split(self, test_size=0.33, reproduce=True):
         patient_ids_1, patient_ids_2 = train_test_split(self.patient_id.unique(), random_state=1, test_size=test_size)
+        if reproduce:
+            patient_ids_2 = [23, 13, 11,  8, 16]  # to make it for all algorithms similar
+            patient_ids_1 = [36, 9, 28, 14, 27, 26, 22, 35, 5]
         x1 = self.features[np.isin(self.patient_id, patient_ids_1)]
         x2 = self.features[np.isin(self.patient_id, patient_ids_2)]
         y1 = self.target[np.isin(self.patient_id, patient_ids_1)]
