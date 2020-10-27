@@ -191,13 +191,13 @@ Da die Visualisierung hochdimensionaler Daten schwierig ist und auch Modelle mas
 
  \begin{figure}[H]
  	\centering
- 	\includegraphics[width=0.7\textwidth]{pic/statistical-pca-lin.png}
+ 	\includegraphics[width=0.6\textwidth]{pic/statistical-pca-lin.png}
 	\caption{Dimensionsreduktion der statistischen Merkmale mit einer \ac{PCA} mit linearem Kernel}
 	\label{fig:dim-red-statistical}
 \end{figure}
 
 %TODO: fix citation
-Da eine hohe Korrelation zwischen einzelnen Merkmalen, wie sie auch bei den statistischen Merkmalen vorliegt, dazu führen kann, dass die Interpretation der Wichtigkeit der Merkmale und die Qualität der Modelle generell eingeschränkt ist\footcite[Kapitel 8]{Harrison2019} wird außerdem die Abhängigkeit der Merkmale voneinander untersucht. Hierzu wird das Python-Paket \texttt{rfimp} verwendet, das ermittelt, welche Merkmale durch andere vorhergesagt werden können. Nach Reduktion der Merkmalsmenge um diese bleiben lediglich fünf Merkmale: die Standardabweichung, der Durchschnitt, die Anzahl der Nulldurchgänge, Schiefe und Kurtosis. Betracht man für diese die Wichtigkeit der einzelnen Merkmale bei einem \acl{RF}, zeigt sich, dass weiterhin der Durchschnitt am wenigsten Einfluss besitzt, wobei die Standardabweichung jetzt am Wichtigsten ist. Die gesamte Verteilung ist in Tabelle \ref{fig:rf-statistical-reduced} sichtbar.
+Da eine hohe Korrelation zwischen einzelnen Merkmalen, wie sie auch bei den statistischen Merkmalen vorliegt, dazu führen kann, dass die Interpretation der Wichtigkeit der Merkmale und die Qualität der Modelle generell eingeschränkt ist\footcite[Kapitel 8]{Harrison2019} wird außerdem die Abhängigkeit der Merkmale voneinander untersucht. Hierzu wird das Python-Paket \texttt{rfimp} verwendet, das ermittelt, welche Merkmale durch andere vorhergesagt werden können. Nach Reduktion der Merkmalsmenge um diese bleiben lediglich fünf Merkmale: die Standardabweichung, der Durchschnitt, die Anzahl der Nulldurchgänge, Schiefe und Kurtosis. Betracht man für diese die Wichtigkeit der einzelnen Merkmale bei einem \acl{RF}, zeigt sich, dass weiterhin der Durchschnitt am wenigsten Einfluss besitzt, wobei die Standardabweichung jetzt am Wichtigsten ist. Die gesamte Verteilung ist in Abbildung \ref{fig:rf-statistical-reduced} sichtbar.
 
 \begin{figure}[H]
 	\centering
