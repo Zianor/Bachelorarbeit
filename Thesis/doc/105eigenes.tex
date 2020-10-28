@@ -67,7 +67,7 @@ Da die Berechnung aller Merkmale für die Menge der Daten zeit- und rechenaufwä
 
 \section{Explorative Datenanalyse und Merkmalsreduktion}\label{reduction}
 
-Durch die Extraktion mehrerer Merkmale pro betrachteter Eigenschaft entstehen korrelierte Merkmale, bei denen es nötig ist, sie zu reduzieren oder zusammenzufassen. Dies geschieht im Zuge der explorativen Datenanalyse. Die Korrelationen sind in dem erzeugten Korrelationsdiagramm, das in Abbildung \ref{fig:corr-heatmap-own} gezeigt ist, deutlich sichtbar.
+Durch die Extraktion mehrerer Merkmale pro betrachteter Eigenschaft entstehen korrelierte Merkmale, bei denen eine Reduktion zu einer verbesserten Performance führen kann. Außerdem werden durch korrelierte Merkmale Analysen der Wichtigkeit der Merkmale verzerrt. Die Reduktion geschieht im Zuge der explorativen Datenanalyse. Die Korrelationen sind in dem erzeugten Korrelationsdiagramm, das in Abbildung \ref{fig:corr-heatmap-own} gezeigt ist, deutlich sichtbar.
 
 \begin{figure}[H]
 	\centering
@@ -84,11 +84,11 @@ Nach Reduktion um diese Merkmale wird die Berechnung der Abhängigkeiten wiederh
 
 Damit verbleiben insgesamt 20 Merkmale. Die Reduktion der Merkmale ermöglicht schnelleres Training und durch die weniger stark korrelierten Merkmale stabilere Modelle. Dennoch muss bei der Evaluation der Modelle untersucht werden, wie sich die Reduktion der Merkmale auswirkt.
 
-Eine andere Möglichkeit der Merkmalsreduktion ist die Transformation in einen neuen Merkmalsraum, beispielsweise durch eine \ac{PCA}. Die graphische Darstellung einer Reduktion in einen zweidimensionalen Merkmalsraum, siehe Abbildung \ref{fig:pca-own-reduced}, zeigt, dass die Daten so nicht linear separierbar sind.
+Eine andere Möglichkeit der Merkmalsreduktion ist die Transformation in einen neuen Merkmalsraum, beispielsweise durch eine \ac{PCA}. Die graphische Darstellung einer Reduktion in einen zweidimensionalen Merkmalsraum, siehe Abbildung \ref{fig:pca-own-reduced}, zeigt, dass die Daten so nicht vollständig linear separierbar sind.
 
 \begin{figure}[H] %TODO: legend into graphic
 	\centering
-	\includegraphics[width=0.7\textwidth]{pic/pca-own-reduced.png}
+	\includegraphics[width=0.7\textwidth]{pic/pca-own-reduced.pdf}
 	\caption{Transformation der Merkmale mittels PCA in einen zweidimensionalen Merkmalsraum}
 	\label{fig:pca-own-reduced}
 \end{figure}

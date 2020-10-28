@@ -9,31 +9,35 @@
 \section{Vergleich der Modelle}
 	
 	\begin{table}[H]
-		\begin{tabular}{l l | l|| c | c | c | c }
- 						&				& Merkmalsset	& \ac{MAE} [FE]	& Coverage [\%]	& F1-Score	& AUC	\\ \hline
- 		insgesamt		&	 			&				& 21{,}85		& -				& - 		& -		\\
- 		annotiert		&				&				& 3{,}28			& 43{,}21		& - 		& -		\\ \hline
+		\begin{tabular}{l | l | l|| c | c | c | c }
+ 						& Merkmalsset	& Modell			& \ac{MAE} [FE]	& Coverage [\%]	& F1-Score	& AUC	\\ \hline
+ 		\multicolumn{3}{l ||}{insgesamt}					& 21{,}85		& -				& - 		& -		\\
+ 		\multicolumn{3}{l ||}{annotiert}					& 3{,}28			& 43{,}21		& - 		& -		\\ \hline
  		\multirow{4}{*}{Klassifikation}
- 						& \multirow{2}{*}{\acs{RF}}		
- 										& reduziert 		& 13{,}90		& 32{,}42		& 0{,}54	& 0,69	\\
- 						&				& alle			&\\\cline{2-7}
- 						& \multirow{2}{*}{\acs{XGBoost}}
- 									 	& reduziert		& 14{,}84		& 40{,}97		& 0{,}57	& 0,68	\\ 
- 						&				& alle 			&\\\hline
- 		\multirow{4}{*}{Regression}				
- 					 	& \multirow{2}{*}{\acs{RF}}		
- 					 					& reduziert		& 8{,}83			& 12{,}64		& 0{,}34	& 0,67	\\
- 					 	&				& alle			&\\\cline{2-7}
- 						& \multirow{2}{*}{\acs{XGBoost}}
- 										& reduziert		& 12{,}63		& 23{,}12		& 0{,}44	& 0,65	\\
- 						&				& alle			&\\
+ 						& \multirow{2}{*}{reduziert}		
+ 										& \acs{RF} 		& 13{,}90		& 32{,}42		& 0{,}54	& 0,69	\\
+ 						&				& \acs{XGBoost}	& 14{,}40		& 38,33			& 0{,}56	& 0,68	\\\cline{2-7} 			
+ 						& \multirow{2}{*}{alle}
+ 									 	& \acs{RF}		& 11{,}88		& 34,87			& 0{,}6		& 0,75	\\
+ 						&				& \acs{XGBoost} 	& 11,96			& 41,89			& 0,64		& 0,76\\\hline
+ 		\multirow{4}{*}{Regression}
+ 						& \multirow{2}{*}{reduziert}
+ 										& \acs{RF}		& 8{,}83			& 12{,}64		& 0{,}34	& 0,67	\\
+ 						&				& \acs{XGBoost}	& 12{,}63		& 23{,}12		& 0{,}44	& 0,65	\\\cline{2-7} 			
+ 					 	& \multirow{2}{*}{alle}		
+ 					 					& \acs{RF}		& 8{,}91			& 17,38			& 0{,}44	& 0,74	\\
+ 					 	&				& \acs{XGBoost} & 10,71			& 30,30			& 0,55		& 0,73\\
+
+ 						
 		\end{tabular}
 		\caption{Vergleich der aller Modelle mit reduziertem und vollständigem Merkmalsset}
 	\end{table}
 	
 	\begin{itemize}
-		\item \ac{XGBoost} höhere Coverage aber auch höheren Fehler
-		\item Regression niedrigerer Fehler und niedrigere Coverage
+		\item \ac{XGBoost} bei Regression höhere Coverage aber auch höheren Fehler
+		\item bei Klassifikation ähnlicher Fehler, aber Coverage von \ac{XGBoost} höher
+		\item Regression niedrigerer Fehler und niedrigere Coverage, ähnlich hohe AUC -> mit Verschieben des Schwellwerts näher an Regression?
+		\item reduziertes Merkmalsset führt zu schlechteren Ergebnissen -> Feature Importances sollten trotzdem aussagekräftiger sein
 	\end{itemize}
 	
 	\begin{itemize}
