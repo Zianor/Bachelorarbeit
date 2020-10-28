@@ -696,6 +696,18 @@ class OwnEstimator(QualityEstimator):
         print("AUC: %.2f" % roc_auc_score(y2, self.clf.predict_proba(x2)[:, 1]))
         super(OwnEstimator, self).print_model_test_report(save_title=save_title)
 
+    def print_short_report(self):
+        x1, x2, y1, y2, _, _ = self._get_patient_split()
+        print("AUC: %.2f" % roc_auc_score(y2, self.clf.predict_proba(x2)[:, 1]))
+        y_pred, y_true = self.predict_test_set()
+        print("F1: %.2f" % f1_score(y_true, y_pred))
+        print(f"Coverage klassifiziert      : {len(y_pred[y_pred]) / len(y_pred) * 100:.2f} %")
+        print(f"Coverage annotiert          : {len(y_true[y_true]) / len(y_true) * 100:.2f} %")
+
+        print("MAE auf als informativ klassifizierten Segmenten: %.2f" % self.get_mean_error(y_true.index, y_pred))
+        print("MAE auf als informativ annotierten Segmenten:  %.2f" % self.get_mean_error(y_true.index, y_true))
+        print("MAE insgesamt:  %.2f" % self.get_mean_error(y_true.index))
+
 
 class OwnEstimatorRegression(OwnEstimator):
 
