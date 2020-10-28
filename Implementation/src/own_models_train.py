@@ -12,10 +12,10 @@ from sklearn.utils.fixes import loguniform
 
 def recreate_own_models(paths, segment_length=10, overlap_amount=0.9, threshold_hr=10, grid_search=False,
                         feature_selection=None):
-    models = {"rf_clf": RandomForestClassifier(random_state=1, n_jobs=-2),
-              "rf_regr": RandomForestRegressor(random_state=1, n_jobs=-2),
-              "xgb_regr": xgb.XGBRegressor(random_state=1, n_jobs=-2),
-              "xgb_clf": xgb.XGBClassifier(random_state=1, n_jobs=-2)}
+    models = {"rf_clf": RandomForestClassifier(random_state=1, n_jobs=2),
+              "rf_regr": RandomForestRegressor(random_state=1, n_jobs=2),
+              "xgb_regr": xgb.XGBRegressor(random_state=1, n_jobs=2),
+              "xgb_clf": xgb.XGBClassifier(random_state=1, n_jobs=2)}
     if grid_search:
         hyperparameter_paths = ['rf_classificator.json', 'rf_regressor.json', 'xgb.json', 'xgb.json']
         hyperparameter_paths = [os.path.join(utils.get_data_root_path(), 'hyperparameter', path) for path in
@@ -126,7 +126,5 @@ def get_default_all_results():
 
 
 if __name__ == "__main__":
-    get_default_results()
-    get_default_all_results()
     recreate_reduced_all(grid_search=True, thresholds=[10])
     pass

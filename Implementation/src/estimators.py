@@ -623,7 +623,7 @@ class OwnEstimator(QualityEstimator):
         cv = LeaveOneGroupOut()
         grid_search = RandomizedSearchCV(
             estimator=self.clf, param_distributions=hyperparameter, scoring=['f1', 'roc_auc'],
-            cv=cv, n_jobs=-2, verbose=2, refit='roc_auc', n_iter=15)
+            cv=cv, n_jobs=6, verbose=2, refit='roc_auc', n_iter=15)
         grid_search.fit(x_g1, y_g1, groups=groups1)
         self.clf = grid_search.best_estimator_
         params = grid_search.best_params_
