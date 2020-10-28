@@ -7,19 +7,21 @@ from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 
 import utils
 from estimators import OwnEstimator, OwnEstimatorRegression
+from sklearn.utils.fixes import loguniform
 
 
 def recreate_own_models(paths, segment_length=10, overlap_amount=0.9, threshold_hr=10, grid_search=False,
                         feature_selection=None):
-    models = {"rf_clf": RandomForestClassifier(random_state=1, verbose=1),
-              "rf_regr": RandomForestRegressor(random_state=1, verbose=1),
-              "xgb_regr": xgb.XGBRegressor(random_state=1, verbosity=1),
-              "xgb_clf": xgb.XGBClassifier(random_state=1, verbosity=1)}
+    models = {"rf_clf": RandomForestClassifier(random_state=1, n_jobs=-2),
+              "rf_regr": RandomForestRegressor(random_state=1, n_jobs=-2),
+              "xgb_regr": xgb.XGBRegressor(random_state=1, n_jobs=-2),
+              "xgb_clf": xgb.XGBClassifier(random_state=1, n_jobs=-2)}
     if grid_search:
         hyperparameter_paths = ['rf_classificator.json', 'rf_regressor.json', 'xgb.json', 'xgb.json']
         hyperparameter_paths = [os.path.join(utils.get_data_root_path(), 'hyperparameter', path) for path in
                                 hyperparameter_paths]
         hyperparameters = []
+
         for path in hyperparameter_paths:
             with open(path) as file:
                 hyperparameters.append(json.loads(file.read()))
@@ -35,6 +37,7 @@ def recreate_own_models(paths, segment_length=10, overlap_amount=0.9, threshold_
             model.set_params(**params)
 
     for i, model_key in enumerate(models.keys()):
+        print(paths[i])
         if "clf" in str(model_key):
             model = OwnEstimator(models[model_key], path=paths[i], feature_selection=feature_selection,
                                  segment_length=segment_length, overlap_amount=overlap_amount,
@@ -43,10 +46,6 @@ def recreate_own_models(paths, segment_length=10, overlap_amount=0.9, threshold_
             model = OwnEstimatorRegression(models[model_key], path=paths[i], feature_selection=feature_selection,
                                            segment_length=segment_length, overlap_amount=overlap_amount,
                                            hr_threshold=threshold_hr, hyperparameter=hyperparameters[i])
-        try:
-            model.print_model_test_report()
-        except:
-            print("exception")
 
 
 def recreate_reduced_all(grid_search=False, thresholds=[10, 15, 20]):
@@ -75,11 +74,12 @@ def recreate_reduced_all(grid_search=False, thresholds=[10, 15, 20]):
     for threshold in thresholds:
         logging.info(f"Default segments, all features, threshold={threshold}")
         paths = get_paths(reduced=False, threshold=threshold)
-        recreate_own_models(paths=paths, grid_search=grid_search)
+        recreate_own_models(paths=paths, grid_search=grid_search, threshold_hr=threshold)
 
         logging.info(f"Default segments, reduced feature set, threshold={threshold}")
         paths = get_paths(reduced=True, threshold=threshold)
-        recreate_own_models(paths=paths, grid_search=grid_search, feature_selection=feature_selection)
+        recreate_own_models(paths=paths, grid_search=grid_search, feature_selection=feature_selection,
+                            threshold_hr=threshold)
 
 
 def get_paths(reduced=False, segment_length=10, threshold=10):
@@ -127,4 +127,6 @@ def get_default_all_results():
 
 if __name__ == "__main__":
     get_default_results()
+    get_default_all_results()
+    recreate_reduced_all(grid_search=True, thresholds=[5, 10, 15])
     pass
