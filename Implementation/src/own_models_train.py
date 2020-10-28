@@ -25,6 +25,14 @@ def recreate_own_models(paths, segment_length=10, overlap_amount=0.9, threshold_
                 hyperparameters.append(json.loads(file.read()))
     else:
         hyperparameters = [None, None, None, None]
+        parameter_paths = ['rf_clf_default.json', 'rf_regr_default.json', 'xgb_default.json', 'xgb_default.json']
+        parameter_paths = [os.path.join(utils.get_data_root_path(), 'hyperparameter', path) for path in parameter_paths]
+        parameters = []
+        for path in parameter_paths:
+            with open(path) as file:
+                parameters.append(json.loads(file.read()))
+        for model, params in zip(models.values(), parameters):
+            model.set_params(**params)
 
     for i, model_key in enumerate(models.keys()):
         if "clf" in str(model_key):
@@ -84,7 +92,39 @@ def get_paths(reduced=False, segment_length=10, threshold=10):
     return paths
 
 
+def get_default_results():
+    feature_selection = [
+        'mean',
+        'number_zero_crossings',
+        'kurtosis',
+        'skewness',
+        'hf_diff_acf',
+        'hf_diff_data',
+        'interval_lengths_std',
+        'sqi_std',
+        'sqi_min',
+        'sqi_median',
+        'peak_mean',
+        'peak_std',
+        'template_corr_highest_sqi_mean',
+        'template_corr_highest_sqi_std',
+        'template_corr_median_sqi_mean',
+        'template_corr_median_sqi_std',
+        'interval_means_std',
+        'sqi_coverage_03',
+        'sqi_coverage_04',
+        'sqi_coverage_05'
+    ]
+    paths = ["RF_Clf_default", "RF_Regr_default", "XGB_Regr_default", "XGB_Clf_default"]
+    recreate_own_models(paths=paths, feature_selection=feature_selection, segment_length=10, overlap_amount=0.9,
+                        threshold_hr=10, grid_search=False)
+
+
+def get_default_all_results():
+    paths = ["RF_Clf_default_all", "RF_Regr_default_all", "XGB_Regr_default_all", "XGB_Clf_default_all"]
+    recreate_own_models(paths=paths, segment_length=10, overlap_amount=0.9, threshold_hr=10, grid_search=False)
+
+
 if __name__ == "__main__":
-    paths = ["RF_Clf_all_10", "RF_Regr_all_10", "XGB_Regr_all_10", "XGB_Clf_all_10"]
-    recreate_own_models(paths=paths, grid_search=True)
+    get_default_results()
     pass
