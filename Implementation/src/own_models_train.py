@@ -39,13 +39,13 @@ def recreate_own_models(paths, segment_length=10, overlap_amount=0.9, threshold_
     for i, model_key in enumerate(models.keys()):
         print(paths[i])
         if "clf" in str(model_key):
-            model = OwnEstimator(models[model_key], path=paths[i], feature_selection=feature_selection,
-                                 segment_length=segment_length, overlap_amount=overlap_amount,
-                                 hr_threshold=threshold_hr, hyperparameter=hyperparameters[i])
+            OwnEstimator(models[model_key], path=paths[i], feature_selection=feature_selection,
+                         segment_length=segment_length, overlap_amount=overlap_amount, hr_threshold=threshold_hr,
+                         hyperparameter=hyperparameters[i])
         else:
-            model = OwnEstimatorRegression(models[model_key], path=paths[i], feature_selection=feature_selection,
-                                           segment_length=segment_length, overlap_amount=overlap_amount,
-                                           hr_threshold=threshold_hr, hyperparameter=hyperparameters[i])
+            OwnEstimatorRegression(models[model_key], path=paths[i], feature_selection=feature_selection,
+                                   segment_length=segment_length, overlap_amount=overlap_amount,
+                                   hr_threshold=threshold_hr, hyperparameter=hyperparameters[i])
 
 
 def recreate_reduced_all(grid_search=False, thresholds=[10, 15, 20]):
@@ -128,5 +128,5 @@ def get_default_all_results():
 if __name__ == "__main__":
     get_default_results()
     get_default_all_results()
-    recreate_reduced_all(grid_search=True, thresholds=[5, 10, 15])
+    recreate_reduced_all(grid_search=True, thresholds=[10])
     pass
