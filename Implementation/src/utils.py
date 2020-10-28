@@ -40,6 +40,10 @@ def get_ecg_data_path(data_folder='data_patients') -> Path:
     return get_ecg_path(data_folder)
 
 
+def get_model_path() -> Path:
+    return os.path.join(get_data_root_path(), 'models')
+
+
 def get_rpeaks_path(data_folder='data_patients') -> Path:
     return get_ecg_path(data_folder)
 

@@ -604,8 +604,7 @@ class OwnEstimator(QualityEstimator):
                                            hr_threshold=hr_threshold, data_folder=data_folder)
         pd.options.mode.use_inf_as_na = True
         self.error_target = self.data['error']
-        self.path = os.path.join(utils.get_data_set_folder(self.data_folder, self.segment_length, self.overlap_amount),
-                                 path)
+        self.path = os.path.join(utils.get_model_path(), path)
         if clf is not None:
             self.clf = OwnClassifier(model=clf, threshold=self.hr_threshold)
             if not os.path.isdir(self.path):
