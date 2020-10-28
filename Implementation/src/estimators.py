@@ -558,7 +558,6 @@ class OwnClassifier(BaseEstimator, ClassifierMixin):
         if type(self.model) == xgb.XGBClassifier:  # class weight
             scale_pos_weight = len(y[~y].index) / len(y[y].index)
             self.model.set_params(scale_pos_weight=scale_pos_weight)
-            print(scale_pos_weight)
         self.model.fit(X.loc[~mask_nan], y_true)
         self.classes_ = [False, True]  # order important for AUC?
         return self
@@ -623,10 +622,8 @@ class OwnEstimator(QualityEstimator):
         x_g1, x_g2, y_g1, y_g2, groups1, groups2 = self._get_patient_split()
         cv = LeaveOneGroupOut()
         grid_search = RandomizedSearchCV(
-            estimator=self.clf, param_distributions=hyperparameter, scoring=['accuracy', 'balanced_accuracy', 'f1',
-                                                                             'roc_auc', 'f1_weighted', 'precision',
-                                                                             'recall'],
-            cv=cv, n_jobs=-2, verbose=2, refit='roc_auc', n_iter=20)
+            estimator=self.clf, param_distributions=hyperparameter, scoring=['f1', 'roc_auc'],
+            cv=cv, n_jobs=-2, verbose=2, refit='roc_auc', n_iter=15)
         grid_search.fit(x_g1, y_g1, groups=groups1)
         self.clf = grid_search.best_estimator_
         params = grid_search.best_params_
@@ -644,7 +641,7 @@ class OwnEstimator(QualityEstimator):
     @staticmethod
     def _get_dataframe_from_cv_results(res):
         data = pd.DataFrame(res)
-        scores = ['accuracy', 'balanced_accuracy', 'f1', 'roc_auc', 'f1_weighted', 'precision', 'recall']
+        scores = ['f1', 'roc_auc']
         columns = ['params']
         for scoring in scores:
             rank = 'rank_test_' + scoring
