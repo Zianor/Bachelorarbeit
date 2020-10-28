@@ -664,7 +664,7 @@ class OwnEstimator(QualityEstimator):
         if os.path.isfile(model_file):
             with open(model_file, 'rb') as file:
                 self.clf = pickle.load(file)
-        else:
+        else:  # TODO better exeption
             raise Exception("No model given and not found at given path")
 
     def _get_features(self):
