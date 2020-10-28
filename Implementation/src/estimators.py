@@ -555,6 +555,10 @@ class OwnClassifier(BaseEstimator, ClassifierMixin):
             y = pd.Series(y, index=X.index)
         mask_nan = X.isna().any(axis=1)
         y_true = y.loc[X[~mask_nan].index]
+        if type(self.model) == xgb.XGBClassifier:  # class weight
+            scale_pos_weight = len(y[~y].index) / len(y[y].index)
+            self.model.set_params(scale_pos_weight=scale_pos_weight)
+            print(scale_pos_weight)
         self.model.fit(X.loc[~mask_nan], y_true)
         self.classes_ = [False, True]  # order important for AUC?
         return self
@@ -619,15 +623,11 @@ class OwnEstimator(QualityEstimator):
     def optimize_hyperparameter(self, hyperparameter):
         x_g1, x_g2, y_g1, y_g2, groups1, groups2 = self._get_patient_split()
         cv = LeaveOneGroupOut()
-        # grid_search = GridSearchCV(
-        #     estimator=self.clf, param_grid=hyperparameter, scoring=['accuracy', 'balanced_accuracy', 'f1', 'roc_auc',
-        #                                                             'f1_weighted', 'precision', 'recall'], cv=cv,
-        #     n_jobs=-2, verbose=2, refit='roc_auc')
         grid_search = RandomizedSearchCV(
             estimator=self.clf, param_distributions=hyperparameter, scoring=['accuracy', 'balanced_accuracy', 'f1',
                                                                              'roc_auc', 'f1_weighted', 'precision',
                                                                              'recall'],
-            cv=cv, n_jobs=-2, verbose=2, refit='roc_auc', n_iter=10)
+            cv=cv, n_jobs=-2, verbose=2, refit='roc_auc', n_iter=20)
         grid_search.fit(x_g1, y_g1, groups=groups1)
         self.clf = grid_search.best_estimator_
         params = grid_search.best_params_
