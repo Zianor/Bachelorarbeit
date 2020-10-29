@@ -37,6 +37,8 @@ def recreate_own_models(paths, segment_length=10, overlap_amount=0.9, threshold_
             model.set_params(**params)
 
     for i, model_key in enumerate(models.keys()):
+        if paths[i] in ["RF_Clf_s10_all_10"]:
+            continue
         print(paths[i])
         if "clf" in str(model_key):
             OwnEstimator(models[model_key], path=paths[i], feature_selection=feature_selection,
