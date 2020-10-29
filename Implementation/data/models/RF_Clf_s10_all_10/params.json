@@ -1,1 +1,1 @@
-{"n_estimators":200,"min_samples_split":10,"min_samples_leaf":4,"max_features":"sqrt","max_depth":15,"criterion":"gini","class_weight":"balanced"}
+{"n_estimators":200,"min_samples_split":5,"min_samples_leaf":10,"max_features":"sqrt","max_depth":15,"criterion":"gini"}
