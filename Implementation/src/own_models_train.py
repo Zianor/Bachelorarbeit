@@ -7,7 +7,14 @@ from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 
 import utils
 from estimators import OwnEstimator, OwnEstimatorRegression
-from sklearn.utils.fixes import loguniform
+
+
+def get_reduced_column_names():
+    return ['mean', 'number_zero_crossings', 'kurtosis', 'skewness', 'hf_diff_acf', 'hf_diff_data',
+            'interval_lengths_std', 'sqi_std', 'sqi_min', 'sqi_median', 'sqi_median', 'peak_range', 'peak_mean',
+            'template_corr_highest_sqi_mean', 'template_corr_highest_sqi_std', 'template_corr_median_sqi_mean',
+            'template_corr_median_sqi_std', 'interval_means_std', 'sqi_coverage_03', 'sqi_coverage_04',
+            'sqi_coverage_05']
 
 
 def recreate_own_models(paths, segment_length=10, overlap_amount=0.9, threshold_hr=10, grid_search=False,
@@ -37,7 +44,7 @@ def recreate_own_models(paths, segment_length=10, overlap_amount=0.9, threshold_
             model.set_params(**params)
 
     for i, model_key in enumerate(models.keys()):
-        if paths[i] in ["RF_Clf_s10_all_10"]:
+        if paths[i] in ["RF_Regr_s10_all_h10", "XGB_Clf_s10_all_h10", "XGB_Regr_s10_all_h10"]:
             continue
         print(paths[i])
         if "clf" in str(model_key):
@@ -51,28 +58,7 @@ def recreate_own_models(paths, segment_length=10, overlap_amount=0.9, threshold_
 
 
 def recreate_reduced_all(grid_search=False, thresholds=[10, 15, 20]):
-    feature_selection = [
-        'mean',
-        'number_zero_crossings',
-        'kurtosis',
-        'skewness',
-        'hf_diff_acf',
-        'hf_diff_data',
-        'interval_lengths_std',
-        'sqi_std',
-        'sqi_min',
-        'sqi_median',
-        'peak_mean',
-        'peak_std',
-        'template_corr_highest_sqi_mean',
-        'template_corr_highest_sqi_std',
-        'template_corr_median_sqi_mean',
-        'template_corr_median_sqi_std',
-        'interval_means_std',
-        'sqi_coverage_03',
-        'sqi_coverage_04',
-        'sqi_coverage_05'
-    ]
+    feature_selection = get_reduced_column_names()
     for threshold in thresholds:
         logging.info(f"Default segments, all features, threshold={threshold}")
         paths = get_paths(reduced=False, threshold=threshold)
@@ -90,43 +76,34 @@ def get_paths(reduced=False, segment_length=10, threshold=10):
     if reduced:
         paths = [path + "_reduced_h" + str(threshold) for path in paths]
     else:
-        paths = [path + "_all_" + str(threshold) for path in paths]
+        paths = [path + "_all_h" + str(threshold) for path in paths]
     return paths
 
 
-def get_default_results():
-    feature_selection = [
-        'mean',
-        'number_zero_crossings',
-        'kurtosis',
-        'skewness',
-        'hf_diff_acf',
-        'hf_diff_data',
-        'interval_lengths_std',
-        'sqi_std',
-        'sqi_min',
-        'sqi_median',
-        'peak_mean',
-        'peak_std',
-        'template_corr_highest_sqi_mean',
-        'template_corr_highest_sqi_std',
-        'template_corr_median_sqi_mean',
-        'template_corr_median_sqi_std',
-        'interval_means_std',
-        'sqi_coverage_03',
-        'sqi_coverage_04',
-        'sqi_coverage_05'
-    ]
+def get_default_results(segment_length=10, overlap_amount=0.9, threshold_hr=10):
+    feature_selection = get_reduced_column_names()
     paths = ["RF_Clf_default", "RF_Regr_default", "XGB_Regr_default", "XGB_Clf_default"]
-    recreate_own_models(paths=paths, feature_selection=feature_selection, segment_length=10, overlap_amount=0.9,
-                        threshold_hr=10, grid_search=False)
+    if segment_length != 10 and overlap_amount != 0.9 and threshold_hr != 10:
+        paths = [path + "_s" + str(segment_length) for path in paths]
+        paths = [path + "_h" + str(threshold_hr) for path in paths]
+    recreate_own_models(paths=paths, feature_selection=feature_selection, segment_length=segment_length,
+                        overlap_amount=overlap_amount, threshold_hr=threshold_hr, grid_search=False)
 
 
-def get_default_all_results():
+def get_default_all_results(segment_length=10, overlap_amount=0.9, threshold_hr=10):
     paths = ["RF_Clf_default_all", "RF_Regr_default_all", "XGB_Regr_default_all", "XGB_Clf_default_all"]
-    recreate_own_models(paths=paths, segment_length=10, overlap_amount=0.9, threshold_hr=10, grid_search=False)
+    if segment_length != 10 and overlap_amount != 0.9 and threshold_hr != 10:
+        paths = [path + "_s" + str(segment_length) for path in paths]
+        paths = [path + "_h" + str(threshold_hr) for path in paths]
+    recreate_own_models(paths=paths, segment_length=segment_length, overlap_amount=overlap_amount,
+                        threshold_hr=threshold_hr, grid_search=False)
 
 
 if __name__ == "__main__":
-    recreate_reduced_all(grid_search=True, thresholds=[10])
+    get_default_results()
+    get_default_results(segment_length=10, overlap_amount=0.9, threshold_hr=5)
+    get_default_all_results(segment_length=10, overlap_amount=0.9, threshold_hr=5)
+    get_default_results(segment_length=10, overlap_amount=0.9, threshold_hr=15)
+    get_default_all_results(segment_length=10, overlap_amount=0.9, threshold_hr=15)
+    recreate_reduced_all(grid_search=True, thresholds=[10, 5, 15])
     pass
