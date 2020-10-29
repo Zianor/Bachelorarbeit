@@ -11,7 +11,7 @@ from estimators import OwnEstimator, OwnEstimatorRegression
 
 def get_reduced_column_names():
     return ['mean', 'number_zero_crossings', 'kurtosis', 'skewness', 'hf_diff_acf', 'hf_diff_data',
-            'interval_lengths_std', 'sqi_std', 'sqi_min', 'sqi_median', 'sqi_median', 'peak_range', 'peak_mean',
+            'interval_lengths_std', 'sqi_std', 'sqi_min', 'sqi_median', 'peak_range', 'peak_mean',
             'template_corr_highest_sqi_mean', 'template_corr_highest_sqi_std', 'template_corr_median_sqi_mean',
             'template_corr_median_sqi_std', 'interval_means_std', 'sqi_coverage_03', 'sqi_coverage_04',
             'sqi_coverage_05']
