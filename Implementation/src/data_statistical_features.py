@@ -711,15 +711,4 @@ class SegmentOwn(Segment):
 
 
 if __name__ == "__main__":
-    # DataSet()
-    DataSetOwn(segment_length=10)
-    DataSetOwn(segment_length=30)
-    DataSetOwn(segment_length=20)
-    DataSetOwn(segment_length=5, overlap_amount=0.8)
-    # DataSetStatistical()
-    # DataSetPino()
-    # DataSetPino(4, 0.75)
-    # DataSetBrueser()
-    # DataSetBrueser(sqi_threshold=0.3)
-    # DataSetBrueser(sqi_threshold=0.2)
     pass
