@@ -8,4 +8,4 @@ def reproduce_own_segments(segment_lengths=[5, 10, 20, 30], overlap_amounts=[0.8
 
 
 if __name__ == "__main__":
-    reproduce_own_segments(segment_lengths=[5, 20, 30], overlap_amounts=[0.8, 0.9, 0.9])
+    reproduce_own_segments(segment_lengths=[20, 30], overlap_amounts=[0.9, 0.9])
