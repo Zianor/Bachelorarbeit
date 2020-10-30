@@ -2,8 +2,9 @@
 
 Im Folgenden werden die entwickelten Modelle untersucht und evaluiert. Für die beiden \acl{RF}s wird die Implementierung von \texttt{sklearn} genutzt, für die Gradient Boosted Trees die Bibliothek \texttt{XGBoost}, da das \ac{XGBoost} besser ist als die in \texttt{sklearn}.\footcite[Kapitel 10]{Harrison2019} Die Ergebnisse der Modelle werden sowohl für das reduzierte als auch das vollständige Merkmalsset berechnet und verglichen. Mit den trainierten Modellen wird erneut eine Merkmalsanalyse durchgeführt. Außerdem wird der Einfluss der gewählten Segmentlänge und des gewählten Schwellwertes der Annotation untersucht. Für alle Untersuchungen wird das gleiche Testset wie in Kapitel \ref{analyse} verwendet.
 
-
 \section{Vergleich der Modelle}
+
+Zunächst werden alle Modelle sowohl mit dem vollständigen Merkmalsset als auch dem reduzierten Merkmalsset verglichen, siehe Tabelle \ref{fig:comparison-all}. Die Ergebnisse von Gradient Boosted Trees und \acl{RF}s sind zunächst ähnlich, weshalb nach Untersuchung der Wichtigkeit der Merkmale übersichtshalber nur noch je ein Klassifikations- und ein Regressionsmodell betrachtet werden. Außerdem zeigt sich, dass das reduzierte Merkmalsset insgesamt zu etwas schlechteren Resultaten führt. Dennoch ist es sinnvoll, auch mit diesem reduzierten Set die Wichtigkeit der Merkmale zu untersuchen, da diese durch korrelierte Merkmale verzerrt werden kann.
 	
 	\begin{table}[H]
 		\begin{tabular}{l | l | l|| c | c | c | c }
@@ -12,22 +13,23 @@ Im Folgenden werden die entwickelten Modelle untersucht und evaluiert. Für die 
  		\multicolumn{3}{l ||}{annotiert}					& 3{,}28			& 43{,}21		& - 		& -		\\ \hline
  		\multirow{4}{*}{Klassifikation}
  						& \multirow{2}{*}{reduziert}		
- 										& \acs{RF} 		& 13{,}90		& 32{,}42		& 0{,}54	& 0,69	\\
- 						&				& \acs{XGBoost}	& 14{,}40		& 38,33			& 0{,}56	& 0,68	\\\cline{2-7} 			
+ 										& \acs{RF} 		& 13{,}87		& 32{,}09		& 0{,}54	& 0,69	\\
+ 						&				& \acs{XGBoost}	& 14{,}60		& 38,10			& 0{,}56	& 0,68	\\\cline{2-7} %TODO: update numbers			
  						& \multirow{2}{*}{alle}
- 									 	& \acs{RF}		& 11{,}88		& 34,87			& 0{,}6		& 0,75	\\
- 						&				& \acs{XGBoost} 	& 11,96			& 41,89			& 0,64		& 0,76\\\hline
+ 									 	& \acs{RF}		& 12{,}11		& 36,81			& 0{,}61	& 0,75	\\
+ 						&				& \acs{XGBoost} 	& 11,38			& 35,93			& 0,62		& 0,75\\\hline %TODO: update numbers
  		\multirow{4}{*}{Regression}
  						& \multirow{2}{*}{reduziert}
- 										& \acs{RF}		& 8{,}83			& 12{,}64		& 0{,}34	& 0,67	\\
- 						&				& \acs{XGBoost}	& 12{,}63		& 23{,}12		& 0{,}44	& 0,65	\\\cline{2-7} 			
+ 										& \acs{RF}		& 8{,}83			& 12{,}64		& 0{,}34	& 0,67	\\ % TODO: update numbers
+ 						&				& \acs{XGBoost}	& 12{,}63		& 23{,}12		& 0{,}44	& 0,65	\\\cline{2-7} % TODO update numbers		
  					 	& \multirow{2}{*}{alle}		
- 					 					& \acs{RF}		& 8{,}91			& 17,38			& 0{,}44	& 0,74	\\
- 					 	&				& \acs{XGBoost} & 10,71			& 30,30			& 0,55		& 0,73\\
+ 					 					& \acs{RF}		& 12,56			& 46,27			& 0,64		& 0,75\\
+ 					 	&				& \acs{XGBoost} & 10,71			& 30,30			& 0,55		& 0,73\\ % TODO: update numbers
 
  						
 		\end{tabular}
 		\caption{Vergleich der aller Modelle mit reduziertem und vollständigem Merkmalsset}
+		\label{fig:comparison-all}
 	\end{table}
 	
 	\begin{itemize}
