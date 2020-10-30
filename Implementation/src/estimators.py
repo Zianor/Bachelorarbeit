@@ -556,7 +556,7 @@ class OwnClassifier(BaseEstimator, ClassifierMixin):
 
     def __init__(self, model):
         self.model = model
-        logging.info(self.model.get_params().items())
+        logging.debug(self.model.get_params().items())
 
     def fit(self, X, y):
         if type(X) is not pd.DataFrame:
@@ -691,11 +691,12 @@ class OwnEstimator(QualityEstimator):
                                                    self.overlap_amount)  # other threshold?
             if os.path.isfile(path):
                 data = pd.read_csv(path, index_col=False)
-                warnings.warn('Labels are recalculated')
-                data['informative'] = data['error'] < self.hr_threshold
+                logging.warning("Labels are recalculated")
+                data['informative'] = data['error'] <= self.hr_threshold
+                logging.info(f"informative: {len(data[data['informative']].index)/len(data.index)} %")
                 data.to_csv(path_hr, index=False)
             else:
-                warnings.warn('No csv, data needs to be reproduced. This may take some time')
+                logging.warning('No csv, data needs to be reproduced. This may take some time')
                 DataSetOwn(segment_length=self.segment_length, overlap_amount=self.overlap_amount,
                            hr_threshold=self.hr_threshold)
         return pd.read_csv(path_hr, index_col=False)
@@ -727,8 +728,9 @@ class OwnEstimatorRegression(OwnEstimator):
                  feature_selection=None, hyperparameter=None):
         if clf is not None:
             clf = RegressionClassifier(model=clf, threshold=10)
-        super(OwnEstimatorRegression, self).__init__(clf, path, segment_length, overlap_amount, hr_threshold,
-                                                     data_folder, feature_selection=feature_selection,
+        super(OwnEstimatorRegression, self).__init__(clf, path, segment_length=segment_length,
+                                                     overlap_amount=overlap_amount, hr_threshold=hr_threshold,
+                                                     data_folder=data_folder, feature_selection=feature_selection,
                                                      hyperparameter=hyperparameter)
 
     def _train(self):
