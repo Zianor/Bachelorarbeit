@@ -24,7 +24,7 @@ def recreate_own_models(paths, segment_length=10, overlap_amount=0.9, threshold_
               "xgb_regr": xgb.XGBRegressor(random_state=1, n_jobs=2),
               "xgb_clf": xgb.XGBClassifier(random_state=1, n_jobs=2)}
     if grid_search:
-        hyperparameter_paths = ['rf_classificator.json', 'rf_regressor.json', 'xgb.json', 'xgb.json']
+        hyperparameter_paths = ['rf_classificator.json', 'rf_regressor.json', 'xgb_regr.json', 'xgb_clf.json']
         hyperparameter_paths = [os.path.join(utils.get_data_root_path(), 'hyperparameter', path) for path in
                                 hyperparameter_paths]
         hyperparameters = []
@@ -83,7 +83,7 @@ def get_paths(reduced=False, segment_length=10, threshold=10):
 def get_default_results(segment_length=10, overlap_amount=0.9, threshold_hr=10):
     feature_selection = get_reduced_column_names()
     paths = ["RF_Clf_default", "RF_Regr_default", "XGB_Regr_default", "XGB_Clf_default"]
-    if segment_length != 10 and overlap_amount != 0.9 and threshold_hr != 10:
+    if segment_length != 10 or overlap_amount != 0.9 or threshold_hr != 10:
         paths = [path + "_s" + str(segment_length) for path in paths]
         paths = [path + "_h" + str(threshold_hr) for path in paths]
     recreate_own_models(paths=paths, feature_selection=feature_selection, segment_length=segment_length,
@@ -92,7 +92,7 @@ def get_default_results(segment_length=10, overlap_amount=0.9, threshold_hr=10):
 
 def get_default_all_results(segment_length=10, overlap_amount=0.9, threshold_hr=10):
     paths = ["RF_Clf_default_all", "RF_Regr_default_all", "XGB_Regr_default_all", "XGB_Clf_default_all"]
-    if segment_length != 10 and overlap_amount != 0.9 and threshold_hr != 10:
+    if segment_length != 10 or overlap_amount != 0.9 or threshold_hr != 10:
         paths = [path + "_s" + str(segment_length) for path in paths]
         paths = [path + "_h" + str(threshold_hr) for path in paths]
     recreate_own_models(paths=paths, segment_length=segment_length, overlap_amount=overlap_amount,
@@ -100,10 +100,18 @@ def get_default_all_results(segment_length=10, overlap_amount=0.9, threshold_hr=
 
 
 if __name__ == "__main__":
-    get_default_results()
-    get_default_results(segment_length=10, overlap_amount=0.9, threshold_hr=5)
-    get_default_all_results(segment_length=10, overlap_amount=0.9, threshold_hr=5)
-    get_default_results(segment_length=10, overlap_amount=0.9, threshold_hr=15)
-    get_default_all_results(segment_length=10, overlap_amount=0.9, threshold_hr=15)
+    logging.basicConfig(level=logging.INFO)
+    # get_default_results()
+    # get_default_all_results()
+    # get_default_results(segment_length=10, overlap_amount=0.9, threshold_hr=5)
+    # get_default_all_results(segment_length=10, overlap_amount=0.9, threshold_hr=5)
+    # get_default_results(segment_length=10, overlap_amount=0.9, threshold_hr=15)
+    # get_default_all_results(segment_length=10, overlap_amount=0.9, threshold_hr=15)
+    # get_default_results(segment_length=20, overlap_amount=0.9, threshold_hr=10) TODO
+    # get_default_all_results(segment_length=20, overlap_amount=0.9, threshold_hr=10)
+    # get_default_results(segment_length=30, overlap_amount=0.9, threshold_hr=10)
+    # get_default_all_results(segment_length=30, overlap_amount=0.9, threshold_hr=10)
+    # get_default_results(segment_length=5, overlap_amount=0.8, threshold_hr=10) TODO
+    # get_default_all_results(segment_length=5, overlap_amount=0.8, threshold_hr=10)
     recreate_reduced_all(grid_search=True, thresholds=[10, 5, 15])
     pass
