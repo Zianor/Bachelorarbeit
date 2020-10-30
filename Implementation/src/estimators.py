@@ -1,3 +1,5 @@
+import logging
+
 import jsonplus as json
 import os
 import pickle
@@ -503,34 +505,43 @@ class MLStatisticalEstimator(QualityEstimator):
 
 class RegressionClassifier(BaseEstimator, ClassifierMixin):
 
-    def __init__(self, model=None, threshold=10):
+    def __init__(self, model, threshold=10, scale_sqrt=1):
         self.model = model
         self.threshold = threshold
+        self.scale_sqrt = scale_sqrt
 
     def fit(self, X, y):
         """Fits the underlying model
         :param y: needs to be continuous target
         """
+        y = np.power(y, 1/self.scale_sqrt)
+        print("fit " + str(self.scale_sqrt))
         self.model.fit(X, y)
         self.classes_ = [False, True]  # order important for AUC?
         return self
 
     def predict(self, X):
         y_continuous = self.model.predict(X)
+        y_continuous = np.power(y_continuous, self.scale_sqrt)
         y = [False if curr > self.threshold else True for curr in y_continuous]
         return y
 
     def get_params(self, deep=True):
         return {'model': self.model,
-                'threshold': self.threshold}
+                'threshold': self.threshold,
+                'scale_sqrt': self.scale_sqrt}
 
     def set_params(self, **params):
+        if "scale_sqrt" in params:
+            self.scale_sqrt = params.pop("scale_sqrt")
         self.model.set_params(**params)
         return self
 
     def predict_proba(self, X):
         y_continuous = self.model.predict(X)
-        proba_true = np.array([np.math.exp(np.log(0.5)/10 * y) for y in y_continuous])  # e function with f(th)=0.5
+        y_continuous = np.power(y_continuous, self.scale_sqrt)
+        # e function with f(th)=0.5
+        proba_true = np.array([np.math.exp(np.log(0.5)/self.threshold * y) for y in y_continuous])
         proba_false = 1 - proba_true
         ret = np.ones(shape=(len(y_continuous), 2))
         ret[:, 0] = proba_false  # TODO: clean up
@@ -543,10 +554,9 @@ class RegressionClassifier(BaseEstimator, ClassifierMixin):
 
 class OwnClassifier(BaseEstimator, ClassifierMixin):
 
-    def __init__(self, model=None, threshold=10, **params):
+    def __init__(self, model):
         self.model = model
-        self.model.set_params(**params)
-        self.threshold = threshold
+        logging.info(self.model.get_params().items())
 
     def fit(self, X, y):
         if type(X) is not pd.DataFrame:
@@ -558,6 +568,7 @@ class OwnClassifier(BaseEstimator, ClassifierMixin):
         if type(self.model) == xgb.XGBClassifier:  # class weight
             scale_pos_weight = len(y[~y].index) / len(y[y].index)
             self.model.set_params(scale_pos_weight=scale_pos_weight)
+        logging.debug("fit " + str(self.get_params()))
         self.model.fit(X.loc[~mask_nan], y_true)
         self.classes_ = [False, True]  # order important for AUC?
         return self
@@ -573,8 +584,7 @@ class OwnClassifier(BaseEstimator, ClassifierMixin):
         return y.to_numpy()
 
     def get_params(self, deep=True):
-        return {'model': self.model,
-                'threshold': self.threshold}
+        return {'model': self.model}
 
     def set_params(self, **params):
         self.model.set_params(**params)
@@ -597,7 +607,8 @@ class OwnClassifier(BaseEstimator, ClassifierMixin):
 class OwnEstimator(QualityEstimator):
 
     def __init__(self, clf, path, segment_length=10, overlap_amount=0.9, hr_threshold=10, data_folder='data_patients',
-                 feature_selection=None, hyperparameter=None, log=True):
+                 feature_selection=None, hyperparameter=None):
+
         self.feature_selection = feature_selection
         super(OwnEstimator, self).__init__(segment_length=segment_length, overlap_amount=overlap_amount,
                                            hr_threshold=hr_threshold, data_folder=data_folder)
@@ -605,16 +616,16 @@ class OwnEstimator(QualityEstimator):
         self.error_target = self.data['error']
         self.path = os.path.join(utils.get_model_path(), path)
         if clf is not None:
-            self.clf = OwnClassifier(model=clf, threshold=self.hr_threshold)
+            self.clf = OwnClassifier(model=clf)
             if not os.path.isdir(self.path):
                 os.mkdir(path=self.path)
             if hyperparameter is not None:
-                print("Hyperparameter optimization, this may need some time")
+                logging.info("Hyperparameter optimization, this may need some time")
                 self.optimize_hyperparameter(hyperparameter)
             else:
-                print("Model is trained, this may need some time")
+                logging.info("Model is trained, this may need some time")
                 self._train()
-            self._save_model()
+                self._save_model()
         else:
             self._load_model()
 
@@ -623,9 +634,10 @@ class OwnEstimator(QualityEstimator):
         cv = LeaveOneGroupOut()
         grid_search = RandomizedSearchCV(
             estimator=self.clf, param_distributions=hyperparameter, scoring=['f1', 'roc_auc'],
-            cv=cv, n_jobs=6, verbose=2, refit='roc_auc', n_iter=15)
+            cv=cv, n_jobs=6, verbose=2, refit='roc_auc', n_iter=15, random_state=1)
         grid_search.fit(x_g1, y_g1, groups=groups1)
         self.clf = grid_search.best_estimator_
+        self._save_model()
         params = grid_search.best_params_
         with open(os.path.join(self.path, 'grid.sav'), 'wb') as file:
             pickle.dump(grid_search, file=file)
@@ -712,12 +724,12 @@ class OwnEstimator(QualityEstimator):
 class OwnEstimatorRegression(OwnEstimator):
 
     def __init__(self, clf, path, segment_length=10, overlap_amount=0.9, hr_threshold=10, data_folder='data_patients',
-                 feature_selection=None, hyperparameter=None, log=True):
+                 feature_selection=None, hyperparameter=None):
         if clf is not None:
             clf = RegressionClassifier(model=clf, threshold=10)
         super(OwnEstimatorRegression, self).__init__(clf, path, segment_length, overlap_amount, hr_threshold,
                                                      data_folder, feature_selection=feature_selection,
-                                                     hyperparameter=hyperparameter, log=log)
+                                                     hyperparameter=hyperparameter)
 
     def _train(self):
         x1, x2, y1, y2, groups1, groups2 = self._get_patient_split()
