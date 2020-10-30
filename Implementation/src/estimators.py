@@ -10,7 +10,8 @@ import xgboost as xgb
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix, classification_report, max_error, \
-    mean_absolute_error, mean_squared_error, r2_score, plot_roc_curve, accuracy_score, roc_auc_score, f1_score
+    mean_absolute_error, mean_squared_error, r2_score, plot_roc_curve, accuracy_score, roc_auc_score, f1_score, \
+    make_scorer
 from sklearn.model_selection import train_test_split, GridSearchCV, LeaveOneGroupOut, RandomizedSearchCV
 from sklearn.base import BaseEstimator, ClassifierMixin
 
@@ -515,7 +516,6 @@ class RegressionClassifier(BaseEstimator, ClassifierMixin):
         :param y: needs to be continuous target
         """
         y = np.power(y, 1/self.scale_sqrt)
-        print("fit " + str(self.scale_sqrt))
         self.model.fit(X, y)
         self.classes_ = [False, True]  # order important for AUC?
         return self
@@ -549,6 +549,7 @@ class RegressionClassifier(BaseEstimator, ClassifierMixin):
         return ret
 
     def score(self, X, y):
+        y = [False if curr > self.threshold else True for curr in y]
         return accuracy_score(y, self.predict(X))
 
 
@@ -622,10 +623,9 @@ class OwnEstimator(QualityEstimator):
             if hyperparameter is not None:
                 logging.info("Hyperparameter optimization, this may need some time")
                 self.optimize_hyperparameter(hyperparameter)
-            else:
-                logging.info("Model is trained, this may need some time")
-                self._train()
-                self._save_model()
+            logging.info("Model is trained, this may need some time")
+            self._train()
+            self._save_model()
         else:
             self._load_model()
 
@@ -637,7 +637,6 @@ class OwnEstimator(QualityEstimator):
             cv=cv, n_jobs=6, verbose=2, refit='roc_auc', n_iter=15, random_state=1)
         grid_search.fit(x_g1, y_g1, groups=groups1)
         self.clf = grid_search.best_estimator_
-        self._save_model()
         params = grid_search.best_params_
         with open(os.path.join(self.path, 'grid.sav'), 'wb') as file:
             pickle.dump(grid_search, file=file)
@@ -737,6 +736,31 @@ class OwnEstimatorRegression(OwnEstimator):
         x1, x2, y1, y2, groups1, groups2 = self._get_patient_split()
         self.clf.fit(x1, self.informative_info.loc[y1.index, 'error'])
 
+    def optimize_hyperparameter(self, hyperparameter):
+        x_g1, x_g2, y_g1, y_g2, groups1, groups2 = self._get_patient_split()
+        cv = LeaveOneGroupOut()
+        scoring = {'auc': make_scorer(self.regression_auc_score, greater_is_better=True, needs_proba=True),
+                    'f1' : make_scorer(self.regression_f1_score, greater_is_better=True, needs_threshold=False)}
+        grid_search = RandomizedSearchCV(
+            estimator=self.clf, param_distributions=hyperparameter, scoring=scoring,
+            cv=cv, n_jobs=6, verbose=2, refit='auc', n_iter=15, random_state=1)
+        grid_search.fit(x_g1, self.informative_info.loc[y_g1.index, 'error'], groups=groups1)
+        self.clf = grid_search.best_estimator_
+        params = grid_search.best_params_
+        with open(os.path.join(self.path, 'grid.sav'), 'wb') as file:
+            pickle.dump(grid_search, file=file)
+        with open(os.path.join(self.path, 'params.json'), 'w') as file:
+            file.write(json.dumps(params))
+            file.flush()
+        self._get_dataframe_from_cv_results(grid_search.cv_results_).to_csv(os.path.join(self.path, 'grid.csv'))
+
+    def regression_auc_score(self, y, y_pred):
+        y = [False if curr > 10 else True for curr in y]
+        return roc_auc_score(y, y_pred[:, 1])
+
+    def regression_f1_score(self, y, y_pred):
+        y = [False if curr > 10 else True for curr in y]
+        return f1_score(y, y_pred)
 
 if __name__ == "__main__":
     pass
