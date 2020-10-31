@@ -134,7 +134,32 @@ Bei der Betrachtung der Regressionsmodelle zeigt sich, dass es bei dem \ac{XGB}-
  	\caption[Coverage unter bestimmten Fehlern $E\textsubscript{HR}$ nach Klassifikation mittels \ac{RF}-Regressor]{Coverage unter bestimmten Fehlern $E\textsubscript{HR}$ nach Klassifikation mittels \ac{RF}-Regressor}
  	\label{fig:own-coverage-default}
  \end{table}
+ 
+ Auch eine Untersuchung der Verteilung von $E\textsubscript{HR}$ auf den als informativ klassifizierten Segmenten zeigt im Verglich, dass der Anteil des Signals mit einem Fehler $E\textsubscript{HR} > 20\si{FE}$ stark gesenkt werden konnte. Auch liegt der durchschnittliche \ac{MAE} der falsch-negativen Segmente bei xxx\,\si{FE}, was über dem Durchschnitt aller als informativ klassifizierten Segmente von 3,28\,\si{FE} liegt.
+ 
+ \begin{figure}[h]
+ 	\centering
+		\begin{subfigure}{.45\textwidth}
+			\centering
+ 			\includegraphics[scale=0.7]{pic/rf-own-final-10-positives.pdf}
+ 			\caption{\ac{RF}-Regressor}
+ 		\end{subfigure}
+    	\begin{subfigure}{.45\textwidth}
+    		\centering
+ 			\includegraphics[scale=0.7]{pic/brueser03-positives.pdf}
+ 			\caption{Ähnlichkeit der Intervallschätzer}
+ 		\end{subfigure}
+ 	\caption{Verteilung von $E\textsubscript{HR}$ bei den als informativ klassifizierten Segmenten}
+ 	\label{fig:own-10-positives}
+ \end{figure}
+ 
+ Mit den im Rahmen dieser Arbeit entwickelten Modellen kann also die Signalqualität zuverlässiger als bisher beurteilt werden. Die Coverage durch die Klassifikation konnte erhöht und der \ac{MAE} der als informativ klassifizierten Segmente gesenkt werden.
+
+\section{Einfluss des Schwellwertes der Annotation}
+
+Nachdem die generelle Performance der Modelle untersucht wurde, wird nun der Einfluss des verwendeten Schwellwertes der Annotation untersucht.
 
 \section{Einfluss der Segmentlänge}
 
-\section{Einfluss des Schwellwertes der Annotation}
+
+
