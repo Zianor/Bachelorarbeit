@@ -179,12 +179,12 @@ class QualityEstimator:
             plt.savefig(file, transparent=True, bbox_inches='tight', dpi=300)
         print(classification_report(y_true, y_pred, target_names=class_names))
 
-        print("MAE auf als informativ klassifizierten Segmenten: %.2f" % self.get_mean_error(
-            y_true.index, y_pred, use_brueser_hr=False))
-        print("MAE auf als informativ annotierten Segmenten:  %.2f" % self.get_mean_error(
-            y_true.index, y_true, use_brueser_hr=False))
-        print("MAE insgesamt:  %.2f" % self.get_mean_error(
-            y_true.index, use_brueser_hr=False))
+        mean_error, std = self.get_mean_error(y_true.index, use_brueser_hr=False)
+        print("MAE insgesamt:  %.2f +- %.2f" % (mean_error, std))
+        mean_error, std = self.get_mean_error(y_true.index, y_pred)
+        print("MAE auf als informativ klassifizierten Segmenten: %.2f +- %.2f" % (mean_error, std))
+        mean_error, std = self.get_mean_error(y_true.index, y_true)
+        print("MAE auf als informativ annotierten Segmenten:  %.2f +- %.2f" % (mean_error, std))
         print("MSE auf als informativ klassifizierten Segmenten: %.2f" % self.get_mean_squared_error(
             y_true.index, y_pred, use_brueser_hr=False))
         print("MSE auf als informativ annotierten Segmenten:  %.2f" % self.get_mean_squared_error(
@@ -217,7 +217,8 @@ class QualityEstimator:
             plt.savefig(file, transparent=True, bbox_inches='tight', dpi=300)
 
         print("\n False Positives")
-        print(f"Durchschnittlicher Fehler von False Positives: {self.get_mean_error(fp_indices):.2f}")
+        mean_error, _ = self.get_mean_error(fp_indices)
+        print(f"Durchschnittlicher Fehler von False Positives: {mean_error:.2f}")
         if save_title is not None:
             file = save_title + '-fp.pdf'
             file = os.path.join(utils.get_thesis_pic_path(), file)
@@ -227,7 +228,8 @@ class QualityEstimator:
         # print(f"Standardabweichung des Fehlers von False Positives: {self.get_mean_error_abs(fp_indices, fp)}")
 
         print("\n False Negatives")
-        print(f"Durchschnittlicher Fehler von False Negatives: {self.get_mean_error(fn_indices):.2f}")
+        mean_error, _ = self.get_mean_error(fn_indices)
+        print(f"Durchschnittlicher Fehler von False Negatives: {mean_error:.2f}")
         if save_title is not None:
             file = save_title + '-fn.pdf'
             file = os.path.join(utils.get_thesis_pic_path(), file)
@@ -263,7 +265,7 @@ class QualityEstimator:
         if labels is not None:
             data_subset = data_subset[labels]
         # data_subset = data_subset[data_subset['quality_class'] != 0]
-        return np.mean(data_subset['error'])
+        return np.mean(data_subset['error']), np.std(data_subset['error'])
 
     def get_mean_squared_error(self, indices, labels=None, use_brueser_hr=False):
         data_subset = self.informative_info.loc[indices]
@@ -716,9 +718,12 @@ class OwnEstimator(QualityEstimator):
         print(f"Coverage klassifiziert      : {len(y_pred[y_pred]) / len(y_pred) * 100:.2f} %")
         print(f"Coverage annotiert          : {len(y_true[y_true]) / len(y_true) * 100:.2f} %")
 
-        print("MAE auf als informativ klassifizierten Segmenten: %.2f" % self.get_mean_error(y_true.index, y_pred))
-        print("MAE auf als informativ annotierten Segmenten:  %.2f" % self.get_mean_error(y_true.index, y_true))
-        print("MAE insgesamt:  %.2f" % self.get_mean_error(y_true.index))
+        mean_error, std = self.get_mean_error(y_true.index, use_brueser_hr=False)
+        print("MAE insgesamt:  %.2f +- %.2f" % (mean_error, std))
+        mean_error, std = self.get_mean_error(y_true.index, y_pred)
+        print("MAE auf als informativ klassifizierten Segmenten: %.2f +- %.2f" % (mean_error, std))
+        mean_error, std = self.get_mean_error(y_true.index, y_true)
+        print("MAE auf als informativ annotierten Segmenten:  %.2f +- %.2f" % (mean_error, std))
 
 
 class OwnEstimatorRegression(OwnEstimator):
@@ -761,6 +766,7 @@ class OwnEstimatorRegression(OwnEstimator):
     def regression_f1_score(self, y, y_pred):
         y = [False if curr > 10 else True for curr in y]
         return f1_score(y, y_pred)
+
 
 if __name__ == "__main__":
     pass
