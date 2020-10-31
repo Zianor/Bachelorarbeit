@@ -1,16 +1,16 @@
-,params,rank_test_f1,mean_test_f1,rank_test_roc_auc,mean_test_roc_auc
-0,"{'subsample': 0.8, 'reg_lambda': 0.1, 'reg_alpha': 0.0001, 'n_estimators': 100, 'min_child_weight': 1, 'max_depth': 20, 'learning_rate': 0.01, 'gamma': 0.5}",1,0.6837031337372313,7,0.27598158002364026
-1,"{'subsample': 0.8, 'reg_lambda': 0.001, 'reg_alpha': 0.01, 'n_estimators': 50, 'min_child_weight': 1, 'max_depth': 3, 'learning_rate': 0.25, 'gamma': 1}",1,0.6837031337372313,11,0.2693938307927
-2,"{'subsample': 0.8, 'reg_lambda': 0.1, 'reg_alpha': 0.01, 'n_estimators': 300, 'min_child_weight': 2, 'max_depth': 5, 'learning_rate': 0.01, 'gamma': 2}",1,0.6837031337372313,14,0.26238379168735004
-3,"{'subsample': 0.6, 'reg_lambda': 0.05, 'reg_alpha': 0.01, 'n_estimators': 200, 'min_child_weight': 1, 'max_depth': 7, 'learning_rate': 0.15, 'gamma': 1.5}",1,0.6837031337372313,6,0.2794597344204863
-4,"{'subsample': 1.0, 'reg_lambda': 0.1, 'reg_alpha': 0.001, 'n_estimators': 200, 'min_child_weight': 10, 'max_depth': 20, 'learning_rate': 0.1, 'gamma': 0.5}",1,0.6837031337372313,4,0.28343994559949115
-5,"{'subsample': 1.0, 'reg_lambda': 0.01, 'reg_alpha': 0.01, 'n_estimators': 50, 'min_child_weight': 2, 'max_depth': 15, 'learning_rate': 0.3, 'gamma': 2}",1,0.6837031337372313,3,0.28446763029302985
-6,"{'subsample': 0.8, 'reg_lambda': 0.001, 'reg_alpha': 0.01, 'n_estimators': 200, 'min_child_weight': 10, 'max_depth': 3, 'learning_rate': 0.3, 'gamma': 0}",1,0.6837031337372313,5,0.28093856569029896
-7,"{'subsample': 0.6, 'reg_lambda': 0.1, 'reg_alpha': 0.0001, 'n_estimators': 250, 'min_child_weight': 2, 'max_depth': 3, 'learning_rate': 0.3, 'gamma': 0}",1,0.6837031337372313,8,0.2740442691151068
-8,"{'subsample': 1.0, 'reg_lambda': 0.05, 'reg_alpha': 0.1, 'n_estimators': 50, 'min_child_weight': 1, 'max_depth': 5, 'learning_rate': 0.2, 'gamma': 5}",1,0.6837031337372313,10,0.26955366329842384
-9,"{'subsample': 0.8, 'reg_lambda': 0.001, 'reg_alpha': 0.01, 'n_estimators': 250, 'min_child_weight': 4, 'max_depth': 3, 'learning_rate': 0.05, 'gamma': 1}",1,0.6837031337372313,12,0.26807590137641424
-10,"{'subsample': 1.0, 'reg_lambda': 0.0001, 'reg_alpha': 0.001, 'n_estimators': 200, 'min_child_weight': 4, 'max_depth': 20, 'learning_rate': 0.3, 'gamma': 1}",1,0.6837031337372313,2,0.28743369769474447
-11,"{'subsample': 1.0, 'reg_lambda': 0.001, 'reg_alpha': 0.1, 'n_estimators': 200, 'min_child_weight': 4, 'max_depth': 30, 'learning_rate': 0.05, 'gamma': 5}",1,0.6837031337372313,9,0.27389250069430493
-12,"{'subsample': 1.0, 'reg_lambda': 0.001, 'reg_alpha': 0.0001, 'n_estimators': 250, 'min_child_weight': 10, 'max_depth': 5, 'learning_rate': 0.01, 'gamma': 1}",1,0.6837031337372313,15,0.2619012317022821
-13,"{'subsample': 0.6, 'reg_lambda': 0.0001, 'reg_alpha': 0.05, 'n_estimators': 250, 'min_child_weight': 1, 'max_depth': 7, 'learning_rate': 0.3, 'gamma': 0}",1,0.6837031337372313,1,0.28854365406745364
-14,"{'subsample': 0.6, 'reg_lambda': 0.001, 'reg_alpha': 0.0001, 'n_estimators': 50, 'min_child_weight': 1, 'max_depth': 5, 'learning_rate': 0.2, 'gamma': 2}",1,0.6837031337372313,13,0.2657856118635316
+,params,rank_test_f1,mean_test_f1
+0,"{'subsample': 0.6, 'scale_sqrt': 4, 'reg_lambda': 0.1, 'reg_alpha': 0.05, 'n_estimators': 150, 'min_child_weight': 2, 'max_depth': 3, 'learning_rate': 0.15, 'gamma': 0}",2,0.6732412260541797
+1,"{'subsample': 0.8, 'scale_sqrt': 3, 'reg_lambda': 0.1, 'reg_alpha': 0.0001, 'n_estimators': 300, 'min_child_weight': 10, 'max_depth': 15, 'learning_rate': 0.2, 'gamma': 0.5}",7,0.6422868722088132
+2,"{'subsample': 1.0, 'scale_sqrt': 3, 'reg_lambda': 0.05, 'reg_alpha': 0.05, 'n_estimators': 300, 'min_child_weight': 2, 'max_depth': 5, 'learning_rate': 0.2, 'gamma': 0.5}",4,0.6562852123816498
+3,"{'subsample': 0.8, 'scale_sqrt': 3, 'reg_lambda': 0.05, 'reg_alpha': 0.01, 'n_estimators': 200, 'min_child_weight': 10, 'max_depth': 15, 'learning_rate': 0.2, 'gamma': 0.5}",8,0.6407444074449764
+4,"{'subsample': 1.0, 'scale_sqrt': 2, 'reg_lambda': 0.01, 'reg_alpha': 0.001, 'n_estimators': 250, 'min_child_weight': 2, 'max_depth': 30, 'learning_rate': 0.25, 'gamma': 1}",13,0.619438230476272
+5,"{'subsample': 0.6, 'scale_sqrt': 2, 'reg_lambda': 0.0001, 'reg_alpha': 0.0001, 'n_estimators': 250, 'min_child_weight': 10, 'max_depth': 20, 'learning_rate': 0.05, 'gamma': 0.5}",10,0.622028069805124
+6,"{'subsample': 1.0, 'scale_sqrt': 2, 'reg_lambda': 0.01, 'reg_alpha': 0.01, 'n_estimators': 300, 'min_child_weight': 1, 'max_depth': 20, 'learning_rate': 0.05, 'gamma': 0}",11,0.621244544557212
+7,"{'subsample': 1.0, 'scale_sqrt': 4, 'reg_lambda': 0.1, 'reg_alpha': 0.0001, 'n_estimators': 200, 'min_child_weight': 2, 'max_depth': 20, 'learning_rate': 0.3, 'gamma': 1.5}",5,0.6484295895987361
+8,"{'subsample': 0.6, 'scale_sqrt': 1, 'reg_lambda': 0.05, 'reg_alpha': 0.05, 'n_estimators': 150, 'min_child_weight': 2, 'max_depth': 10, 'learning_rate': 0.2, 'gamma': 1.5}",14,0.5289516740482443
+9,"{'subsample': 1.0, 'scale_sqrt': 3, 'reg_lambda': 0.001, 'reg_alpha': 0.0001, 'n_estimators': 100, 'min_child_weight': 2, 'max_depth': 10, 'learning_rate': 0.25, 'gamma': 0}",6,0.6437340241585013
+10,"{'subsample': 1.0, 'scale_sqrt': 2, 'reg_lambda': 0.0001, 'reg_alpha': 0.01, 'n_estimators': 300, 'min_child_weight': 10, 'max_depth': 20, 'learning_rate': 0.1, 'gamma': 0.5}",12,0.6197834204443315
+11,"{'subsample': 0.8, 'scale_sqrt': 2, 'reg_lambda': 0.0001, 'reg_alpha': 0.0001, 'n_estimators': 200, 'min_child_weight': 1, 'max_depth': 3, 'learning_rate': 0.1, 'gamma': 1.5}",9,0.6306178712453889
+12,"{'subsample': 0.8, 'scale_sqrt': 3, 'reg_lambda': 0.1, 'reg_alpha': 0.0001, 'n_estimators': 300, 'min_child_weight': 1, 'max_depth': 3, 'learning_rate': 0.05, 'gamma': 1.5}",3,0.6622874235349664
+13,"{'subsample': 0.6, 'scale_sqrt': 4, 'reg_lambda': 0.0001, 'reg_alpha': 0.1, 'n_estimators': 150, 'min_child_weight': 4, 'max_depth': 7, 'learning_rate': 0.01, 'gamma': 5}",1,0.7120609799288952
+14,"{'subsample': 0.6, 'scale_sqrt': 1, 'reg_lambda': 0.1, 'reg_alpha': 0.0001, 'n_estimators': 250, 'min_child_weight': 4, 'max_depth': 30, 'learning_rate': 0.15, 'gamma': 2}",15,0.5197846644526721
