@@ -508,7 +508,7 @@ class MLStatisticalEstimator(QualityEstimator):
 
 class RegressionClassifier(BaseEstimator, ClassifierMixin):
 
-    def __init__(self, model, threshold=10, scale_sqrt=1):
+    def __init__(self, model, threshold=10, scale_sqrt=4):
         self.model = model
         self.threshold = threshold
         self.scale_sqrt = scale_sqrt
@@ -636,7 +636,7 @@ class OwnEstimator(QualityEstimator):
         cv = LeaveOneGroupOut()
         grid_search = RandomizedSearchCV(
             estimator=self.clf, param_distributions=hyperparameter, scoring=['f1', 'roc_auc'],
-            cv=cv, n_jobs=6, verbose=2, refit='roc_auc', n_iter=15, random_state=1)
+            cv=cv, n_jobs=6, verbose=2, refit='roc_auc', n_iter=7, random_state=1)
         grid_search.fit(x_g1, y_g1, groups=groups1)
         self.clf = grid_search.best_estimator_
         params = grid_search.best_params_
@@ -748,7 +748,7 @@ class OwnEstimatorRegression(OwnEstimator):
                    'f1': make_scorer(self.regression_f1_score, greater_is_better=True, needs_threshold=False)}
         grid_search = RandomizedSearchCV(
             estimator=self.clf, param_distributions=hyperparameter, scoring=scoring,
-            cv=cv, n_jobs=6, verbose=2, refit='auc', n_iter=15, random_state=1)
+            cv=cv, n_jobs=6, verbose=2, refit='auc', n_iter=7, random_state=1)
         grid_search.fit(x_g1, self.informative_info.loc[y_g1.index, 'error'], groups=groups1)
         self.clf = grid_search.best_estimator_
         params = grid_search.best_params_
