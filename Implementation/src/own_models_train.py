@@ -26,10 +26,10 @@ def get_final_column_names():
 
 
 def get_final_models(grid_search, segment_length=10, overlap_amount=0.9, threshold_hr=10):
-    paths = get_final_paths()
+    paths = get_final_paths(gridsearch=grid_search)
     feature_selection = get_final_column_names()
     recreate_own_models(paths=paths, segment_length=segment_length, overlap_amount=overlap_amount,
-                        threshold_hr=threshold_hr, feature_selection=feature_selection)
+                        threshold_hr=threshold_hr, feature_selection=feature_selection, grid_search=grid_search)
 
 
 def recreate_own_models(paths, segment_length=10, overlap_amount=0.9, threshold_hr=10, grid_search=False,
@@ -102,7 +102,7 @@ def get_final_paths(gridsearch=True, segment_length=10, threshold=10):
     if not gridsearch:
         paths = [path + "_default_h" + str(threshold) for path in paths]
     else:
-        paths = [path + "h" + str(threshold) for path in paths]
+        paths = [path + "_h" + str(threshold) for path in paths]
     return paths
 
 
@@ -148,5 +148,6 @@ if __name__ == "__main__":
     #     get_default_all_results(segment_length=5, overlap_amount=0.8, threshold_hr=10)
     # except:
     #     logging.error("5 second segments didn't work")
-    recreate_reduced_all(grid_search=True, thresholds=[10, 5, 15])
+    # recreate_reduced_all(grid_search=True, thresholds=[10, 5, 15])
+    get_final_models(grid_search=True)
     pass
