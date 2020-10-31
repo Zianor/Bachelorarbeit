@@ -1,0 +1,8 @@
+,params,rank_test_f1,mean_test_f1,rank_test_roc_auc,mean_test_roc_auc
+0,"{'n_estimators': 150, 'min_samples_split': 10, 'min_samples_leaf': 4, 'max_features': 'sqrt', 'max_depth': 5, 'criterion': 'entropy', 'class_weight': 'balanced'}",4,0.5945120648975434,4,0.7270853032182953
+1,"{'n_estimators': 100, 'min_samples_split': 10, 'min_samples_leaf': 10, 'max_features': 'sqrt', 'max_depth': 5, 'criterion': 'gini', 'class_weight': 'balanced'}",5,0.5939582014445084,5,0.7257835886175343
+2,"{'n_estimators': 150, 'min_samples_split': 2, 'min_samples_leaf': 2, 'max_features': 'log2', 'max_depth': 7, 'criterion': 'entropy', 'class_weight': 'balanced'}",3,0.6124028343351057,3,0.7353755568944903
+3,"{'n_estimators': 100, 'min_samples_split': 5, 'min_samples_leaf': 1, 'max_features': 'sqrt', 'max_depth': 3, 'criterion': 'entropy', 'class_weight': 'balanced'}",7,0.5695408071806247,7,0.7148615950957544
+4,"{'n_estimators': 100, 'min_samples_split': 10, 'min_samples_leaf': 10, 'max_features': 'sqrt', 'max_depth': 20, 'criterion': 'gini', 'class_weight': 'balanced'}",2,0.6417775280747908,1,0.7401336454526537
+5,"{'n_estimators': 300, 'min_samples_split': 2, 'min_samples_leaf': 10, 'max_features': 'sqrt', 'max_depth': 30, 'criterion': 'entropy', 'class_weight': 'balanced'}",1,0.6442468784605165,2,0.7394209272502601
+6,"{'n_estimators': 200, 'min_samples_split': 5, 'min_samples_leaf': 1, 'max_features': 'log2', 'max_depth': 3, 'criterion': 'entropy', 'class_weight': 'balanced'}",6,0.5712911955547757,6,0.7208181999455165
