@@ -740,7 +740,7 @@ class OwnEstimatorRegression(OwnEstimator):
         x_g1, x_g2, y_g1, y_g2, groups1, groups2 = self._get_patient_split()
         cv = LeaveOneGroupOut()
         scoring = {'auc': make_scorer(self.regression_auc_score, greater_is_better=True, needs_proba=True),
-                    'f1' : make_scorer(self.regression_f1_score, greater_is_better=True, needs_threshold=False)}
+                   'f1': make_scorer(self.regression_f1_score, greater_is_better=True, needs_threshold=False)}
         grid_search = RandomizedSearchCV(
             estimator=self.clf, param_distributions=hyperparameter, scoring=scoring,
             cv=cv, n_jobs=6, verbose=2, refit='auc', n_iter=15, random_state=1)

@@ -6,7 +6,7 @@ import xgboost as xgb
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 
 import utils
-from estimators import OwnEstimator, OwnEstimatorRegression, RegressionClassifier
+from estimators import OwnEstimator, OwnEstimatorRegression
 
 
 def get_reduced_column_names():
@@ -44,7 +44,8 @@ def recreate_own_models(paths, segment_length=10, overlap_amount=0.9, threshold_
             model.set_params(**params)
 
     for i, model_key in enumerate(models.keys()):
-        if paths[i] in ["RF_Clf_s10_all_h10", "RF_Clf_s10_reduced_h10"]:
+        if paths[i] in ["RF_Clf_s10_all_h10", "RF_Clf_s10_reduced_h10", "XGB_Clf_s10_all_h10", "RF_Regr_s10_all_h10",
+                        "XGB_Regr_s10_all_h10"]:
             continue
         print(paths[i])
         if "clf" in str(model_key):
@@ -107,20 +108,20 @@ if __name__ == "__main__":
     # get_default_all_results(segment_length=10, overlap_amount=0.9, threshold_hr=5)
     # get_default_results(segment_length=10, overlap_amount=0.9, threshold_hr=15)
     # get_default_all_results(segment_length=10, overlap_amount=0.9, threshold_hr=15)
-    try:
-        get_default_results(segment_length=20, overlap_amount=0.9, threshold_hr=10)
-        get_default_all_results(segment_length=20, overlap_amount=0.9, threshold_hr=10)
-    except:
-        logging.error("20 second segments didn't work")
-    try:
-        get_default_results(segment_length=30, overlap_amount=0.9, threshold_hr=10)
-        get_default_all_results(segment_length=30, overlap_amount=0.9, threshold_hr=10)
-    except:
-        logging.error("30 second segments didn't work")
-    try:
-        get_default_results(segment_length=5, overlap_amount=0.8, threshold_hr=10)
-        get_default_all_results(segment_length=5, overlap_amount=0.8, threshold_hr=10)
-    except:
-        logging.error("5 second segments didn't work")
+    # try:
+    #     get_default_results(segment_length=20, overlap_amount=0.9, threshold_hr=10)
+    #     get_default_all_results(segment_length=20, overlap_amount=0.9, threshold_hr=10)
+    # except:
+    #     logging.error("20 second segments didn't work")
+    # try:
+    #     get_default_results(segment_length=30, overlap_amount=0.9, threshold_hr=10)
+    #     get_default_all_results(segment_length=30, overlap_amount=0.9, threshold_hr=10)
+    # except:
+    #     logging.error("30 second segments didn't work")
+    # try:
+    #     get_default_results(segment_length=5, overlap_amount=0.8, threshold_hr=10)
+    #     get_default_all_results(segment_length=5, overlap_amount=0.8, threshold_hr=10)
+    # except:
+    #     logging.error("5 second segments didn't work")
     recreate_reduced_all(grid_search=True, thresholds=[10, 5, 15])
     pass
