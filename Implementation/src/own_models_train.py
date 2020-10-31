@@ -17,6 +17,21 @@ def get_reduced_column_names():
             'sqi_coverage_05']
 
 
+def get_final_column_names():
+    return ['mean', 'number_zero_crossings', 'kurtosis', 'skewness', 'hf_diff_acf', 'hf_diff_data',
+            'interval_lengths_std', 'sqi_std', 'sqi_min', 'sqi_median', 'peak_range', 'peak_mean',
+            'template_corr_highest_sqi_mean', 'template_corr_highest_sqi_std', 'template_corr_median_sqi_mean',
+            'template_corr_median_sqi_std', 'interval_means_std', 'sqi_coverage_03', 'sqi_coverage_04',
+            'sqi_coverage_05', 'hf_ratio_acf', 'hf_ratio_data']
+
+
+def get_final_models(grid_search, segment_length=10, overlap_amount=0.9, threshold_hr=10):
+    paths = get_final_paths()
+    feature_selection = get_final_column_names()
+    recreate_own_models(paths=paths, segment_length=segment_length, overlap_amount=overlap_amount,
+                        threshold_hr=threshold_hr, feature_selection=feature_selection)
+
+
 def recreate_own_models(paths, segment_length=10, overlap_amount=0.9, threshold_hr=10, grid_search=False,
                         feature_selection=None):
     models = {"rf_clf": RandomForestClassifier(random_state=1, n_jobs=2),
@@ -45,7 +60,7 @@ def recreate_own_models(paths, segment_length=10, overlap_amount=0.9, threshold_
 
     for i, model_key in enumerate(models.keys()):
         if paths[i] in ["RF_Clf_s10_all_h10", "RF_Clf_s10_reduced_h10", "XGB_Clf_s10_all_h10", "RF_Regr_s10_all_h10",
-                        "XGB_Regr_s10_all_h10"]:
+                        "XGB_Regr_s10_all_h10", "RF_Regr_s10_reduced_h10"]:
             continue
         print(paths[i])
         if "clf" in str(model_key):
@@ -78,6 +93,16 @@ def get_paths(reduced=False, segment_length=10, threshold=10):
         paths = [path + "_reduced_h" + str(threshold) for path in paths]
     else:
         paths = [path + "_all_h" + str(threshold) for path in paths]
+    return paths
+
+
+def get_final_paths(gridsearch=True, segment_length=10, threshold=10):
+    paths = ["RF_Clf", "RF_Regr", "XGB_Regr", "XGB_Clf"]
+    paths = [path + "_s" + str(segment_length) for path in paths]
+    if not gridsearch:
+        paths = [path + "_default_h" + str(threshold) for path in paths]
+    else:
+        paths = [path + "h" + str(threshold) for path in paths]
     return paths
 
 
