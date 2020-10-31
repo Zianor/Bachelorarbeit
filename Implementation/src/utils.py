@@ -184,7 +184,9 @@ def get_plt_big_size():
     return width, height
 
 
-def bland_altman_plot(hr1, hr2, title=None, color=None):
+def bland_altman_plot(hr1, hr2, title=None, color=None, samplesize=15000):
+    # hr1 = hr1.sample(samplesize, random_state=1)
+    # hr2 = hr2.loc[hr1.index]
     hr1 = np.asarray(hr1)
     hr2 = np.asarray(hr2)
     mean = np.mean([hr1, hr2], axis=0)
