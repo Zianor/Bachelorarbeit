@@ -2,9 +2,11 @@
 
 Im Folgenden werden die entwickelten Modelle untersucht und evaluiert. Für die beiden \acl{RF}s wird die Implementierung von \texttt{sklearn} genutzt, für die Gradient Boosted Trees die Bibliothek \texttt{XGBoost}, da das \ac{XGBoost} besser ist als die in \texttt{sklearn}.\footcite[Kapitel 10]{Harrison2019} Die Ergebnisse der Modelle werden sowohl für das reduzierte als auch das vollständige Merkmalsset berechnet und verglichen. Mit den trainierten Modellen wird erneut eine Merkmalsanalyse durchgeführt. Außerdem wird der Einfluss der gewählten Segmentlänge und des gewählten Schwellwertes der Annotation untersucht. Für alle Untersuchungen wird das gleiche Testset wie in Kapitel \ref{analyse} verwendet.
 
-\section{Vergleich der Modelle}
+\section{Vergleich der Modelle} %TODO: besserer Titel? Merkmalsauswahl?
 
-Zunächst werden alle Modelle sowohl mit dem vollständigen Merkmalsset als auch dem reduzierten Merkmalsset verglichen, siehe Tabelle \ref{fig:comparison-all}. Die Ergebnisse von Gradient Boosted Trees und \acl{RF}s sind zunächst ähnlich, weshalb nach Untersuchung der Wichtigkeit der Merkmale übersichtshalber nur noch je ein Klassifikations- und ein Regressionsmodell betrachtet werden. Außerdem zeigt sich, dass das reduzierte Merkmalsset insgesamt zu etwas schlechteren Resultaten führt. Dennoch ist es sinnvoll, auch mit diesem reduzierten Set die Wichtigkeit der Merkmale zu untersuchen, da diese durch korrelierte Merkmale verzerrt werden kann.
+Zunächst werden alle Modelle sowohl mit dem vollständigen Merkmalsset als auch dem reduzierten Merkmalsset verglichen, siehe Tabelle \ref{fig:comparison-all}. Die Ergebnisse der Klassifikation mit Gradient Boosted Trees und \acl{RF}s sind zunächst ähnlich, weshalb nach Untersuchung der Wichtigkeit der Merkmale übersichtshalber nur noch ein Klassifikationsmodell betrachtet wird. Bei der Regression erreichen Gradient Bossted Trees eine sehr hohe Coverage von, bei Verwendung aller Merkmale, 80\,\% mit einem zu den anderen Modellen verhältnismäßig hohen \ac{MAE} von 16,04\,\si{FE}. 
+
+Insgesamt zeigt sich bereits, dass eine deutlich höhere Coverage als bei der reinen Betrachtung der Intervallschätzer des CLIE-Algorithmus erreicht wird. Diese lag beispielsweise für $q\textsubscript{th} = 0.3$ bei 20,93\,\% mit einem \ac{MAE} von 13,90\,\si{FE}.
 	
 	\begin{table}[H]
 		\begin{tabular}{l | l | l|| c | c | c | c }
@@ -17,33 +19,27 @@ Zunächst werden alle Modelle sowohl mit dem vollständigen Merkmalsset als auch
  						&				& \acs{XGBoost}	& 14{,}60		& 38,10			& 0{,}56	& 0,68	\\\cline{2-7} %TODO: update numbers			
  						& \multirow{2}{*}{alle}
  									 	& \acs{RF}		& 12{,}11		& 36,81			& 0{,}61	& 0,75	\\
- 						&				& \acs{XGBoost} 	& 11,38			& 35,93			& 0,62		& 0,75\\\hline %TODO: update numbers
+ 						&				& \acs{XGBoost} 	& 11,38			& 35,93			& 0,62		& 0,75\\\hline
  		\multirow{4}{*}{Regression}
  						& \multirow{2}{*}{reduziert}
  										& \acs{RF}		& 8{,}83			& 12{,}64		& 0{,}34	& 0,67	\\ % TODO: update numbers
  						&				& \acs{XGBoost}	& 12{,}63		& 23{,}12		& 0{,}44	& 0,65	\\\cline{2-7} % TODO update numbers		
  					 	& \multirow{2}{*}{alle}		
  					 					& \acs{RF}		& 12,56			& 46,27			& 0,64		& 0,75\\
- 					 	&				& \acs{XGBoost} & 10,71			& 30,30			& 0,55		& 0,73\\ % TODO: update numbers
-
- 						
+ 					 	&				& \acs{XGBoost} & 16,04			& 81,80			& 0,65		& 0,74\\
 		\end{tabular}
 		\caption{Vergleich der aller Modelle mit reduziertem und vollständigem Merkmalsset}
 		\label{fig:comparison-all}
 	\end{table}
 	
-	\begin{itemize}
-		\item \ac{XGBoost} bei Regression höhere Coverage aber auch höheren Fehler
-		\item bei Klassifikation ähnlicher Fehler, aber Coverage von \ac{XGBoost} höher
-		\item Regression niedrigerer Fehler und niedrigere Coverage, ähnlich hohe AUC -> mit Verschieben des Schwellwerts näher an Regression?
-		\item reduziertes Merkmalsset führt zu schlechteren Ergebnissen -> Feature Importances sollten trotzdem aussagekräftiger sein
-	\end{itemize}
+
+ Des Weiteren zeigt sich, dass das reduzierte Merkmalsset insgesamt zu etwas schlechteren Resultaten führt. Dennoch ist es sinnvoll, auch mit diesem reduzierten Set die Wichtigkeit der Merkmale zu untersuchen, da diese durch korrelierte Merkmale verzerrt werden kann. Vergleicht man
 	
 	\begin{itemize}
-		\item zunächst das in Kapitel \ref{reduction} reduzierte Merkmalsset
-		\item Übersicht alle Modelle mit Coverage, MAE, auc auf inf Set
-		\item je Regression und Klassifikation um besseres Modell auszuwählen -> Vergleich von XGBoost und RF
-		\item Vergleich von Regression und Klassifikation
+		\item Feature Importance aller plotten, jeweils reduziert und alle
+		\item Vergleichen
+		\item Modelle untereinander vergleichen
+		\item recursive feature elminination
 	\end{itemize}
 	
 	\section{Evaluation der Merkmale}
