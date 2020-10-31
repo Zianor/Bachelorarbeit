@@ -36,7 +36,7 @@ def get_latex_column_names():
         'interval means std': '$\\text{mean}\\textsubscript{std}$',
         'interval stds std': '$\\text{std}\\textsubscript{std}$',
         'interval ranges std': '$\\text{range}\\textsubscript{std}$',
-        'sqi coverage 03': '$C_{0{,}3}$',
-        'sqi coverage 04': '$C_{0{,}4}$',
-        'sqi coverage 05': '$C_{0{,}5}$'
+        'sqi coverage 03': '$C\\textsubscript{0{,}3}$',
+        'sqi coverage 04': '$C\\textsubscript{0{,}4}$',
+        'sqi coverage 05': '$C\\textsubscript{0{,}5}$'
     }
