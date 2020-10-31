@@ -1,0 +1,16 @@
+,params,rank_test_f1,mean_test_f1
+0,"{'scale_sqrt': 2, 'n_estimators': 100, 'min_samples_split': 10, 'min_samples_leaf': 2, 'max_features': 'log2', 'max_depth': 7}",7,0.5761155122922206
+1,"{'scale_sqrt': 4, 'n_estimators': 250, 'min_samples_split': 10, 'min_samples_leaf': 10, 'max_features': 'log2', 'max_depth': 3}",4,0.6125238620433717
+2,"{'scale_sqrt': 1, 'n_estimators': 300, 'min_samples_split': 2, 'min_samples_leaf': 4, 'max_features': 'log2', 'max_depth': 7}",11,0.40861571519214573
+3,"{'scale_sqrt': 2, 'n_estimators': 150, 'min_samples_split': 2, 'min_samples_leaf': 10, 'max_features': 'sqrt', 'max_depth': 5}",8,0.5579368264567268
+4,"{'scale_sqrt': 4, 'n_estimators': 100, 'min_samples_split': 2, 'min_samples_leaf': 4, 'max_features': 'sqrt', 'max_depth': 20}",1,0.6435632275009843
+5,"{'scale_sqrt': 4, 'n_estimators': 250, 'min_samples_split': 2, 'min_samples_leaf': 1, 'max_features': 'log2', 'max_depth': 30}",14,
+6,"{'scale_sqrt': 1, 'n_estimators': 100, 'min_samples_split': 2, 'min_samples_leaf': 1, 'max_features': 'log2', 'max_depth': 7}",12,0.40838935873371485
+7,"{'scale_sqrt': 1, 'n_estimators': 150, 'min_samples_split': 5, 'min_samples_leaf': 4, 'max_features': 'log2', 'max_depth': 3}",15,
+8,"{'scale_sqrt': 2, 'n_estimators': 200, 'min_samples_split': 2, 'min_samples_leaf': 4, 'max_features': 'log2', 'max_depth': 3}",9,0.5328687233149155
+9,"{'scale_sqrt': 2, 'n_estimators': 300, 'min_samples_split': 5, 'min_samples_leaf': 4, 'max_features': 'sqrt', 'max_depth': 20}",6,0.596523501842054
+10,"{'scale_sqrt': 1, 'n_estimators': 300, 'min_samples_split': 5, 'min_samples_leaf': 4, 'max_features': 'log2', 'max_depth': 20}",10,0.46244381313528
+11,"{'scale_sqrt': 2, 'n_estimators': 250, 'min_samples_split': 10, 'min_samples_leaf': 10, 'max_features': 'sqrt', 'max_depth': 30}",5,0.6014144287891895
+12,"{'scale_sqrt': 3, 'n_estimators': 100, 'min_samples_split': 2, 'min_samples_leaf': 1, 'max_features': 'sqrt', 'max_depth': 7}",2,0.6167242591685043
+13,"{'scale_sqrt': 1, 'n_estimators': 100, 'min_samples_split': 10, 'min_samples_leaf': 2, 'max_features': 'sqrt', 'max_depth': 7}",13,0.40732560461904205
+14,"{'scale_sqrt': 3, 'n_estimators': 300, 'min_samples_split': 2, 'min_samples_leaf': 2, 'max_features': 'sqrt', 'max_depth': 7}",3,0.6164720861523487
