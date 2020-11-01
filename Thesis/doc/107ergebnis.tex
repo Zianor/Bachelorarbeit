@@ -2,8 +2,21 @@
 
 \section{Zusammenfassung}
 
+Ziel dieser Arbeit war die Untersuchung von Möglichkeiten, die Signalqualität von ballistokardiographischen Signalen mittels Methoden maschinellen Lernens zu beurteilen. Besonderer Fokus lag dabei bei Messdaten von bettlägerigen Patient*innen. Hierzu wurden zunächst die Grundprinzipien des maschinellen Lernens vorgestellt und die Eigenschaften von ballistokardiographischen Signalen untersucht. Auf dieser Basis wurden Besonderheiten der Signalverarbeitungen von \ac{BKG}-Signalen herausgestellt und existierende Verfahren zur Beurteilung der Signalqualität vorgestellt.
+
+Die vorliegenden Messdaten wurden vorbereitet und ein geeignetes Verfahren zur Annotation entwickelt. Diese vorbereiteten Daten wurden anschließend genutzt, um die nachimplementierten, existierenden Verfahren zur Beurteilung der Signalqualität zu testen und zu evaluieren. Es zeigte sich, dass diese sich nur bedingt eignen, wenn die ein großer Teil des Signals von schlechter Qualität ist, wie es bei den untersuchten Daten der Fall ist. Also wurden Merkmale entwickelt, anhand derer die Signalqualität beurteilt werden kann.
+
+Zur Untersuchung dieser Merkmale wurden insgesamt vier Modelle maschinellen Lernens ausgewählt: Regression und Klassifikation jeweils mit \acl{RF}s und Gradient Boosted Trees. Diese Modelle sind robust und schnell lernend und eignen sich somit für eine Evaluation verschiedener Einflüsse wie beispielsweise die Merkmalsauswahl, die Länge der Segmente, die beurteilt werden sollen und der Schwellwert, der für die Klassifikation verwendet wird. Um die Modelle an Besonderheiten wie Lücken in den Daten anzupassen, wurden ein eigenes Modell entwickelt, das ein Modell maschinellen Lernens erweitert. Um Regressionsverfahren für eine Klassifikation nutzen zu können, wurde auch hierfür ein Modell entwickelt, dass die Vorhersagen des Regressionsmodell in eine binäre Klassifikation umwandelt und zusätzlich Wahrscheinlichkeiten zu den Klassifikationen liefern kann.
+
+Die Evaluierung der Modelle zeigte eine deutliche Verbesserung zu den existierenden Methoden zur Beurteilung der Signalqualität. Der Einfluss von Segmentlänge und Schwellwert der binären Annotation wurden gezeigt. Abschließend wurden die Modelle erfolgreich auf Daten einer anderen Aufnahmesituation, von schlafenden und gesunden Proband*innen, getestet.
 
 \section{Ausblick}
+
+Im Rahmen dieser Arbeit war es nicht Möglich, die Daten von Expert*innen annotieren zu lassen. Eine solche Annotation führt zu weniger Fehlern im zum Training verwendeten Datenset und kann so womöglich zu besseren Ergebnissen führen. Auch kann das entwickelte Merkmalsset noch um weitere Merkmale erweitert werden und unwichtigere Merkmale beispielsweise mit rekursiver Merkmalselimination verworfen werden.
+
+Aufgrund von begrenzter Zeit und Rechenleistung wurden die Hyperparameter für diese Arbeit nur eingeschränkt optimiert. Weiteres Hyperparameter-Tuning bietet Potenzial, die Ergebnisse weiter zu verbessern. Idealerweise wird hierfür ein eigene Metrik entwickelt, die erreichte Coverage und \ac{MAE} kombiniert bewertet, da diese beiden Werte die entscheidenden für die Bewertung der Ergebnisse sind.
+
+Auch könnte untersucht werden, ob eine Kombination von Modellen, Segmentlängen und Schwellwerten genutzt werden kann um zunächst eine gröbere Klassifikation vorzunehmen und diese anschließend zu verfeinern.
 
 
 

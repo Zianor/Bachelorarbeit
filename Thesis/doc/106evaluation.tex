@@ -366,5 +366,29 @@ Der direkte Vergleich der Verteilung von $E\textsubscript{HR}$ auf den als infor
 
  Bei der Bewertung muss jedoch auch beachtet werden, dass die Herzrate über die Berechnung des Medians der geschätzten Intervalllängen bestimmt wird, also dementsprechend mit steigender Segmentlänge auch robuster wird. Auch hier gilt aus diesem Grund, dass die Wahl der Segmentlänge von dem Anwendungsfall abhängt, tendenziell aber längere Segmente zu besseren Ergebnissen führen.
 
+\section{Test auf Daten von gesunden Personen}
 
+Neben den bisher betrachteten Daten der Patient*innen liegen außerdem die im Schlaf aufgenommenen Daten von 8 gesunden Personen vor. Da die Beurteilung der Signalqualität bei schlafenden, gesunden Personen bedeutend einfacher ist, wurden diese Daten bis jetzt nicht betrachtet. Abschließend werden diese genutzt, um die Performance der Modell für Daten mit anderen Aufnahmebedingungen zu Testen. Getestet werden 10-Sekunden lange Segmente mit dem Schwellwert $E\textsubscript{th} = 20$.
 
+Schon bei der Betrachtung der Daten fällt der Unterschied der Signalqualität insgesamt auf: Während bei den betrachteten Daten mit $E\textsubscript{th} = 20$ eine Coverage von 59,45\,\% durch die Annotation erreicht werden, liegt sie bei den Daten der gesunden Proband*innen bei 83,96\,\%. Auch liegt der durchschnittliche \ac{MAE} aller Daten bei den gesunden Personen bei 13,76\,\si{FE} im Vergleich zu 21,85\,\si{FE} bei tatsächlichen Patient*innen.
+
+Die Daten werden auf den trainierten Modellen ohne weitere Anpassungen getestet. Es zeigt sich, dass die Klassifikation auch auf unbekannten Daten mit anderen Aufnahmebedingungen funktioniert. Die Ergebnisse für die vier Modelle sind in Tabelle \ref{fig:res-healthy-data} abgebildet. Es zeigt sich erneut, dass die Regressionsmodelle eine höhere Coverage bei einem ebenfalls höheren \ac{MAE} erreichen. Während die Performance der Klassifikationsmodelle auch bei den unbekannten Daten sehr ähnlich ist, zeigt sich bei den Regressionsmodellen, dass das \ac{RF}-Modell bei der \ac{AUC}, dem F1-Score und der Accuracy etwas besser abschneidet. Allerdings ist auch der \ac{MAE} leicht höher - bei einer ebenfalls leicht höheren Coverage.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{l | l || c | c | c | c | c}
+									& Modell			& \ac{MAE} [FE]	& Coverage [\%]	& F1-Score	& AUC	& Accuracy	\\ \hline
+ 	\multicolumn{2}{l ||}{insgesamt}					& 13,76			& -				& - 		& -		\\
+ 	\multicolumn{2}{l ||}{annotiert}					& 4,34			& 83,96			& - 		& -		\\ \hline
+ 	\multirow{2}{*}{Klassifikation}
+ 									& \acs{RF} 		& 6,60			& 81,58			& 0,91		& 0,80	& 0,85	\\
+ 									& \acs{XGB}		& 6,60			& 81,58			& 0,90		& 0,80	& 0,85	\\\hline 
+ 	\multirow{2}{*}{Regression}
+ 									& \acs{RF}		& 7,58 			& 91,33			& 0,93		& 0,81	& 0,88	\\
+ 									& \acs{XGB}		& 7,34			& 88,95			& 0,92		& 0,77	& 0,87	\\\hline
+\end{tabular}
+\caption{Resultate der 4 Modelle auf im Schlaf aufgenommenen Daten gesunder Proband*innen}
+\label{fig:res-healthy-data}	
+\end{table}
+
+Die Modelle sind also in der Lage, auch die Signalqualität von Daten mit anderen Aufnahmebedingungen ohne weiteres Training zu beurteilen.
