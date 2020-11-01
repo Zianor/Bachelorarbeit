@@ -40,7 +40,7 @@ Des Weiteren zeigt sich, dass das reduzierte Merkmalsset entgegen der Erwartunge
  	\label{fig:rf-clf-all-importances}
 \end{figure}
 
-Bei den folgenden Untersuchungen wird aus diesem Grund das erweiterte reduzierte Merkmalsset verwendet. Die Ergebnisse der vier Modelle sind in Tabelle \ref{fig:final-results-comparison} abgebildet. Alle erzielen ähnliche Ergebnisse, wobei die Regressionsmodelle eine etwas höhere Coverage erreichen. Es gibt im Gegensatz zu den vorherigen Ergebnissen keine Ausreißer. Sowohl bei Regression als auch Klassifikation erreichen die \ac{XGB}-Modelle bei ähnlichem Fehler eine etwas höhere Coverage. Die \ac{AUC} zeigt, dass alle Modelle bei den gegebenen Daten in der Lage sind, informatives und nicht informatives Signal zu separieren.
+Bei den folgenden Untersuchungen wird aus diesem Grund das erweiterte reduzierte Merkmalsset verwendet. Die Ergebnisse der vier Modelle sind in Tabelle \ref{fig:final-results-comparison} abgebildet. Alle erzielen ähnliche Ergebnisse, wobei die Regressionsmodelle eine etwas höhere Coverage erreichen. Es gibt im Gegensatz zu den vorherigen Ergebnissen keine Ausreißer. Die \ac{AUC} zeigt, dass alle Modelle bei den gegebenen Daten in der Lage sind, informatives und nicht informatives Signal zu separieren.
 %\begin{multicols}{2}
 %\begin{itemize}
 %	\item Mittelwert
@@ -74,11 +74,11 @@ Bei den folgenden Untersuchungen wird aus diesem Grund das erweiterte reduzierte
  	\multicolumn{2}{l ||}{insgesamt}					& 21{,}85		& -				& - 		& -		\\
  	\multicolumn{2}{l ||}{annotiert}					& 3{,}28			& 43{,}21		& - 		& -		\\ \hline
  	\multirow{2}{*}{Klassifikation}
- 									& \acs{RF} 		& 11,97			& 36,51			& 0,61		& 0,75	\\
- 									& \acs{XGB}		& 12,44			& 41,99			& 0,64		& 0,74	\\\hline %TODO: update numbers
+ 									& \acs{RF} 		& 11,86			& 34,90			& 0,60		& 0,75	\\
+ 									& \acs{XGB}		& 12,44			& 41,99			& 0,63		& 0,75	\\\hline 
  	\multirow{2}{*}{Regression}
- 									& \acs{RF}		& 12,52			& 46,05			& 0,64		& 0,75	\\ %TODO: update numbers
- 									& \acs{XGB}		& 12,44			& 47,59			& 0,63		& 0,74	\\\hline %TODO: update numbers
+ 									& \acs{RF}		& 12,57 			& 46,36			& 0,64		& 0,75	\\
+ 									& \acs{XGB}		& 12,66			& 47,59			& 0,64		& 0,74	\\\hline
  	\end{tabular}	
 	\caption{Vergleich der aller Modelle mit finalem Merkmalsset}
 	\label{fig:final-results-comparison}
@@ -127,16 +127,16 @@ Bei der Betrachtung der Regressionsmodelle zeigt sich, dass es bei dem \ac{XGB}-
  	\centering
   	\begin{tabular}{l || c | c | c}
  											& insgesamt 		& \ac{RF}-Regressor & \ac{CLIE}-Intervallschätzer\\\hline
- 		$E\textsubscript{HR} < 5$\,\si{FE} 	&  32{,}61\,\% 	& 23,79\,\% 			& 18,32\,\%\\
- 		$E\textsubscript{HR} < 10$\,\si{FE} 	&  43{,}21\,\% 	& 28,67\,\% 			& 21,34\,\%\\
- 		$E\textsubscript{HR} < 15$\,\si{FE} 	&  51{,}64\,\% 	& 32,02\,\% 			& 23,35\,\%\\
- 		$E\textsubscript{HR} < 20$\,\si{FE} 	&  59{,}38\,\% 	& 34,86\,\% 			& 25,12\,\%\\
+ 		$E\textsubscript{HR} < 5$\,\si{FE} 	&  32{,}61\,\% 	& 23,93\,\% 			& 18,32\,\%\\
+ 		$E\textsubscript{HR} < 10$\,\si{FE} 	&  43{,}21\,\% 	& 28,80\,\% 			& 21,34\,\%\\
+ 		$E\textsubscript{HR} < 15$\,\si{FE} 	&  51{,}64\,\% 	& 32,17\,\% 			& 23,35\,\%\\
+ 		$E\textsubscript{HR} < 20$\,\si{FE} 	&  59{,}38\,\% 	& 35,03\,\% 			& 25,12\,\%\\
  	\end{tabular}
  	\caption[Coverage unter bestimmten Fehlern $E\textsubscript{HR}$ nach Klassifikation mittels \ac{RF}-Regressor]{Coverage unter bestimmten Fehlern $E\textsubscript{HR}$ nach Klassifikation mittels \ac{RF}-Regressor}
  	\label{fig:own-coverage-default}
  \end{table}
  
- Auch eine Untersuchung der Verteilung von $E\textsubscript{HR}$ auf den als informativ klassifizierten Segmenten zeigt im Verglich, dass der Anteil des Signals mit einem Fehler $E\textsubscript{HR} > 20\,\si{FE}$ stark gesenkt werden konnte. Auch liegt der durchschnittliche \ac{MAE} der falsch-negativen Segmente bei 4,33\,\si{FE}, was über dem Durchschnitt aller als informativ klassifizierten Segmente von 3,28\,\si{FE} liegt.
+ Auch eine Untersuchung der Verteilung von $E\textsubscript{HR}$ auf den als informativ klassifizierten Segmenten zeigt im Verglich, dass der Anteil des Signals mit einem Fehler $E\textsubscript{HR} > 20\,\si{FE}$ stark gesenkt werden konnte. Auch liegt der durchschnittliche \ac{MAE} der falsch-negativen Segmente bei 4,36\,\si{FE}, was über dem Durchschnitt aller als informativ klassifizierten Segmente von 3,28\,\si{FE} liegt.
  
  \begin{figure}[h]
  	\centering
@@ -158,21 +158,87 @@ Bei der Betrachtung der Regressionsmodelle zeigt sich, dass es bei dem \ac{XGB}-
 
 \section{Einfluss des Schwellwertes der Annotation}
 
-Nachdem die generelle Performance der Modelle untersucht wurde, wird nun der Einfluss des verwendeten Schwellwertes $E\textsubscript{th}$ der Annotation untersucht. %Aufgrund des Rechenaufwands wurden für diese Modelle die Hyperparameter nicht optimiert, weshalb die Ergebnisse nur relativ zueinander zu betrachten sind.
+Nachdem die generelle Performance der Modelle untersucht wurde, wird nun der Einfluss des verwendeten Schwellwertes $E\textsubscript{th}$ der Annotation untersucht. Dafür werden die vier Modelle jeweils für vier Schwellwerte $E\textsubscript{th}$ trainiert: $E\textsubscript{th} \in \{5, 10, 15, 20\}$.
+
+Die Ergebnisse der Klassifikationsmodelle sind in Tabelle \ref{fig:var-eth-clf} gezeigt. Für diese Modelle ergibt sich für niedrigere Schwellwerte $E\textsubscript{th}$ jeweils eine niedrigere Coverage und ein niedrigerer \ac{MAE}. Die Variation des \ac{MAE} beträgt zwischen $E\textsubscript{th}= 5\,\si{FE}$ und $E\textsubscript{th} = 20\,\si{FE}$ allerdings nur gut 2\,\si{FE} beim \ac{RF}-Klassifikator bzw. 2,5\,\si{FE} beim \ac{XGB}-Klassifikator. Die Coverage kann dabei um ca. 15\,\% für das \ac{RF}-Modell und um ca. 18\,\% für das \ac{XGB}-Modell erhöht werden. Wie wichtig die Genauigkeit der Herzratenschätzung im Vergleich zur Coverage ist, hängt vom Anwendungsfall ab, allerdings ist der Gewinn durch die deutlich erhöhte Coverage vermutlich in den meisten Fällen größer. Für alle Schwellwerte ist weiterhin eine Trennung der beiden Klassen möglich, wobei jeweils die Modelle mit $E\textsubscript{th}= 5\text{\,}\si{FE}$ die beste Trennung ermöglichen. Es kann also auch sinnvoll sein, lediglich den Schwellwert des Klassifikationsmodells anzupassen. Eine genauere Untersuchung der Auswirkungen durch eine solche Variation ist im Rahmen dieser Arbeit allerdings nicht möglich. In diesen Untersuchungen zeigt sich ebenfalls, dass der \ac{XGB}-Klassifikator tendenziell eine höhere Coverage mit höherem \ac{MAE} erreicht als das \ac{RF}-Modell.
+
+\begin{table}[H]
+	\begin{subfigure}{\textwidth}
+	\centering
+	\begin{tabular}{l || c | c | c | c | c}
+								& insgesamt	& $E\textsubscript{th}=5$	& $E\textsubscript{th}=10$	& $E\textsubscript{th}=15$	& $E\textsubscript{th}=20$	\\ \hline
+	Coverage annotiert [\%]		& -			& 32,61						& 43{,}21 					& 51,64						& 59,45\\
+ 	Coverage klassifiziert [\%]	& -			& 29,30						& 34,90 					& 42,46						& 53,78\\
+ 	\ac{MAE} [FE]				& 21{,}85	& 11,39						& 11,86						& 12,44						& 13,27\\
+ 	F1-Score 					& -			& 0,59						& 0,60						& 0,64						& 0,70\\
+ 	AUC 						& -			& 0,78						& 0,75						& 0,73						& 0,73\\
+ 	\end{tabular}	
+	\caption{\ac{RF}-Klassifikator}
+	\end{subfigure}
+	\begin{subfigure}{\textwidth}
+	\centering
+	\begin{tabular}{l || c | c | c | c | c}
+	\multicolumn{6}{l}{	}	\\
+								& insgesamt	& $E\textsubscript{th}=5$	& $E\textsubscript{th}=10$	& $E\textsubscript{th}=15$	& $E\textsubscript{th}=20$	\\ \hline
+	Coverage annotiert [\%]		& -			& 32,61						& 43{,}21 					& 51,64						& 59,45\\
+ 	Coverage klassifiziert [\%]	& -			& 31,51						& 41,99 					& 51,15						& 59,73\\
+ 	\ac{MAE} [FE]				& 21{,}85	& 11,39						& 12,44						& 13,23						& 13,86\\
+ 	F1-Score 					& -			& 0,59						& 0,63						& 0,67						& 0,73\\
+ 	AUC 						& -			& 0,77						& 0,75						& 0,73						& 0,73\\
+ 	\end{tabular}	
+	\caption{\ac{XGB}-Klassifikator}
+	\end{subfigure}
+	\caption{Variation des Schwellwerts $E\textsubscript{th}$ der Annotation bei den Klassifikationsmodellen}
+	\label{fig:var-eth-clf}
+\end{table}
+
+Betrachtet man die Coverage unter bestimmten Fehlern für $E\textsubscript{th}= 5\text{\,}\si{FE}$ und $E\textsubscript{th}= 20\text{\,}\si{FE}$ im Vergleich, wird deutlich, dass durch eine Erhöhung von $E\textsubscript{th}$ in der Annotation auch Segmente mit niedrigem Fehler deutlich zuverlässiger miterfasst werden. Der direkte Vergleich ist in Tabelle \ref{fig:xgb-clf-cov-eth} für den \ac{XGB}-Klassifikator gezeigt.
 
 \begin{table}[H]
 	\centering
-	\begin{tabular}{l || c | c | c | c }
-								& insgesamt	& $E\textsubscript{th}=5$	& $E\textsubscript{th}=10$	& $E\textsubscript{th}=15$	\\ \hline
-	Coverage annotiert [\%]		& -			& 43{,}21					& - 						& -		\\
- 	Coverage klassifiziert [\%]	& -			& 43{,}21					& - 						& -		\\
- 	\ac{MAE} [FE]				& 21{,}85	& -							& - 						& -		\\
- 	F1-Score 					& -			& 36,51						& 0,61						& 0,75	\\%TODO: update numbers
- 	AUC 						& -			& 41,99						& 0,64						& 0,74	\\%TODO: update numbers
- 	\end{tabular}	
-	\caption{Variation des Schwellwerts $E\textsubscript{th}$ der Annotation beim \ac{RF}-Klassifikator}
-	\label{fig:rf-clf-e-th}
+  	\begin{tabular}{l || c | c | c}
+ 											& insgesamt 		& $E\textsubscript{th}= 5\text{\,}\si{FE}$ & $E\textsubscript{th}= 20\text{\,}\si{FE}$\\\hline
+ 		$E\textsubscript{HR} < 5$\,\si{FE} 	&  32{,}61\,\% 	& 18,85\,\% 			& 26,06\,\%\\
+ 		$E\textsubscript{HR} < 10$\,\si{FE} 	&  43{,}21\,\% 	& 21,70\,\% 			& 33,22\,\%\\
+ 		$E\textsubscript{HR} < 15$\,\si{FE} 	&  51{,}64\,\% 	& 23,33\,\% 			& 38,65\,\%\\
+ 		$E\textsubscript{HR} < 20$\,\si{FE} 	&  59{,}38\,\% 	& 24,65\,\% 			& 43,35\,\%\\
+ 	\end{tabular}
+ 	\caption{Coverage unter bestimmten Fehlern $E\textsubscript{HR}$ nach Klassifikation mittels \ac{XGB}-Klassifikator für verschiedene Schwellwerte der Annotation}
+ 	\label{fig:xgb-clf-cov-eth}
 \end{table}
+
+Bei den Regressionsmodellen ist der Einfluss der Variation von $E\textsubscript{th}$ deutlich stärker, wie in Tabelle\,\ref{fig:var-eth-regr} zu sehen ist. Hier variiert der \ac{MAE} um ca. 5,5\,\si{FE} für das \ac{RF}-Modell und um ca. 4,5\,\si{FE} für den \ac{XGB}-Regressor. Die Coverage zeigt eine stärkere Variation von knapp 60\,\% bzw. für das \ac{XGB}-Modell knapp 50\,\%. Auch sind die erreichten durchschnittlichen Fehler für $E\textsubscript{th}= 20\text{\,}\si{FE}$ 1 bis 2\,\si{FE} höher als bei den Klassifikationsmodellen und für $E\textsubscript{th}= 5\text{\,}\si{FE}$ 1 bis 2\,\si{FE} niedriger. Die \ac{AUC} dagegen verhält sich relativ ähnlich.
+
+\begin{table}[H]
+	\begin{subfigure}{\textwidth}
+	\centering
+	\begin{tabular}{l || c | c | c | c | c}
+								& insgesamt	& $E\textsubscript{th}=5$	& $E\textsubscript{th}=10$	& $E\textsubscript{th}=15$	& $E\textsubscript{th}=20$	\\ \hline
+	Coverage annotiert [\%]		& -			& 32,61						& 43{,}21 					& 51,64						& 59,45\\
+ 	Coverage klassifiziert [\%]	& -			& 20,19						& 46,36 					& 71,16						& 79,47\\
+ 	\ac{MAE} [FE]				& 21{,}85	& 9,83						& 12,57						& 14,61						& 15,39\\
+ 	F1-Score 					& -			& 0,52						& 0,64						& 0,72						& 0,78\\
+ 	AUC 						& -			& 0,77						& 0,75						& 0,74						& 0,73\\
+ 	\end{tabular}	
+	\caption{\ac{RF}-Regressor}
+	\end{subfigure}
+ 	\begin{subfigure}{\textwidth}
+	\centering
+	\begin{tabular}{l || c | c | c | c | c}
+	\multicolumn{6}{l}{	}	\\
+								& insgesamt	& $E\textsubscript{th}=5$	& $E\textsubscript{th}=10$	& $E\textsubscript{th}=15$	& $E\textsubscript{th}=20$	\\ \hline
+	Coverage annotiert [\%]		& -			& 32,61						& 43{,}21 					& 51,64						& 59,45\\
+ 	Coverage klassifiziert [\%]	& -			& 26,76						& 47,59 					& 63,74						& 74,18\\
+ 	\ac{MAE} [FE]				& 21{,}85	& 10,52						& 12,66						& 14,04						& 14,94\\
+ 	F1-Score 					& -			& 0,55						& 0,64						& 0,71						& 0,77\\
+ 	AUC 						& -			& 0,75						& 0,74						& 0,73						& 0,73\\
+ 	\end{tabular}	
+	\caption{\ac{XGB}-Regressor}
+	\end{subfigure}
+	\caption{Variation des Schwellwerts $E\textsubscript{th}$ der Annotation bei den Regressionsmodellen}
+	\label{fig:var-eth-regr}
+\end{table}
+
 
 
 \section{Einfluss der Segmentlänge}
