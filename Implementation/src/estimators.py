@@ -731,7 +731,7 @@ class OwnEstimatorRegression(OwnEstimator):
     def __init__(self, clf, path, segment_length=10, overlap_amount=0.9, hr_threshold=10, data_folder='data_patients',
                  feature_selection=None, hyperparameter=None):
         if clf is not None:
-            clf = RegressionClassifier(model=clf, threshold=10)
+            clf = RegressionClassifier(model=clf, threshold=hr_threshold)
         super(OwnEstimatorRegression, self).__init__(clf, path, segment_length=segment_length,
                                                      overlap_amount=overlap_amount, hr_threshold=hr_threshold,
                                                      data_folder=data_folder, feature_selection=feature_selection,
