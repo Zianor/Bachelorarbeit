@@ -207,7 +207,7 @@ Betrachtet man die Coverage unter bestimmten Fehlern für $E\textsubscript{th}= 
  	\label{fig:xgb-clf-cov-eth}
 \end{table}
 
-Bei den Regressionsmodellen ist der Einfluss der Variation von $E\textsubscript{th}$ deutlich stärker, wie in Tabelle\,\ref{fig:var-eth-regr} zu sehen ist. Hier variiert der \ac{MAE} um ca. 5,5\,\si{FE} für das \ac{RF}-Modell und um ca. 4,5\,\si{FE} für den \ac{XGB}-Regressor. Die Coverage zeigt eine stärkere Variation von knapp 60\,\% bzw. für das \ac{XGB}-Modell knapp 50\,\%. Auch sind die erreichten durchschnittlichen Fehler für $E\textsubscript{th}= 20\text{\,}\si{FE}$ 1 bis 2\,\si{FE} höher als bei den Klassifikationsmodellen und für $E\textsubscript{th}= 5\text{\,}\si{FE}$ 1 bis 2\,\si{FE} niedriger. Die \ac{AUC} dagegen verhält sich relativ ähnlich.
+Bei den Regressionsmodellen ist der Einfluss der Variation von $E\textsubscript{th}$ deutlich stärker, wie in Tabelle\,\ref{fig:var-eth-regr} zu sehen ist. Hier variiert der \ac{MAE} um ca. 5,5\,\si{FE} für das \ac{RF}-Modell und um ca. 4,5\,\si{FE} für den \ac{XGB}-Regressor. Die Coverage zeigt eine stärkere Variation von knapp 60\,\% bzw. für das \ac{XGB}-Modell knapp 50\,\%. Auch sind die erreichten durchschnittlichen Fehler für $E\textsubscript{th}= 20\text{\,}\si{FE}$ 1 bis 2\,\si{FE} höher als bei den Klassifikationsmodellen und für $E\textsubscript{th}= 5\text{\,}\si{FE}$ jeweils 1 bis 2\,\si{FE} niedriger. Die \ac{AUC} dagegen verhält sich relativ ähnlich zu den Klassifikationsmodellen.
 
 \begin{table}[H]
 	\begin{subfigure}{\textwidth}
@@ -239,9 +239,132 @@ Bei den Regressionsmodellen ist der Einfluss der Variation von $E\textsubscript{
 	\label{fig:var-eth-regr}
 \end{table}
 
+Auch hier wird die Coverage unter bestimmten Fehlern $E\textsubscript{HR}$ untersucht. Die Ergebnisse der Regressionsmodell für niedrige $E\textsubscript{th}$ weisen eine deutlich geringere Coverage auf, aber für $E\textsubscript{th} = 20$ wird nahezu alles informative Signal erkannt. Vor allem fällt auf, dass bei $E\textsubscript{th}= 5\text{\,}\si{FE}$ sehr viel Signal mit nur geringem Fehler nicht erkannt wird. Der Vergleich zwischen $E\textsubscript{th}= 5\text{\,}\si{FE}$ und $E\textsubscript{th}= 5\text{\,}\si{FE}$ beim \ac{RF}-Regressor ist in Tabelle\,\ref{fig:rf-regr-cov-eth} gezeigt.
 
+\begin{table}[H]
+	\centering
+  	\begin{tabular}{l || c | c | c}
+ 											& insgesamt 		& $E\textsubscript{th}= 5\text{\,}\si{FE}$ & $E\textsubscript{th}= 20\text{\,}\si{FE}$\\\hline
+ 		$E\textsubscript{HR} < 5$\,\si{FE} 	&  32{,}61\,\% 	& 13,75\,\% 			& 31,14\,\%\\
+ 		$E\textsubscript{HR} < 10$\,\si{FE} 	&  43{,}21\,\% 	& 15,05\,\% 			& 40,48\,\%\\
+ 		$E\textsubscript{HR} < 15$\,\si{FE} 	&  51{,}64\,\% 	& 15,75\,\% 			& 47,78\,\%\\
+ 		$E\textsubscript{HR} < 20$\,\si{FE} 	&  59{,}38\,\% 	& 16,36\,\% 			& 54,37\,\%\\
+ 	\end{tabular}
+ 	\caption{Coverage unter bestimmten Fehlern $E\textsubscript{HR}$ nach Klassifikation mittels \ac{RF}-Regressor für verschiedene Schwellwerte der Annotation}
+ 	\label{fig:rf-regr-cov-eth}
+\end{table}
+
+Die Untersuchungen zeigen, dass die Wahl von $E\textsubscript{th}$ einen großen Einfluss vor allem auf die erreichte Coverage der Klassifizierung hast. Auch hier muss abgewogen werden, ob hohe Genauigkeit oder hohe Coverage wichtiger sind, allerdings ist der Gewinn der Coverage durch die Wahl eines höheren Schwellwertes $E\textsubscript{th}$ in den meisten Fällen vermutlich größer.
 
 \section{Einfluss der Segmentlänge}
+
+Neben dem Einfluss des Schwellwertes der Annotation $E\textsubscript{th}$ wird auch der Einfluss der verwendeten Segmentlänge $s$ untersucht. Für diese Untersuchung wird aufgrund der Ergebnisse der vorherigen Untersuchungen $E\textsubscript{th}=20$ gewählt. Untersuchte Segmentlänge sind 5, 10, 20 und 30 Sekunden.
+
+Bei den Klassifikationsmodellen zeigt sich deutlich, dass mit steigender Segmentlänge die Coverage höher und der \ac{MAE} niedriger wird, siehe Tabelle\,\ref{fig:var-s-clf}. Es muss zusätzlich beachtet werden, dass der \ac{MAE} über die Segmente insgesamt mit steigender Segmentlänge ebenfalls sinkt, die Verbesserung also eventuell darin begründet ist. Auch der F1-Score steigt mit der Segmentlänge; die \ac{AUC} dagegen wird etwas niedriger. Bei dem \ac{RF}-Modell sind die Veränderungen in \ac{MAE} und Coverage etwas größer als bei dem \ac{XGB}-Klassifikator. Alles in allem führen größere Segmente bei den Klassifikationsmodellen zu besseren Ergebnissen bezüglich Coverage und \ac{MAE}, allerdings lassen sich die beiden Klassen etwas schlechter voneinander trennen. 
+
+\begin{table}[H]
+	\begin{subfigure}{\textwidth}
+	\centering
+	\begin{tabular}{l || c | c | c | c }
+								& $s = 5$	& $s=10$		& $s=20$		& $s=30$	\\ \hline
+	Coverage annotiert [\%]		& 39,30		& 43,21	 	& 45,47		& 45,87\\
+	\ac{MAE} insgesamt [FE]		& 25,96		& 21,85		& 19,99		& 19,31\\\hline
+ 	Coverage klassifiziert [\%]	& 45,94		& 53,78 		& 60,93		& 62,01\\
+ 	\ac{MAE} klassifiziert [FE]	& 14,20		& 13,27		& 13,03		& 12,68\\
+ 	F1-Score 					& 0,62		& 0,65		& 0,66		& 0,67\\
+ 	AUC 						& 0,75		& 0,74		& 0,73		& 0,73\\
+ 	\end{tabular}	
+	\caption{\ac{RF}-Klassifikator}
+	\end{subfigure}
+	\begin{subfigure}{\textwidth}
+	\centering
+	\begin{tabular}{l || c | c | c | c }
+	\multicolumn{5}{l}{	}	\\
+								& $s = 5$	& $s=10$		& $s=20$		& $s=30$	\\ \hline
+								
+	Coverage annotiert [\%]		& 39,30		& 43,21	 	& 45,47		& 45,87\\
+	\ac{MAE} insgesamt [FE]		& 25,96		& 21,85		& 19,99		& 19,31\\\hline
+ 	Coverage klassifiziert [\%]	& 54,18		& 59,73 		& 64,81		& 67,00\\
+ 	\ac{MAE} klassifiziert [FE]	& 14,20		& 13,86		& 13,23		& 13,12\\
+ 	F1-Score 					& 0,61		& 0,65		& 0,66		& 0,67\\
+ 	AUC 						& 0,73		& 0,73		& 0,72		& 0,72\\
+ 	\end{tabular}		
+	\caption{\ac{XGB}-Klassifikator}
+	\end{subfigure}
+	\caption{Variation des Segmentlänge $s$ bei den Klassifikationsmodellen}
+	\label{fig:var-s-clf}
+\end{table}
+
+Betrachtet man die Coverage aufgeschlüsselt nach bestimmten Fehlern $E\textsubscript{HR}$, zeigt sich, dass der Fehler wie schon beschrieben bei längeren Segmenten niedriger ist, aber auch, dass die Klassifikation bei längeren Segmenten näher an der Annotation ist. Für den \ac{RF}-Klassifikator ist die Coverage für die Segmentlängen $s=5$ und $s=30$ in Tabelle\,\ref{fig:rf-clf-cov-s} aufgeschlüsselt.
+
+\begin{table}[H]
+	\centering
+  	\begin{tabular}{l || c | c || c | c}
+  											& \multicolumn{2}{c ||}{$s=5$}	& \multicolumn{2}{c}{$s=30$}\\
+ 											& insgesamt 		& klassifiziert & insgesamt		& klassifiziert\\\hline
+ 		$E\textsubscript{HR} < 5$\,\si{FE} 	&  29,88\,\% 	& 21,72\,\% 		& 33,33\,\%		& 27,45\,\%\\
+ 		$E\textsubscript{HR} < 10$\,\si{FE} 	&  39,29\,\% 	& 26,36\,\% 		& 45,86\,\%		& 36,16\,\%\\
+ 		$E\textsubscript{HR} < 15$\,\si{FE} 	&  47,38\,\% 	& 30,07\,\% 		& 54,97\,\%		& 42,23\,\%\\
+ 		$E\textsubscript{HR} < 20$\,\si{FE} 	&  55,17\,\% 	& 33,48\,\% 		& 62,85\,\%		& 47,11\,\%\\
+ 	\end{tabular}
+ 	\caption{Coverage unter bestimmten Fehlern $E\textsubscript{HR}$ nach Klassifikation mittels \ac{RF}-Klassifikator für verschiedene Segmentlängen s}
+ 	\label{fig:rf-clf-cov-s}
+\end{table}
+
+Bei den Regressionsmodellen ist, wie in Tabelle\,\ref{fig:var-s-regr} gezeigt, ähnliches zu beobachten. Hier ist der Effekt auf den \ac{MAE} etwas stärker als bei den Klassifikationsmodellen; bei beiden Modellen beträgt die Veränderung über 2\,\si{FE}. Auch hier ist er beim \ac{RF}-Modell etwas stärker. Die Veränderung der Coverage ist beim \ac{RF}-Regressor dagegen nur minimal; zwischen $s=5$ und $s=30$ beträgt der Unterschied nur knapp 1,5\,\%. Auch beim \ac{XGB}-Modell ist die Veränderung der Coverage weniger stark, als bei den Klassifikationsmodellen, aber zumindest bei ca. 8\,\%.
+
+
+\begin{table}[H]
+	\begin{subfigure}{\textwidth}
+	\centering
+	\begin{tabular}{l || c | c | c | c }
+								& $s = 5$	& $s=10$		& $s=20$		& $s=30$	\\ \hline
+	Coverage annotiert [\%]		& 39,30		& 43,21	 	& 45,47		& 45,87\\
+	\ac{MAE} insgesamt [FE]		& 25,96		& 21,85		& 19,99		& 19,31\\\hline
+ 	Coverage klassifiziert [\%]	& 78,93		& 79,47 		& 80,15		& 80,31\\
+ 	\ac{MAE} klassifiziert [FE]	& 17,62		& 15,39		& 14,35		& 14,01\\
+ 	F1-Score 					& 0,62		& 0,66		& 0,68		& 0,68\\
+ 	AUC 						& 0,76		& 0,75		& 0,74		& 0,73\\
+ 	\end{tabular}		
+	\caption{\ac{RF}-Regressor}
+	\end{subfigure}
+	\begin{subfigure}{\textwidth}
+	\centering
+	\begin{tabular}{l || c | c | c | c } %TODO
+	\multicolumn{5}{l}{	}	\\
+								& $s = 5$	& $s=10$		& $s=20$		& $s=30$	\\ \hline
+	Coverage annotiert [\%]		& 39,30		& 43,21	 	& 45,47		& 45,87\\
+	\ac{MAE} insgesamt [FE]		& 25,96		& 21,85		& 19,99		& 19,31\\\hline
+ 	Coverage klassifiziert [\%]	& 69,40		& 74,18 		& 76,69		& 77,14\\
+ 	\ac{MAE} klassifiziert [FE]	& 16,34		& 14,94		& 14,17		& 13,96\\
+ 	F1-Score 					& 0,63		& 0,66		& 0,68		& 0,68\\
+ 	AUC 						& 0,74		& 0,74		& 0,72		& 0,71\\
+ 	\end{tabular}
+	\caption{\ac{XGB}-Regressor}
+	\end{subfigure}
+	\caption{Variation des Segmentlänge $s$ bei den Regressionsmodellen}
+	\label{fig:var-s-regr}
+\end{table}
+
+Der direkte Vergleich der Verteilung von $E\textsubscript{HR}$ auf den als informativ klassifizierten Segmenten zeigt deutlich, dass bei $s=30$ ein deutlich größerer Teil des als informativ klassifizierten Signals einen kleinen Fehler $E\textsubscript{HR}$ aufweist. Bei $s=5$ dagegen ist der Anteil des Signals mit $E\textsubscript{HR} > 20$ ähnlich groß wie der mit $E\textsubscript{HR} < 5$.
+
+ \begin{figure}[H]
+ 	\centering
+		\begin{subfigure}{.45\textwidth}
+			\centering
+ 			\includegraphics[scale=0.7]{pic/rf-regr-s5-h20-positives.pdf}
+ 			\caption{$s=5$}
+ 		\end{subfigure}
+    	\begin{subfigure}{.45\textwidth}
+    		\centering
+ 			\includegraphics[scale=0.7]{pic/rf-regr-s30-h20-positives.pdf}
+ 			\caption{$s=30$}
+ 		\end{subfigure}
+ 	\caption{Verteilung von $E\textsubscript{HR}$ bei den vom \ac{RF}-Regressor als informativ klassifizierten Segmenten mit verschiedenen Segmentlängen $s$}
+ 	\label{fig:rf-regr-var-s-positives}
+ \end{figure}
+
+ Bei der Bewertung muss jedoch auch beachtet werden, dass die Herzrate über die Berechnung des Medians der geschätzten Intervalllängen wird, also dementsprechend mit steigender Segmentlänge auch robuster wird. Auch hier gilt aus diesem Grund, dass die Wahl der Segmentlänge von dem Anwendungsfall abhängt, tendenziell aber längere Segmente zu besseren Ergebnissen führen.
 
 
 
