@@ -250,8 +250,8 @@ class DataSetPino(DataSet):
 
 class DataSetOwn(DataSet):
 
-    def __init__(self, segment_length=10, overlap_amount=0.9, hr_threshold=10):
-        super(DataSetOwn, self).__init__(segment_length, overlap_amount, hr_threshold)
+    def __init__(self, segment_length=10, overlap_amount=0.9, hr_threshold=10, data_folder='data_patients'):
+        super(DataSetOwn, self).__init__(segment_length, overlap_amount, hr_threshold, data_folder=data_folder)
 
     def _get_path(self):
         return utils.get_own_features_csv_path(self.data_folder, self.segment_length, self.overlap_amount)
