@@ -1,0 +1,1 @@
+{"subsample":0.6,"reg_lambda":0.001,"reg_alpha":0.0001,"n_estimators":200,"min_child_weight":4,"max_depth":7,"learning_rate":0.01,"gamma":5}
