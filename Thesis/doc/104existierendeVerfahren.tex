@@ -79,7 +79,7 @@ Bei einer ersten Betrachtung von \ac{MAE} in \si{FE}, Coverage und Accuracy wird
  			\includegraphics[scale=0.7]{pic/brueser03-positives.pdf}
  			\caption[$q_{th}=0.3$]{$q_{th}=0.3$}
  		\end{subfigure}
- 	\caption[Verteilung von $E\textsubscript{HR}$ bei den als informativ klassifizierten Segmenten]{Verteilung von $E\textsubscript{HR}$ bei den als informativ klassifizierten Segmenten}
+ 	\caption[Verteilung von $E\textsubscript{HR}$ bei den als informativ klassifizierten Segmenten durch Betrachtung der Ähnlichkeit der \ac{CLIE}-Intervallschätzer]{Verteilung von $E\textsubscript{HR}$ bei den als informativ klassifizierten Segmenten}
  	\label{fig:brueser-positives}
  \end{figure}
  
@@ -94,7 +94,7 @@ Bei einer ersten Betrachtung von \ac{MAE} in \si{FE}, Coverage und Accuracy wird
  		$E\textsubscript{HR} < 15$\,\si{FE} 	&  51{,}64\,\% 	& 23,35\,\% 					& 9,22\,\%	\\
  		$E\textsubscript{HR} < 20$\,\si{FE} 	&  59{,}38\,\% 	& 25,12\,\% 					& 9,47\,\%\\
  	\end{tabular}
- 	\caption[Coverage unter bestimmten Fehlern $E\textsubscript{HR}$ vor und nach Klassifikation]{Coverage unter bestimmten Fehlern $E\textsubscript{HR}$ vor und nach Klassifikation}
+ 	\caption[Coverage unter bestimmten Fehlern $E\textsubscript{HR}$ vor und nach Klassifikation durch Betrachtung der Ähnlichkeit der \ac{CLIE}-Intervallschätzer]{Coverage unter bestimmten Fehlern $E\textsubscript{HR}$ vor und nach Klassifikation}
  	\label{fig:brueser-coverage}
  \end{table}
  
@@ -143,7 +143,7 @@ Bei einer ähnlich hohen, beziehungsweise höheren Coverage wie die der Annotati
  			\includegraphics[scale=0.7]{pic/mlp-statistical-positives.pdf}
  			\caption[MLP]{MLP}
  		\end{subfigure}
- 	\caption[Verteilung von $E\textsubscript{HR}$ bei den als informativ klassifizierten Segmenten]{Verteilung von $E\textsubscript{HR}$ bei den als informativ klassifizierten Segmenten}
+ 	\caption[Verteilung von $E\textsubscript{HR}$ bei den als informativ klassifizierten Segmenten nach Klassifikation mittels statistischen Merkmalen]{Verteilung von $E\textsubscript{HR}$ bei den als informativ klassifizierten Segmenten}
  	\label{fig:ml-statistical-positives}
  \end{figure}
  
@@ -158,7 +158,7 @@ Bei einer ähnlich hohen, beziehungsweise höheren Coverage wie die der Annotati
  		$E\textsubscript{HR} < 15$\,\si{FE} 	&  51{,}66\,\% 	& 34,66\,\% 	& 24,34\,\%	\\
  		$E\textsubscript{HR} < 20$\,\si{FE} 	&  59{,}40\,\% 	& 38,52\,\% 	& 27,45\,\%\\
  	\end{tabular}
- 	\caption[Coverage unter bestimmten Fehlern $E\textsubscript{HR}$ vor und nach Klassifikation]{Coverage unter bestimmten Fehlern $E\textsubscript{HR}$ vor und nach Klassifikation}
+ 	\caption[Coverage unter bestimmten Fehlern $E\textsubscript{HR}$ vor und nach Klassifikation mittels statistischen Merkmalen]{Coverage unter bestimmten Fehlern $E\textsubscript{HR}$ vor und nach Klassifikation}
  	\label{fig:ml-statistical-coverage}
  \end{table}
  
@@ -182,7 +182,7 @@ Weiteren Einblick ermöglicht die Analyse des \ac{RF}, da bei diesem ermittelt w
 \begin{figure}[H]
 	\centering
 	\includegraphics[scale=0.95]{pic/rf-cl-statistical.pdf}
-	\caption{Wichtigkeit der Merkmale für den \ac{RF}-Klassifikator}
+	\caption{Wichtigkeit der Merkmale für den \ac{RF}-Klassifikator mit statistischen Merkmalen}
 	\label{fig:rf-statistical-importances}
 \end{figure}
 
@@ -202,7 +202,7 @@ Da eine hohe Korrelation zwischen einzelnen Merkmalen, wie sie auch bei den stat
 \begin{figure}[H]
 	\centering
 	\includegraphics[scale=0.85]{pic/rf-reduced-statistical.pdf}
-	\caption{Wichtigkeit der Merkmale für den \ac{RF}-Klassifikator mit reduzierter Merkmalszahl}
+	\caption{Wichtigkeit der Merkmale für den \ac{RF}-Klassifikator mit reduziertem Merkmalsset statistischer Merkmale}
 	\label{fig:rf-statistical-reduced}
 \end{figure}
 
@@ -222,7 +222,7 @@ Die Ergebnisse dieses \acl{RF} mit reduzierter Merkmalsanzahl können mit dem in
  		\makecell[l]{Accuracy\\(Kreuzvalidierung\\Trainingsset)}	& -					& 0{,}52			& 0,51\\\hline
  		AUC														& -					& 0,59				& 0,50
  	\end{tabular}
- 	\caption{Random Forest mit reduzierter Merkmalszahl im Vergleich zu allen 13 Merkmalen}
+ 	\caption{Random Forest mit reduzierter Merkmalszahl im Vergleich zu allen 13 statistischen Merkmalen}
  	\label{fig:ml-statistical-reduced-comparison}
  \end{table}
 
