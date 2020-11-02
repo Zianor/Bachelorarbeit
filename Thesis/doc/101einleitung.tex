@@ -4,7 +4,7 @@
 
 Der derzeitige demographische Wandel stellt das Gesundheitssystem vor eine große Herausforderung: Es gibt immer mehr Patient*innen, die im Alter überwacht und versorgt werden müssen. Eine kontinuierliche autonome Überwachung von Vitalparametern im Krankenhaus oder auch Zuhause erlaubt es, Erkrankungen frühzeitig zu erkennen und zu beobachten, ohne dass große Personalkapazitäten vonnöten sind.
 
-Für diesen Anwendungszweck eignen sich vor allem Messmethoden, die die Patient*innen im Alltag nicht einschränken und wenig invasiv sind. Im Englischen wird dies mit dem Begriff \textit{unobtrusive} bezeichnet. Da es keine zufriedenstellende deutsche Entsprechung gibt, wird dieser im Folgenden nicht übersetzt. Solche \textit{unobtrusive} Messmethoden beinhalten meist keine Notwendigkeit für direkten Körper- oder Hautkontakt, liefern aber Information über Atmung und Herzschlag. Die Herausforderung bei einem so ermitteltem Signal besteht in der Signalverarbeitung, da Messungenauigkeiten und Alltagsbewegungen zu Störungen im Signal führen. Nicht informatives, also nicht für die Verarbeitung geeignetes Signal muss aber zwingend identifiziert werden, da die Ergebnisse stark verfälscht würden.
+Für diesen Anwendungszweck eignen sich vor allem Messmethoden, die die Patient*innen im Alltag nicht einschränken und wenig invasiv sind. Im Englischen wird dies mit dem Begriff \textit{unobtrusive} bezeichnet. Da es keine zufriedenstellende deutsche Entsprechung gibt, wird dieser im Folgenden nicht übersetzt. Solche \textit{unobtrusive} Messmethoden benötigen meist keinen direkten Körper- oder Hautkontakt, liefern aber Information über Atmung und Herzschlag. Die Herausforderung bei einem so ermitteltem Signal besteht in der Signalverarbeitung, da Messungenauigkeiten und Alltagsbewegungen zu Störungen im Signal führen. Nicht informatives, also nicht für die Verarbeitung geeignetes Signal muss aber zwingend identifiziert werden, da die Ergebnisse stark verfälscht würden.
 
 Eine solche \textit{unobtrusive} Messmethode ist die \acf{BKG}. Sensoren lassen sich beispielsweise in Betten und Stühlen implementieren. Aufgezeichnet werden Aktivitäten des Herzens und der Atmung. Die Signalmorphologie variiert jedoch sowohl zwischen den Patient*innen als auch innerhalb %TODO: Alternative zu "innerhalb", bei?
 einer Person sehr stark, wodurch die automatische Beurteilung der Signalqualität erschwert wird. Um eine aussagekräftige Signalverarbeitung zu ermöglichen, ist dies jedoch essentiell. Besonders bei in Betten aufgenommenem Signal ist die Variation des Signals in Kombination mit Artefakten durch Körperbewegungen oder ähnliches problematisch.  
@@ -12,9 +12,9 @@ einer Person sehr stark, wodurch die automatische Beurteilung der Signalqualitä
 
 \section{Ziel der Arbeit}
 
-Das Ziel dieser Arbeit ist es, Möglichkeiten der Beurteilung der Signalqualität von \ac{BKG}-Signalen mittels maschinellen Lernens zu untersuchen. Im besonderen Fokus liegen dabei Langzeitaufnahmen, sowohl nachts als auch tagsüber, von bettlägerigen Patient*innen, da diese sich in der Vergangenheit als besonders anfällig für geringe Signalqualität gezeigt haben.
+Das Ziel dieser Arbeit ist es, Möglichkeiten zur Beurteilung der Signalqualität von \ac{BKG}-Signalen mittels maschinellen Lernens zu untersuchen. Im besonderen Fokus liegen dabei Langzeitaufnahmen, sowohl nachts als auch tagsüber, von bettlägerigen Patient*innen, da diese sich in der Vergangenheit als besonders anfällig für geringe Signalqualität gezeigt haben.\footcite{HoogAntink2020}
 
-Dafür werden zunächst die vorliegenden Daten aufbereitet und existierende Verfahren der Artefakterkennung für diese getestet und bewertet. Anschließend wird das Signal auf mögliche Merkmale untersucht, die Aussagen über die Signalqualität ermöglichen. Anhand dieses Wissens werden Modelle des maschinellen Lernens ausgewählt und getestet. Auch wird untersucht, welchen Einfluss Annotation und Eingabeform auf das Ergebnis haben.
+Dafür werden zunächst die vorliegenden Daten aufbereitet und existierende Verfahren der Artefakterkennung für diese getestet und bewertet. Anschließend wird das Signal auf mögliche Merkmale untersucht und entwickelt, die Aussagen über die Signalqualität ermöglichen. Anhand dieses Wissens werden Modelle des maschinellen Lernens ausgewählt und getestet. Auch wird untersucht, welchen Einfluss Annotation und Eingabeform auf das Ergebnis haben.
 
 Langfristig soll ermöglicht werden, \acf{BKG} im medizinischen Alltag auch in unkontrollierten Umgebungen anzuwenden. Ziel dieser Arbeit ist es, für diesen Anwendungszweck eine erste Möglichkeit zur Beurteilung der Signalqualität zu bieten.% TODO: sinnvoller schreiben
 
@@ -26,8 +26,8 @@ In \textbf{Kapitel \ref{signalverarbeitung}} wird das Thema der Verarbeitung bal
 
 Anschließend werden in \textbf{Kapitel \ref{analyse}} die vorgestellten existierenden Verfahren mit den vorliegenden Messdaten getestet, evaluiert und eine Analyse der Daten durchgeführt.
 
-Aufbauend dazu werden in \textbf{Kapitel \ref{synthese}} weitere Merkmale konstruiert, untersucht und reduziert und eine Modellauswahl und Basis für den Vergleich verschiedener Modelle gebildet. %TODO: Modellauswahl wird nicht gebildet
+Aufbauend darauf werden in \textbf{Kapitel \ref{synthese}} weitere Merkmale konstruiert, untersucht und reduziert und eine Modellauswahl und Basis für den Vergleich verschiedener Modelle gebildet. %TODO: Modellauswahl wird nicht gebildet
 
-In \textbf{Kapitel \ref{evaluation}} werden die Modelle verglichen und evaluiert. Anhand der trainierten Modell werden die Merkmale erneut betrachtet und der Einfluss der Segmentlänge und des Schwellwertes der Annotation untersucht.
+In \textbf{Kapitel \ref{evaluation}} werden die Modelle verglichen und evaluiert. Anhand der trainierten Modelle werden die Merkmale erneut betrachtet und der Einfluss der Segmentlänge und des Schwellwertes der Annotation untersucht.
 
 Die Ergebnisse der Arbeit werden in \textbf{Kapitel \ref{zusammenfassung}} zusammengefasst und ein Ausblick gegeben, wie darauf aufgebaut werden kann.

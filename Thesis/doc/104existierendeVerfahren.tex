@@ -16,7 +16,7 @@ Diese Daten werden anschließend in Trainings- und Testset aufgeteilt. Um diese 
 \end{figure}
 
 
-Wie schon in Kapitel \ref{artefakterkennung} beschrieben, sind bei der Verarbeitung von medizinischen Signalen zwei Bereiche wichtig: Die Coverage und die Qualität des Signals, in diesem Fall also die Genauigkeit der geschätzten Herzrate im Vergleich zur Referenz. Diese beiden müssen gegeneinander aufgewogen werden und werden aus diesem Grund beide betrachtet. Die Qualität der Modelle kann zunächst anhand der binären Klassifikation beurteilt werden. Da diese aber keine Auskunft darüber enthält, wie nah klassifiziertes Signal an dem Schwellwert für $E\textsubscript{HR}$ liegt, wird letzteres in einer tiefergehenden Evaluation ebenfalls betrachtet. Im Zuge dessen wird sowohl der Fehler auf dem als informativ klassifizierten Signal betrachtet als auch die Coverage in Bezug auf das ganze Signal für verschiedene Fehlergrößen. Insbesondere falsch klassifiziertes Signal, also Falsch-Negative und Falsch-Positive, ist interessant, um zu beurteilen, ob Fehlklassifikationen lediglich im Grenzbereich $E\textsubscript{HR} \approx 10$\,\si{FE} oder allgemein vorkommen.
+Wie schon in Kapitel \ref{artefakterkennung} beschrieben, sind bei der Verarbeitung von medizinischen Signalen zwei Kenngrößen wichtig: Die Coverage und die Qualität des Signals, in diesem Fall also die Genauigkeit der geschätzten Herzrate im Vergleich zur Referenz. Diese beiden müssen gegeneinander aufgewogen werden und werden aus diesem Grund beide betrachtet. Die Qualität der Modelle kann zunächst anhand der binären Klassifikation beurteilt werden. Da diese aber keine Auskunft darüber enthält, wie nah klassifiziertes Signal an dem Schwellwert für $E\textsubscript{HR}$ liegt, wird das in einer tiefergehenden Evaluation ebenfalls betrachtet. Im Zuge dessen wird sowohl der Fehler auf dem als informativ klassifizierten Signal betrachtet als auch die Coverage in Bezug auf das ganze Signal für verschiedene Fehlergrößen. Insbesondere falsch klassifiziertes Signal, also Falsch-Negative und Falsch-Positive, ist interessant, um zu beurteilen, ob Fehlklassifikationen lediglich im Grenzbereich $E\textsubscript{HR} \approx 10$\,\si{FE} oder allgemein vorkommen.
 
 \section{Anwendung existierender Verfahren}
 
@@ -25,7 +25,7 @@ Zunächst werden die in Kapitel \ref{artefakterkennung} beschriebenen existieren
 \subsection{Ähnlichkeit der Intervallschätzer des CLIE-Algorithmus}\label{eval-brueser}
 
 Der \ac{SQI}, der die Ähnlichkeit der Intervallschätzer des \ac{CLIE}-Algorithmus angibt, wird im Normalfall herzschlagweise angewendet. Da die Datenannotion nur bereichsweise vorgenommen werden kann, wurde entschieden, ein Segment als informativ zu klassifizieren, wenn mit den Herzschlägen, deren \ac{SQI} über einem Schwellwert $q_{th}$ liegt, eine Coverage über einem gegebenen Schwellwert $c_{th}$ auf dem Segment erreicht wird. %TODO: evtl kürzen/trennen
-Getestete Schwellwerte für die Coverage sind 50\,\%, 75\,\% und 100\,\%. Zum Testen des Algorithmus wurde unter anderem $q_{th} = 0{,}4$ gewählt, da dieser Wert auch von \citeauthor{Zink2017} verwendet wird.\footcite[]{Zink2017} Zusätzlich wurden $q_{th} = 0{,}3$ und $q_{th} = 0{,}2$ untersucht, um den Einfluss von $q_{th}$ einzuordnen. Bei der Berechnung der Merkmale werden für jedes Segment die detektierten Herzschläge extrahiert, deren \ac{SQI} über $q_{th}$ liegt. Auf Basis dieser Intervalllängen wird wie in Kapitel \ref{annotation} beschrieben die Herzrate, im Folgenden $HR\textsubscript{SQI}$ genannt, ermittelt. Extrahierte Merkmale sind damit in diesem Fall $HR\textsubscript{SQI}$ und die Coverage $C\textsubscript{SQI}$. Für die Auswertung muss beachtet werden, dass sich die ermittelte Herzrate $HR\textsubscript{SQI}$ von der zur Annotation verwendeten Herzrate unterscheidet. Aufgrund der Vergleichbarkeit wird $HR\textsubscript{SQI}$ nicht für die Berechnung des \ac{MAE} des Algorithmus verwendet.
+Getestete Schwellwerte für die Coverage sind 50\,\%, 75\,\% und 100\,\%. Zum Testen des Algorithmus wurde unter anderem $q_{th} = 0{,}4$ gewählt, da dieser Wert auch von \citeauthor{Zink2017} verwendet wird.\footcite[]{Zink2017} Zusätzlich wurden $q_{th} = 0{,}3$ und $q_{th} = 0{,}2$ untersucht, um den Einfluss von $q_{th}$ einzuordnen. Bei der Berechnung der Merkmale werden für jedes Segment die detektierten Herzschläge extrahiert, deren \ac{SQI} über $q_{th}$ liegt. Auf Basis dieser Intervalllängen wird wie in Kapitel \ref{annotation} beschrieben die Herzrate, im Folgenden $HR\textsubscript{SQI}$ genannt, ermittelt. Extrahierte Merkmale sind damit in diesem Fall $HR\textsubscript{SQI}$ und die Coverage $C\textsubscript{SQI}$. Für die Auswertung muss beachtet werden, dass sich die ermittelte Herzrate $HR\textsubscript{SQI}$ von der zur Annotation verwendeten Herzrate unterscheiden kann. Aufgrund der Vergleichbarkeit wird $HR\textsubscript{SQI}$ nicht für die Berechnung des \ac{MAE} des Algorithmus verwendet.
 
 Bei einer ersten Betrachtung von \ac{MAE} in \si{FE}, Coverage und Accuracy wird sichtbar, dass die Wahl der Schwellwerte großen Einfluss auf das Ergebnis hat und in jedem Fall Aussagekraft des Signals gegen Coverage eingetauscht wird. Die genauen Ergebnisse sind in Tabelle \ref{fig:brueser-sqi-MAE-Coverage} zu finden. Auch ist deutlich, dass die Accuracy der Klassifikation mit mit Werten knapp über 0{,}6 nicht gut ist. Des Weiteren ist die Coverage bei verhältnismäßig kleineren \ac{MAE} sehr niedrig.
  
@@ -67,7 +67,7 @@ Bei einer ersten Betrachtung von \ac{MAE} in \si{FE}, Coverage und Accuracy wird
 % \end{figure}
  
  
- \begin{figure}[h]
+ \begin{figure}[h]%TODO: gleiche y-Achse
  	\centering
 		\begin{subfigure}{.45\textwidth}
 			\centering
@@ -111,7 +111,7 @@ Die Tests mit beiden Segmentlängen zeigen, dass dieses Verfahren für die in di
 
 Für das maschinelle Lernen mittels statistischer Merkmale werden die in Kapital \ref{ml-beschreibung} aufgezählten Merkmale extrahiert. Als Bibliothek für die Modelle des maschinellen Lernens wird \textit{scikit-learn}\footcite[]{scikit-learn} verwendet. Da die Daten sich grundlegend von den von \citeauthor{Sadek2016} untersuchten unterscheiden, werden die Hyperparameter der Modelle im Zuge dieser Arbeit erneut optimiert. Bei der dafür durchgeführten Kreuzvalidierung wird wie schon bei der Unterteilung in Trainings- und Testset anhand der Patient*innen-ID geteilt, damit auch diese aussagekräftige Ergebnisse liefert.
 
-Insgesamt zeigen bereits Accuracy und \ac{MAE}, siehe Tabelle \ref{fig:ml-statistical-MAE-Coverage}, eindeutig, dass die Klassifikation vom keinem der Modelle den Ergebnissen des Papers von \citeauthor{Sadek2016}\footcite{Sadek2016} entspricht. Die Accuracy und AUC von je unter 0,6 zeigen, dass die Klassifikation nur minimal besser als reines Raten ist. Teils ist der \ac{MAE} der als informativ klassifizierten Segmente sogar größer als der auf dem gesamten Signal. In der folgenden tiefergehenden Evaluation werden lediglich \ac{RF} und \ac{MLP} betrachtet. Zwar sind die Ergebnisse des \ac{DT} auf einem ähnlichen Niveau, aber da ein \ac{RF} lediglich ein Zusammenschluss mehrerer \ac{DT} ist, ist eine zusätzliche Analyse nicht lohnenswert. 
+Insgesamt zeigen bereits Accuracy und \ac{MAE}, siehe Tabelle \ref{fig:ml-statistical-MAE-Coverage}, eindeutig, dass die Klassifikation von keinem der Modelle den Ergebnissen des Papers von \citeauthor{Sadek2016}\footcite{Sadek2016} entspricht. Die Accuracy und AUC von je unter 0,6 zeigen, dass die Klassifikation nur minimal besser als reines Raten ist. Teils ist der \ac{MAE} der als informativ klassifizierten Segmente sogar größer als der auf dem gesamten Signal. In der folgenden tiefergehenden Evaluation werden lediglich \ac{RF} und \ac{MLP} betrachtet. Zwar sind die Ergebnisse des \ac{DT} auf einem ähnlichen Niveau, aber da ein \ac{RF} lediglich ein Zusammenschluss mehrerer \ac{DT} ist, ist eine zusätzliche Analyse nicht lohnenswert. 
 
 \begin{table}[H]
 	\centering
@@ -129,9 +129,9 @@ Insgesamt zeigen bereits Accuracy und \ac{MAE}, siehe Tabelle \ref{fig:ml-statis
  	\label{fig:ml-statistical-MAE-Coverage}
 \end{table}
 
-Bei einer ähnlich hohen, beziehungsweise höheren Coverage wie die der Annotation ist der deutlich höhere \ac{MAE} der Klassifikation in falsch-positiven Segmenten begründet. Der Anteil von Segmenten mit einem Fehler $E\textsubscript{HR}$ größer als 20\,\si{FE} ist bei beiden Modellen mit 35 bis 40\,\% ähnlich hoch. Zusätzlich sind 0{,}002\,\% der vom \ac{RF} als informativ klassifizierten Segmente solche, bei den $E\textsubscript{HR}$ maximal ist. Das bedeutet, dass die falsch-positiv klassifizierten Segmente bei beiden Klassifikatoren keine Randfälle sind. Der \ac{MAE} der falsch-negativen Klassifikationen beträgt beim \ac{RF} 4,07\,\si{FE} und beim \ac{MLP} 3{,}39\,\si{FE}, ist also leicht höher als der \ac{MAE} aller informativen Segmente, aber nicht relevant. Auch bei diesen handelt es sich demnach nicht um Randfälle.
+Bei einer ähnlich hohen, beziehungsweise höheren Coverage als die der Annotation ist der deutlich höhere \ac{MAE} der Klassifikation in falsch-positiven Segmenten begründet. Der Anteil von Segmenten mit einem Fehler $E\textsubscript{HR}$ größer als 20\,\si{FE} ist bei beiden Modellen mit 35 bis 40\,\% ähnlich hoch. Zusätzlich sind 0{,}002\,\% der vom \ac{RF} als informativ klassifizierten Segmente solche, bei den $E\textsubscript{HR}$ maximal ist. Das bedeutet, dass die falsch-positiv klassifizierten Segmente bei beiden Klassifikatoren keine Randfälle sind. Der \ac{MAE} der falsch-negativen Klassifikationen beträgt beim \ac{RF} 4,07\,\si{FE} und beim \ac{MLP} 3{,}39\,\si{FE}, ist also leicht höher als der \ac{MAE} aller informativen Segmente, aber nicht relevant. Auch bei diesen handelt es sich demnach nicht um Randfälle.
  	
- \begin{figure}[H]
+ \begin{figure}[H] %TODO: y-Achsenbeschriftung
  	\centering
 		\begin{subfigure}{.45\textwidth}
 			\centering
@@ -162,13 +162,13 @@ Bei einer ähnlich hohen, beziehungsweise höheren Coverage wie die der Annotati
  	\label{fig:ml-statistical-coverage}
  \end{table}
  
- Insgesamt zeigt sich, dass die Klassifikation mittels statistischer Merkmale bei vorliegenden Daten und Annotation nicht sehr zuverlässig. Zwar wurden auf anderen Daten sehr gute Ergebnisse erreicht, aber es bestätigt sich die Vermutung, dass sich dies, vermutlich aufgrund der unterschiedlichen Aufnahmesituation der Daten und der nicht aussagekräftigen Validierung der Ergebnisse für die im Paper untersuchten Daten, nicht übertragen lässt. 
+ Insgesamt zeigt sich, dass die Klassifikation mittels statistischer Merkmale bei vorliegenden Daten und Annotation nicht sehr zuverlässig ist. Zwar wurden auf anderen Daten sehr gute Ergebnisse erreicht, aber es bestätigt sich die Vermutung, dass sich dies, vermutlich aufgrund der unterschiedlichen Aufnahmesituation der Daten und der nicht aussagekräftigen Validierung der Ergebnisse für die im Paper untersuchten Daten, nicht übertragen lässt. 
  
 \section{Analyse der Merkmale}
 
 Obwohl keines der Verfahren sehr gute Ergebnisse für die vorliegenden Daten liefert, ist besonders bei den Modellen maschinellen Lernens interessant, welchen Einfluss und welchen Informationsgewinn die jeweiligen Merkmale haben. Aus diesem Grund wird im Folgenden eine explorative Datenanalyse durchgeführt.
 
-Zunächst wird betrachtet, ob die Merkmale untereinander und mit $E\textsubscript{HR}$ und der Annotation korreliert sind. Da die Merkmale das Segment gemeinschaftlich statistisch beschreiben ist eine hohe Korrelation untereinander erwartet und zeigt sich auch. Eine Ausnahme bilden Kurtosis, Mittelwert und Schiefe. Die Anzahl der Nulldurchgänge ist ebenfalls nur schwächer mit den restlichen Mermalen korreliert. Außerdem zeigt sich bei der Betrachtung des in Abbildung \ref{fig:corr-heatmap-statistical} abgebildeten Korrelationsdiagramms, dass die Korrelation zu $E\textsubscript{HR}$ und der Annotation nicht signifikant ist. Auch bei paarweiser Visualisierung zeigt sich, dass sich anhand keines untersuchten Merkmalspaares informative von nicht informativen unterscheiden lassen.
+Zunächst wird betrachtet, ob die Merkmale untereinander und mit $E\textsubscript{HR}$ und der Annotation korreliert sind. Da die Merkmale das Segment gemeinschaftlich statistisch beschreiben ist eine hohe Korrelation untereinander erwartet und zeigt sich auch. Eine Ausnahme bilden Kurtosis, Mittelwert und Schiefe. Die Anzahl der Nulldurchgänge ist ebenfalls nur schwächer mit den restlichen Mermalen korreliert. Außerdem zeigt sich bei der Betrachtung des in Abbildung \ref{fig:corr-heatmap-statistical} abgebildeten Korrelationsdiagramms, dass die Korrelation zu $E\textsubscript{HR}$ und der Annotation nicht signifikant ist. Auch bei paarweiser Visualisierung zeigt sich, dass sich anhand keines untersuchten Merkmalspaares informative von nicht informativen Segmenten unterscheiden lassen.
 
 \begin{figure}[H] %TODO: Label rotiert, jedes label in x-Achse
 	\centering
@@ -189,7 +189,7 @@ Weiteren Einblick ermöglicht die Analyse des \ac{RF}, da bei diesem ermittelt w
 Da die Visualisierung hochdimensionaler Daten schwierig ist und auch Modelle maschinellen Lernens bei einer hohen Merkmalszahl aufwändiger zu trainieren sind, wurde ebenfalls untersucht, wie sich die Daten bei einer Transformation in einen niedriger dimensionierten Raum verhalten. Untersuchte Transformationen umfassen sowohl unüberwachte Verfahren wie eine \ac{PCA} mit verschiedenen Kerneln als auch überwachte Verfahren wie eine Dimensionsreduktion mit einer \ac{LDA}. Auch die transformierten Daten lassen sich nicht voneinander trennen, wie auch in Abbildung \ref{fig:dim-red-statistical} beispielhaft für eine \ac{PCA} mit linearem Kernel gezeigt ist.
 
 
- \begin{figure}[H]
+ \begin{figure}[H] %TODO: achsenlabel erklären
  	\centering
  	\includegraphics[width=0.6\textwidth]{pic/statistical-pca-lin.pdf}
 	\caption{Dimensionsreduktion der statistischen Merkmale mit einer \ac{PCA} mit linearem Kernel}
@@ -197,7 +197,7 @@ Da die Visualisierung hochdimensionaler Daten schwierig ist und auch Modelle mas
 \end{figure}
 
 %TODO: fix citation
-Da eine hohe Korrelation zwischen einzelnen Merkmalen, wie sie auch bei den statistischen Merkmalen vorliegt, dazu führen kann, dass die Interpretation der Wichtigkeit der Merkmale und die Qualität der Modelle generell eingeschränkt ist\footcite[Kapitel 8]{Harrison2019} wird außerdem die Abhängigkeit der Merkmale voneinander untersucht. Hierzu wird das Python-Paket \texttt{rfimp} verwendet, das ermittelt, welche Merkmale durch andere vorhergesagt werden können. Nach Reduktion der Merkmalsmenge um diese bleiben lediglich fünf Merkmale: die Standardabweichung, der Durchschnitt, die Anzahl der Nulldurchgänge, Schiefe und Kurtosis. Betracht man für diese die Wichtigkeit der einzelnen Merkmale bei einem \acl{RF}, zeigt sich, dass weiterhin der Durchschnitt am wenigsten Einfluss besitzt, wobei die Standardabweichung jetzt am Wichtigsten ist. Die gesamte Verteilung ist in Abbildung \ref{fig:rf-statistical-reduced} sichtbar.
+Da eine hohe Korrelation zwischen einzelnen Merkmalen, wie sie auch bei den statistischen Merkmalen vorliegt, dazu führen kann, dass die Interpretation der Wichtigkeit der Merkmale und die Qualität der Modelle generell eingeschränkt ist\footcite[Kapitel 8]{Harrison2019}, wird außerdem die Abhängigkeit der Merkmale voneinander untersucht. Hierzu wird das Python-Paket \texttt{rfimp} verwendet, das ermittelt, welche Merkmale durch andere vorhergesagt werden können. Nach Reduktion der Merkmalsmenge um diese bleiben lediglich fünf Merkmale: die Standardabweichung, der Durchschnitt, die Anzahl der Nulldurchgänge, Schiefe und Kurtosis. Betracht man für diese die Wichtigkeit der einzelnen Merkmale bei einem \acl{RF}, zeigt sich, dass weiterhin der Durchschnitt am wenigsten Einfluss besitzt, wobei die Standardabweichung jetzt am Wichtigsten ist. Die gesamte Verteilung ist in Abbildung \ref{fig:rf-statistical-reduced} sichtbar.
 
 \begin{figure}[H]
 	\centering
@@ -206,7 +206,7 @@ Da eine hohe Korrelation zwischen einzelnen Merkmalen, wie sie auch bei den stat
 	\label{fig:rf-statistical-reduced}
 \end{figure}
 
-Die Ergebnisse dieses \acl{RF} mit reduzierter Merkmalsanzahl können mit dem in Kapitel \ref{res-statistical} untersuchten \acl{RF} verglichen werden. Der \ac{MAE} und die Coverage sind bei reduzierter Merkmalszahl geringfügig niedriger, die AUC deutlich. Insgesamt sind die Klassifikatoren auf einem ähnlichen Niveau, auch wenn dieser Vergleich bei der geringen Qualität schwierig ist. In Tabelle \ref{fig:ml-statistical-reduced-comparison} sind die beiden \acl{RF} gegenübergestellt.
+Die Ergebnisse dieses \acl{RF}s mit reduzierter Merkmalsanzahl können mit dem in Kapitel \ref{res-statistical} untersuchten \acl{RF} verglichen werden. Der \ac{MAE} und die Coverage sind bei reduzierter Merkmalszahl geringfügig niedriger, die AUC deutlich. Insgesamt sind die Klassifikatoren auf einem ähnlichen Niveau, auch wenn dieser Vergleich bei der geringen Qualität schwierig ist. In Tabelle \ref{fig:ml-statistical-reduced-comparison} sind die beiden \acl{RF}s gegenübergestellt.
 
  \begin{table}[H]
  	\centering
@@ -226,5 +226,5 @@ Die Ergebnisse dieses \acl{RF} mit reduzierter Merkmalsanzahl können mit dem in
  	\label{fig:ml-statistical-reduced-comparison}
  \end{table}
 
-Anhand der statistischen Merkmale kann also keine zuverlässige Klassifikation für den Schwellwert $E\textsubscript{HR} = 10$ vorgenommen werden. Vermutlich sorgt die große Variation der in Betten aufgenommenen \ac{BKG}-Signale dafür, dass sich die Signale nicht statistisch verallgemeinern lassen. Auch die reine Betrachtung der Ähnlichkeit der Intervallschätzer führt zu einem im Verhältnis zur Coverage hohen \ac{MAE}. Es müssen also weitere Merkmale gefunden werden, die allein oder ergänzend zu den bereits betrachteten eine bessere Aussage zu der Signalqualität ermöglichen.
+Anhand der statistischen Merkmale kann also keine zuverlässige Klassifikation für den Schwellwert $E\textsubscript{HR} = 10\,\si{FE}$ vorgenommen werden. Vermutlich sorgt die große Variation der in Betten aufgenommenen \ac{BKG}-Signale dafür, dass sich die Signale nicht statistisch verallgemeinern lassen. Auch die reine Betrachtung der Ähnlichkeit der Intervallschätzer führt zu einem im Verhältnis zur Coverage hohen \ac{MAE}. Es müssen also weitere Merkmale gefunden werden, die allein oder ergänzend zu den bereits betrachteten eine bessere Aussage zu der Signalqualität ermöglichen.
 

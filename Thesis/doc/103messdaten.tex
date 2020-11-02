@@ -4,8 +4,8 @@ Im folgenden Kapitel wird eine Einführung in das Thema der Signalverarbeitung u
 
 \section{Grundsätzliches} % TODO: eventuell in allgemeinen Teil des Kapitels
 
-	Kardiorespiratorische Signale sind durch die quasiperiodische Natur des Herzens und der Lunge selbst quasiperiodisch. Zwei zyklische Vorgänge werden gleichzeitig gemessen, lassen sich aber durch eine Bandpass-Filterung nach ihren unterschiedlichen Frequenzen filtern. Der Normbereich für die Atemfrequenz liegt bei \numrange{12}{25} Atemzügen pro Minute, alles ober- und unterhalb wird als abnormal betrachtet. Bei der Herzfrequenz wird ein Bereich von \numrange{30}{200} Schlägen pro Minute erwartet. Dabei entsprechen 30 Schläge pro Minute der Pulsabsenkung in der Nacht, der Ruhepuls selbst ist höher. Grundsätzlich gibt es verschiedene Arten der Signalverarbeitung: Algorithmen, die im Zeitbereich arbeiten, solche, die im Frequenzbereich arbeiten und solche, die beides kombinieren. Dabei ist zu beachten, dass bei frequenzbasierten Algorithmen durch die Analyse von spektralen Eigenschaften zunächst nur durchschnittliche Frequenzen ermittelt werden. Dies ist für einige medizinische Anwendungen ausreichend, für andere wie z.B. die Ermittlung der \ac{HRV} allerdings nicht. Algorithmen, die auf dem Zeitbereich arbeiten, basieren oft auf Wissen über die Morphologie des physiologischen Signals. Durch die Eigenschaften der \ac{BKG}-Signale, vor allem durch die variable Morphologie ist dies schwieriger als bei anderen kardiorespiratorischen Signalen. %TODO: dies evtl unklar
-	\citeauthor{Paalasmaa2015} sagt dazu:
+	Kardiorespiratorische Signale sind durch die quasiperiodische Natur des Herzens und der Lunge selbst quasiperiodisch. Zwei zyklische Vorgänge werden gleichzeitig gemessen, lassen sich aber durch eine Bandpass-Filterung nach ihren unterschiedlichen Frequenzen filtern. Der Normbereich für die Atemfrequenz liegt bei \numrange{12}{25} Atemzügen pro Minute, alles ober- und unterhalb wird als abnormal betrachtet. Bei der Herzfrequenz wird ein Bereich von \numrange{30}{200} Schlägen pro Minute erwartet. Dabei entsprechen 30 Schläge pro Minute der Pulsabsenkung in der Nacht, der Ruhepuls selbst ist höher. Grundsätzlich gibt es verschiedene Arten der Signalverarbeitung: Algorithmen, die im Zeitbereich arbeiten, solche, die im Frequenzbereich arbeiten und solche, die beides kombinieren. Dabei ist zu beachten, dass bei frequenzbasierten Algorithmen durch die Analyse von spektralen Eigenschaften zunächst nur durchschnittliche Frequenzen ermittelt werden. Dies ist für einige medizinische Anwendungen ausreichend, für andere wie z.\,B. die Ermittlung der \ac{HRV} allerdings nicht. Algorithmen, die auf dem Zeitbereich arbeiten, basieren oft auf Wissen über die Morphologie des physiologischen Signals. Durch die Eigenschaften der \ac{BKG}-Signale, vor allem durch die variable Morphologie ist dies schwieriger als bei anderen kardiorespiratorischen Signalen. %TODO: dies evtl unklar
+	\citeauthor{Paalasmaa2015} sagen dazu:
 
 	\begin{quote}\textit{The properties of the BCG signal vary so much in practice that no simple filtering rule can be devised for an accurate and reliable beat-to-beat interval detection.}\footcite{Paalasmaa2015}\end{quote}
 	
@@ -96,7 +96,7 @@ Im folgenden Kapitel wird eine Einführung in das Thema der Signalverarbeitung u
 	\end{figure}
 	
 		
-	Bei der Betrachtung verschiedener Ansätze zur Signalverarbeitung und Artefakterkennung bei \ac{BKG}-Signalen ist auffällig, dass Proband*innen oft angewiesen werden, sich möglichst wenig zu bewegen. Das ist bei der Messung im Alltag, insbesondere bei Messungen in Betten nicht realistisch. Dazu kommt, dass beim Einsatz im Alltag auch Kontakt mit der Person nicht immer gewährleistet ist, z.B. wenn diese sich aufrichtet. \citeauthor{HoogAntink2020} haben festgestellt, dass bei Messsystemen in Betten besonders Messungen tagsüber große Signalteile von schlechter Qualität aufweisen, deutlich mehr als nachts. Dies ist durch gesteigerte Aktivität tagsüber erklärbar. Ebenfalls im \textit{unobtrusive} Kontext nicht zielführende Methoden zur Artefakterkennung verwenden eine \ac{EKG}-Referenz.
+	Bei der Betrachtung verschiedener Ansätze zur Signalverarbeitung und Artefakterkennung bei \ac{BKG}-Signalen ist auffällig, dass Proband*innen oft angewiesen werden, sich möglichst wenig zu bewegen. Das ist bei der Messung im Alltag, insbesondere bei Messungen in Betten nicht realistisch. Dazu kommt, dass beim Einsatz im Alltag auch Kontakt mit der Person nicht immer gewährleistet ist, z.\,B. wenn diese sich aufrichtet. \citeauthor{HoogAntink2020} haben festgestellt, dass bei Messsystemen in Betten besonders Messungen tagsüber große Signalteile von schlechter Qualität aufweisen, deutlich mehr als nachts. Dies ist durch gesteigerte Aktivität tagsüber erklärbar. Ebenfalls im \textit{unobtrusive} Kontext nicht zielführende Methoden zur Artefakterkennung verwenden eine \ac{EKG}-Referenz.
 	
 	Im Folgenden werden drei verschiedene Methoden zur Beurteilung der Signalqualität vorgestellt.
 
@@ -153,7 +153,7 @@ Im folgenden Kapitel wird eine Einführung in das Thema der Signalverarbeitung u
 	
 	Bei der Ermittlung der konkreten Schlag-zu-Schlag Intervalle wird von dem \ac{SQI} $q$ äquivalent zu den geschätzten Intervalllängen der Median berechnet. Schätzungen dessen Qualität unter einem Schwellwert $q\textsubscript{th}$ werden verworfen. Die Wahl von $q\textsubscript{th}$ hängt von der gewünschten Genauigkeit und Coverage ab, je höher die gewünschte Genauigkeit, desto niedriger die Coverage.
 	
-	Dieser \ac{SQI} wird in verschiedenen Papern mit unterschiedlich gewähltem $q\textsubscript{th}$ genutzt und erreicht damit bei der \ac{BKG}-Messung in Betten während der Nacht bei gesunden Patient*innen gute Ergebnisse. \citeauthor{Bruser2013} erreicht zum Beispiel bei 8 gesunden Proband*innen durchschnittlich eine Coverage von $85\,\%$ bei einem Fehler zur \ac{EKG}-Referenz von \num{0{,}61}\,\% Schlägen pro Minute.\footcite[Vgl.][]{Bruser2013} Bei Patient*innen im Krankenhaus zeigte sich, dass sowohl die Ergebnisse bezüglich der Coverage als auch der Genauigkeit bedeutend schlechter sind. So erreichte \citeauthor{HoogAntink2020} bei 14 Patient*innen durchschnittlich \num{40}\,\% Coverage bei einem Fehler von \num{2{,}16}\,\% Schlägen pro Minute. Werden nur die nächtlichen Aufnahmen betrachtet, wird eine Coverage von \num{52}\,\% bei einem Fehler von \num{1{,}29}\,\% Schlägen pro Minute erreicht. Bei der Berechnung letztere Ergebnisse wurden zusätzlich Intervallschätzungen verworfen, deren relative Abweichung vom Median der anderen Schätzungen einen bestimmten Schwellwert überschreitet.\footcite[Vgl.][]{HoogAntink2020}
+	Dieser \ac{SQI} wird in verschiedenen Papern mit unterschiedlich gewähltem $q\textsubscript{th}$ genutzt und erreicht damit bei der \ac{BKG}-Messung in Betten während der Nacht bei gesunden Patient*innen gute Ergebnisse. \citeauthor{Bruser2013} erreichen zum Beispiel bei acht gesunden Proband*innen durchschnittlich eine Coverage von $85\,\%$ bei einem Fehler zur \ac{EKG}-Referenz von \num{0{,}61}\,\% Schlägen pro Minute.\footcite[Vgl.][]{Bruser2013} Bei Patient*innen im Krankenhaus zeigte sich, dass sowohl die Ergebnisse bezüglich der Coverage als auch der Genauigkeit bedeutend schlechter sind. So erreichen \citeauthor{HoogAntink2020} bei 14 Patient*innen durchschnittlich \num{40}\,\% Coverage bei einem Fehler von \num{2{,}16}\,\% Schlägen pro Minute. Werden nur die nächtlichen Aufnahmen betrachtet, wird eine Coverage von \num{52}\,\% bei einem Fehler von \num{1{,}29}\,\% Schlägen pro Minute erreicht. Bei der Berechnung letzterer Ergebnisse wurden zusätzlich Intervallschätzungen verworfen, deren relative Abweichung vom Median der anderen Schätzungen einen bestimmten Schwellwert überschreitet.\footcite[Vgl.][]{HoogAntink2020}
 	
 	Dieser Algorithmus ist der einzige der drei betrachteten, der im Bett aufgenommenes \ac{BKG}-Signal untersucht. Die Ergebnisse sind bei gesunden, schlafenden Patient*innen sehr gut, im tatsächlichen Einsatz im Krankenhaus wird allerdings eine deutlich geringere Coverage bei höherem Fehler erreicht.
 	
@@ -180,7 +180,7 @@ Im folgenden Kapitel wird eine Einführung in das Thema der Signalverarbeitung u
 	
 	Um die Herzraten auf Intervallen bestimmen zu können, müssen sowohl das \ac{BKG}- als auch das \ac{EKG}-Signal vorverarbeitet werden. Da diese Vorverarbeitung durch die große Datenmenge sehr aufwändig ist, werden die Ergebnisse als .csv-Dateien serialisiert. Beim Laden der Daten kann so geprüft werden, ob die Berechnung wiederholt werden muss oder geladen werden kann.
 	
-	Bei der Vorverarbeitung des \ac{BKG}-Signals wird der in Kapitel \ref{CLIE} vorgestellte CLIE-Algorithmus angewendet und die ermittelten Indices der Intervalle, die geschätzte Intervallängen und der in Kapitel \ref{brueserQI} beschriebene Qualitätsindex gespeichert. Für das \ac{EKG}-Signal wird für alle drei Kanäle eine Detektion der QRS-Komplexe durchgeführt, mit denen die Schlag-zu-Schlag Intervalle ermittelt werden können. Dafür wird die Python-Implementierung von \citeauthor{Howell2019} des von \citeauthor{Elgendi2010} beschriebenen Algorithmus\footcite[][]{Elgendi2010} genutzt. Dieser zeigt in einer Untersuchung von \citeauthor{Porr2019} gute Ergebnisse.\footcite[Vgl.][]{Porr2019}
+	Bei der Vorverarbeitung des \ac{BKG}-Signals wird der in Kapitel \ref{CLIE} vorgestellte CLIE-Algorithmus angewendet und die ermittelten Indizes der Intervalle, die geschätzten Intervallängen und der in Kapitel \ref{brueserQI} beschriebene Qualitätsindex gespeichert. Für das \ac{EKG}-Signal wird für alle drei Kanäle eine Detektion der QRS-Komplexe durchgeführt, mit denen die Schlag-zu-Schlag Intervalle ermittelt werden können. Dafür wird die Python-Implementierung von \citeauthor{Howell2019} des von \citeauthor{Elgendi2010} beschriebenen Algorithmus\footcite[][]{Elgendi2010} genutzt. Dieser zeigt in einer Untersuchung von \citeauthor{Porr2019} gute Ergebnisse.\footcite[Vgl.][]{Porr2019}
 	
 	
 	\subsection{Annotation der Daten}\label{annotation}
@@ -199,7 +199,7 @@ Im folgenden Kapitel wird eine Einführung in das Thema der Signalverarbeitung u
 	
 	Die Auswirkungen dieses Verfahrens sind in Abbildung \ref{fig:ecg-patient-26} sichtbar. Eine Fusion nur auf dem aktuellen Bereich führt zu einigen Fehlern in der Herzratenschätzung, die die Umgebung einbeziehende Fusion führt zu deutlich besseren Ergebnissen. Auch ist hier sichtbar, wie groß die Abweichung einzelner Kanäle ist.
 
-	\begin{figure}[H]%TODO: Gendersternchen auch in Figure
+	\begin{figure}[H]%TODO: Gendersternchen auch in Figure, Achsenbeschriftungen
 		\centering
 		\includegraphics{pic/ecg-patient-26.pdf}
 		\caption[\ac{EKG}-Herzratenschätzungen auf sich überlappenden 10-Sekunden-Segmenten für Patient*in 26]{\ac{EKG}-Herzratenschätzungen auf sich überlappenden 10-Sekunden-Segmenten für Patient*in 26. Fusioniert lokal zeigt die Fusion ohne Miteinbeziehung der Umgebung, Fusioniert Umgebung die oben beschriebene Fusion}
@@ -232,13 +232,13 @@ Im folgenden Kapitel wird eine Einführung in das Thema der Signalverarbeitung u
 		E\textsubscript{HR} \hat{=} \Delta\text{HR}\textsubscript{abs} \cdot 2.
 	\end{align*}
 	
-	Wenn keine Herzrate auf dem \ac{BKG}-Signal ermittelt werden konnte, wird $E\textsubscript{HR}$ auf den maximalen Wert 667 gesetzt, da das der maximal möglichen relativen Abweichung von Herzraten zwischen 30 und 200 Schlägen pro Minute entspricht. Die Verteilung von $E\textsubscript{HR}$, abgebildet in Abbildung \ref{fig:class-histo}, zeigt, dass Segmente mit Fehlern von mehr als 20\,\% und solche mit Fehlern unter 5\,\% jeweils die beiden größten Gruppen bilden. Für $E\textsubscript{HR}$ wird im Folgenden die Einheit Fehlereinheit \si{FE} verwendet.
+	Wenn keine Herzrate auf dem \ac{BKG}-Signal ermittelt werden konnte, wird $E\textsubscript{HR}$ auf den maximalen Wert 667 gesetzt, da das der maximal möglichen relativen Abweichung von Herzraten zwischen 30 und 200 Schlägen pro Minute entspricht. Für $E\textsubscript{HR}$ wird im Folgenden die Einheit Fehlereinheit \si{FE} verwendet. Die Verteilung von $E\textsubscript{HR}$, dargestellt in Abbildung \ref{fig:class-histo}, zeigt, dass Segmente mit Fehlern von mehr als 20\,\si{FE} und solche mit Fehlern unter 5\,\si{FE} jeweils die beiden größten Gruppen bilden.
 	
 	
-	\begin{figure}[H]
+	\begin{figure}[H] %TODO: Prozent
 		\centering
 		\includegraphics{pic/data-E-HR-bar.pdf}
-		\caption[Verteilung von $E\textsubscript{HR}$]{Verteilung von $E\textsubscript{HR}$}
+		\caption[Verteilung von $E\textsubscript{HR}$ auf allen Messdaten]{Verteilung von $E\textsubscript{HR}$}
 		\label{fig:class-histo}
 	\end{figure}
 	
