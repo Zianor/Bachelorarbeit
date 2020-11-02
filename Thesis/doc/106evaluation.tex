@@ -4,7 +4,7 @@ Im Folgenden werden die entwickelten Modelle untersucht und evaluiert. Für die 
 
 \section{Modellevaluation} %TODO: besserer Titel? Merkmalsauswahl?
 
-Zunächst werden alle Modelle sowohl mit dem vollständigen Merkmalsset als auch dem reduzierten Merkmalsset verglichen; die Ergebnisse sind inTabelle \ref{fig:comparison-all} gezeigt. Insgesamt zeigt sich bereits, dass eine deutlich höhere Coverage als bei der reinen Betrachtung der Intervallschätzer des CLIE-Algorithmus erreicht wird. Diese lag beispielsweise für $q\textsubscript{th} = 0.3$ bei 20,93\,\% mit einem \ac{MAE} von 13,90\,\si{FE}. Die Ergebnisse der Klassifikation mit Gradient Boosted Trees und \acl{RF}s sind zunächst ähnlich. Bei der Regression erreichen Gradient Boosted Trees eine sehr hohe Coverage von über 80\,\% mit einem zu den anderen Modellen verhältnismäßig hohen \ac{MAE} von über 16\,\si{FE}.
+Zunächst werden alle Modelle sowohl mit dem vollständigen Merkmalsset als auch dem reduzierten Merkmalsset verglichen; die Ergebnisse sind in Tabelle \ref{fig:comparison-all} gezeigt. Insgesamt zeigt sich bereits, dass eine deutlich höhere Coverage als bei der reinen Betrachtung der Intervallschätzer des CLIE-Algorithmus erreicht wird. Diese lag beispielsweise für $q\textsubscript{th} = 0.3$ bei 20,93\,\% mit einem \ac{MAE} von 13,90\,\si{FE}. Die Ergebnisse der Klassifikation mit Gradient Boosted Trees und \acl{RF}s sind zunächst ähnlich. Bei der Regression erreichen Gradient Boosted Trees eine sehr hohe Coverage von über 80\,\% mit einem zu den anderen Modellen verhältnismäßig hohen \ac{MAE} von über 16\,\si{FE}.
 
 	\begin{table}[H]
 	\centering
@@ -31,7 +31,7 @@ Zunächst werden alle Modelle sowohl mit dem vollständigen Merkmalsset als auch
 		\label{fig:comparison-all}
 	\end{table}
 
-Des Weiteren zeigt sich, dass das reduzierte Merkmalsset entgegen der Erwartungen zu etwas schlechteren Ergebnissen führt. Eine Betrachtung der Wichtigkeit der Merkmale für die Modelle mit vollständigem Merkmalsset zeigt, dass hier jeweils $\text{ratio}\textsubscript{acf}$ und $\text{ratio}\textsubscript{acf}$ zu den wichtigsten Merkmalen gehören, welche beide kein Teil des reduzierten Merkmalssets. In Abbildung \ref{fig:rf-clf-all-importances} ist die Verteilung der Relevanz der Merkmale gezeigt. Ein Test mit einem \ac{RF}-Klassifikator mit dem reduzierten Merkmalsset zuzüglich den oben genannten Merkmalen zeigt, dass die Performance im Vergleich zum vollständigen Merkmalsset so vergleichbar ist und ein \ac{MAE} von 11,97\,\si{FE} bei einer Coverage von 36,51\,\% erreicht wird.
+Des Weiteren zeigt sich, dass das reduzierte Merkmalsset entgegen der Erwartungen zu etwas schlechteren Ergebnissen führt. Eine Betrachtung der Wichtigkeit der Merkmale für die Modelle mit vollständigem Merkmalsset zeigt, dass hier jeweils $\text{ratio}\textsubscript{acf}$ und $\text{ratio}\textsubscript{acf}$ zu den wichtigsten Merkmalen gehören, welche beide kein Teil des reduzierten Merkmalssets sind. In Abbildung \ref{fig:rf-clf-all-importances} ist die Verteilung der Relevanz der Merkmale exemplarisch für den \ac{RF}-Klassifikator mit vollständigem Merkmalsset gezeigt. Ein Test mit einem \ac{RF}-Klassifikator mit dem reduzierten Merkmalsset zuzüglich den oben genannten Merkmalen zeigt, dass die Performance im Vergleich zum vollständigen Merkmalsset vergleichbar ist und ein \ac{MAE} von 11,97\,\si{FE} bei einer Coverage von 36,51\,\% erreicht wird.
 
 \begin{figure}[H]
 	\centering
@@ -121,7 +121,7 @@ Bei der Betrachtung der Regressionsmodelle zeigt sich, dass es bei dem \ac{XGB}-
  	\label{fig:importances-comparison-rf-xgb-regr}
  \end{figure}
  
- Die \ac{RF}-Modelle gewichten die einzelnen Merkmale bei den vorliegenden Daten ähnlicher als die \ac{XGB}-Modelle. Dennoch sind die Ergebnisse der ersten Evaluation ähnlich. Auch ist die Wichtigkeit der Merkmale zwischen den Klassifikations- und Regressionsmodellen ähnlich. Insgesamt zeigen die Regressionsmodelle aber eine überlegende Performance. Eine genauere Evaluation der Coverage und der Verteilung von $E\textsubscript{HR}$ wird für den \ac{RF}-Regressor durchgeführt. Zum Vergleich werden die Ergebnisse der Klassifizierung anhand der Intervallschätzer des \ac{CLIE}-Algorithmus für $q\textsubscript{th}=0{,}3$ und $c\textsubscript{th}$ gezeigt, da mit diesen Schwellwerten ebenfalls eine Reduzierung des \ac{MAE} mit einer vergleichbaren Coverage von 37,87\,\% erreicht wurde. Der Vergleich der erreichten Coverage unter einem bestimmten $E\textsubscript{HR}$, sichtbar in Tabelle \ref{fig:own-coverage-default}, zeigt deutlich, dass die Coverage geringer Fehler deutlich erhöht werden konnte. 
+ Die \ac{RF}-Modelle gewichten die einzelnen Merkmale bei den vorliegenden Daten ähnlicher als die \ac{XGB}-Modelle. Dennoch sind die Ergebnisse der ersten Evaluation ähnlich. Auch ist die Wichtigkeit der Merkmale zwischen den Klassifikations- und Regressionsmodellen ähnlich. Insgesamt zeigen die Regressionsmodelle aber eine überlegene Performance. Eine genauere Evaluation der Coverage und der Verteilung von $E\textsubscript{HR}$ wird für den \ac{RF}-Regressor durchgeführt. Zum Vergleich werden die Ergebnisse der Klassifizierung anhand der Intervallschätzer des \ac{CLIE}-Algorithmus für $q\textsubscript{th}=0{,}3$ und $c\textsubscript{th}$ gezeigt, da mit diesen Schwellwerten ebenfalls eine Reduzierung des \ac{MAE} mit einer vergleichbaren Coverage von 37,87\,\% erreicht wurde. Der Vergleich der erreichten Coverage unter einem bestimmten $E\textsubscript{HR}$, sichtbar in Tabelle \ref{fig:own-coverage-default}, zeigt deutlich, dass die Coverage geringer Fehler deutlich erhöht werden konnte. 
  
   \begin{table}[h]
  	\centering
@@ -136,7 +136,7 @@ Bei der Betrachtung der Regressionsmodelle zeigt sich, dass es bei dem \ac{XGB}-
  	\label{fig:own-coverage-default}
  \end{table}
  
- Auch eine Untersuchung der Verteilung von $E\textsubscript{HR}$ auf den als informativ klassifizierten Segmenten zeigt im Verglich, dass der Anteil des Signals mit einem Fehler $E\textsubscript{HR} > 20\,\si{FE}$ stark gesenkt werden konnte. Auch liegt der durchschnittliche \ac{MAE} der falsch-negativen Segmente bei 4,36\,\si{FE}, was über dem Durchschnitt aller als informativ klassifizierten Segmente von 3,28\,\si{FE} liegt.
+ Auch eine Untersuchung der Verteilung von $E\textsubscript{HR}$ auf den als informativ klassifizierten Segmenten zeigt im Vergleich, dass der Anteil des Signals mit einem Fehler $E\textsubscript{HR} > 20\,\si{FE}$ stark gesenkt werden konnte. Auch liegt der durchschnittliche \ac{MAE} der falsch-negativen Segmente bei 4,36\,\si{FE}, was über dem Durchschnitt aller als informativ klassifizierten Segmente von 3,28\,\si{FE} liegt.
  
  \begin{figure}[h]
  	\centering
