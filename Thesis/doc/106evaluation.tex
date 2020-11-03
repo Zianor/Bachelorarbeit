@@ -18,7 +18,7 @@ Zunächst werden alle Modelle sowohl mit dem vollständigen Merkmalsset als auch
  						&				& \acs{XGB}		& 13,14			& 29,79			& 0{,}53	& 0,69	\\\cline{2-7}
  						& \multirow{2}{*}{alle}
  									 	& \acs{RF}		& 12{,}11		& 36,81			& 0{,}61	& 0,75	\\
- 						&				& \acs{XGB} 	& 11,38			& 35,93			& 0,62		& 0,75\\\hline
+ 						&				& \acs{XGB} 		& 11,38			& 35,93			& 0,62		& 0,75\\\hline
  		\multirow{4}{*}{Regression}
  						& \multirow{2}{*}{reduziert}
  										& \acs{RF}		& 14,34			& 41,21			& 0,57		& 0,69	\\
@@ -85,7 +85,8 @@ Bei den folgenden Untersuchungen wird aus diesem Grund das erweiterte reduzierte
 \end{table}
 
 	
-Betrachtet man die Wichtigkeit der Merkmale der beiden Klassifikationsmodelle, fällt auf, dass bei dem \ac{XGB}-Klassifikator ein Merkmal allein deutlich wichtiger als alle anderen ist; sowohl beim reduzierten als auch beim vollständigen Merkmalsset. Bei den \ac{RF}-Modellen dagegen ist die Wichtigkeit gleichmäßiger verteilt. Der direkte Vergleich ist in Abbildung \ref{fig:importances-comparison-rf-xgb-clf} zu sehen. Trotz der unterschiedlichen Gewichtung der Merkmale erzielen beide Modelle ähnliche Ergebnisse. Allerdings ist der \ac{XGB}-Klassifikator weniger stabil für Verzerrung in dem mit Abstand wichtigstem Merkmal $C_{0{,}5}$. Es zeigt aber auch, dass die Ähnlichkeit der Intervallschätzer des \ac{CLIE}-Algorithmus ein gutes Kriterium zur Beurteilung der Signalqualität ist.
+Betrachtet man die Wichtigkeit der Merkmale der beiden Klassifikationsmodelle, fällt auf, dass bei dem \ac{XGB}-Klassifikator ein Merkmal allein deutlich wichtiger als alle anderen ist; sowohl beim reduzierten als auch beim vollständigen Merkmalsset. Bei den \ac{RF}-Modellen dagegen ist die Wichtigkeit gleichmäßiger verteilt. Der direkte Vergleich ist in Abbildung \ref{fig:importances-comparison-rf-xgb-clf} zu sehen. Trotz der unterschiedlichen Gewichtung der Merkmale erzielen beide Modelle ähnliche Ergebnisse. Allerdings ist der \ac{XGB}-Klassifikator weniger stabil, falls das mit Abstand wichtigstem Merkmal $C_{0{,}5}$ gestört wird.%TODO: satzverständlichkeit
+ Es zeigt aber auch, dass die Ähnlichkeit der Intervallschätzer des \ac{CLIE}-Algorithmus ein gutes Kriterium zur Beurteilung der Signalqualität ist.
 
  \begin{figure}[h]
  	\centering
@@ -121,7 +122,7 @@ Bei der Betrachtung der Regressionsmodelle zeigt sich, dass es bei dem \ac{XGB}-
  	\label{fig:importances-comparison-rf-xgb-regr}
  \end{figure}
  
- Die \ac{RF}-Modelle gewichten die einzelnen Merkmale bei den vorliegenden Daten ähnlicher als die \ac{XGB}-Modelle. Dennoch sind die Ergebnisse der ersten Evaluation ähnlich. Auch ist die Wichtigkeit der Merkmale zwischen den Klassifikations- und Regressionsmodellen ähnlich. Insgesamt zeigen die Regressionsmodelle aber eine überlegene Performance. Eine genauere Evaluation der Coverage und der Verteilung von $E\textsubscript{HR}$ wird für den \ac{RF}-Regressor durchgeführt. Zum Vergleich werden die Ergebnisse der Klassifizierung anhand der Intervallschätzer des \ac{CLIE}-Algorithmus für $q\textsubscript{th}=0{,}3$ und $c\textsubscript{th}$ gezeigt, da mit diesen Schwellwerten ebenfalls eine Reduzierung des \ac{MAE} mit einer vergleichbaren Coverage von 37,87\,\% erreicht wurde. Der Vergleich der erreichten Coverage unter einem bestimmten $E\textsubscript{HR}$, sichtbar in Tabelle \ref{fig:own-coverage-default}, zeigt deutlich, dass die Coverage geringer Fehler deutlich erhöht werden konnte. 
+ Die \ac{RF}-Modelle gewichten die einzelnen Merkmale bei den vorliegenden Daten ähnlicher als die \ac{XGB}-Modelle. Dennoch sind die Ergebnisse der ersten Evaluation ähnlich. Auch ist die Wichtigkeit der Merkmale zwischen den Klassifikations- und Regressionsmodellen ähnlich. Insgesamt zeigen die Regressionsmodelle aber eine überlegene Performance. Eine genauere Evaluation der Coverage und der Verteilung von $E\textsubscript{HR}$ wird für den \ac{RF}-Regressor durchgeführt. Zum Vergleich werden die Ergebnisse der Klassifizierung anhand der Intervallschätzer des \ac{CLIE}-Algorithmus für $q\textsubscript{th}=0{,}3$ und $c\textsubscript{th}$ gezeigt, da mit diesen Schwellwerten ebenfalls eine Reduzierung des \ac{MAE} mit einer vergleichbaren Coverage von 37,87\,\% erreicht wurde. Der Vergleich der erreichten Coverage unter einem bestimmten $E\textsubscript{HR}$, sichtbar in Tabelle \ref{fig:own-coverage-default}, zeigt deutlich, dass die Coverage für geringe Fehler deutlich erhöht werden konnte. 
  
   \begin{table}[h]
  	\centering
@@ -160,31 +161,31 @@ Bei der Betrachtung der Regressionsmodelle zeigt sich, dass es bei dem \ac{XGB}-
 
 Nachdem die generelle Performance der Modelle untersucht wurde, wird nun der Einfluss des verwendeten Schwellwertes $E\textsubscript{th}$ der Annotation untersucht. Dafür werden die vier Modelle jeweils für vier Schwellwerte $E\textsubscript{th}$ trainiert: $E\textsubscript{th} \in \{5, 10, 15, 20\}$.
 
-Die Ergebnisse der Klassifikationsmodelle sind in Tabelle \ref{fig:var-eth-clf} gezeigt. Für diese Modelle ergibt sich für niedrigere Schwellwerte $E\textsubscript{th}$ jeweils eine niedrigere Coverage und ein niedrigerer \ac{MAE}. Die Variation des \ac{MAE} beträgt zwischen $E\textsubscript{th}= 5\,\si{FE}$ und $E\textsubscript{th} = 20\,\si{FE}$ allerdings nur gut 2\,\si{FE} beim \ac{RF}-Klassifikator bzw. 2,5\,\si{FE} beim \ac{XGB}-Klassifikator. Die Coverage kann dabei um ca. 15\,\% für das \ac{RF}-Modell und um ca. 18\,\% für das \ac{XGB}-Modell erhöht werden. Wie wichtig die Genauigkeit der Herzratenschätzung im Vergleich zur Coverage ist, hängt vom Anwendungsfall ab, allerdings ist der Gewinn durch die deutlich erhöhte Coverage vermutlich in den meisten Fällen größer. Für alle Schwellwerte ist weiterhin eine Trennung der beiden Klassen möglich, wobei jeweils die Modelle mit $E\textsubscript{th}= 5\text{\,}\si{FE}$ die beste Trennung ermöglichen. Es kann also auch sinnvoll sein, lediglich den Schwellwert des Klassifikationsmodells anzupassen. Eine genauere Untersuchung der Auswirkungen durch eine solche Variation ist im Rahmen dieser Arbeit allerdings nicht möglich. In diesen Untersuchungen zeigt sich ebenfalls, dass der \ac{XGB}-Klassifikator tendenziell eine höhere Coverage mit höherem \ac{MAE} erreicht als das \ac{RF}-Modell.
+Die Ergebnisse der Klassifikationsmodelle sind in Tabelle \ref{fig:var-eth-clf} gezeigt. Für diese Modelle ergibt sich für niedrigere Schwellwerte $E\textsubscript{th}$ jeweils eine niedrigere Coverage und ein niedrigerer \ac{MAE}. Die Variation des \ac{MAE} beträgt zwischen $E\textsubscript{th}= 5\,\si{FE}$ und $E\textsubscript{th} = 20\,\si{FE}$ allerdings nur gut 2\,\si{FE} beim \ac{RF}-Klassifikator bzw. 2,5\,\si{FE} beim \ac{XGB}-Klassifikator. Die Coverage kann dabei um ca. 15 Prozentpunkte für das \ac{RF}-Modell und um ca. 18 Prozentpunkte für das \ac{XGB}-Modell erhöht werden. Wie wichtig die Genauigkeit der Herzratenschätzung im Vergleich zur Coverage ist, hängt vom Anwendungsfall ab, allerdings ist der Gewinn durch die deutlich erhöhte Coverage vermutlich in den meisten Fällen größer. Für alle Schwellwerte ist weiterhin eine Trennung der beiden Klassen möglich, wobei jeweils die Modelle mit $E\textsubscript{th}= 5\text{\,}\si{FE}$ die beste Trennung ermöglichen. Es kann also auch sinnvoll sein, lediglich den Schwellwert des Klassifikationsmodells anzupassen. Eine genauere Untersuchung der Auswirkungen durch eine solche Variation ist im Rahmen dieser Arbeit allerdings nicht möglich. In diesen Untersuchungen zeigt sich ebenfalls, dass der \ac{XGB}-Klassifikator tendenziell eine höhere Coverage bei gleichzeitig höherem \ac{MAE} erreicht als das \ac{RF}-Modell.
 
 \begin{table}[H]
 	\begin{subfigure}{\textwidth}
 	\centering
-	\begin{tabular}{l || c | c | c | c | c}
-								& insgesamt	& $E\textsubscript{th}=5$	& $E\textsubscript{th}=10$	& $E\textsubscript{th}=15$	& $E\textsubscript{th}=20$	\\ \hline
-	Coverage annotiert [\%]		& -			& 32,61						& 43{,}21 					& 51,64						& 59,45\\
- 	Coverage klassifiziert [\%]	& -			& 29,30						& 34,90 					& 42,46						& 53,78\\
- 	\ac{MAE} [FE]				& 21{,}85	& 11,39						& 11,86						& 12,44						& 13,27\\
- 	F1-Score 					& -			& 0,59						& 0,60						& 0,64						& 0,70\\
- 	AUC 						& -			& 0,78						& 0,75						& 0,73						& 0,73\\
+	\begin{tabular}{l || c | c | c | c}
+								& $E\textsubscript{th}=5$	& $E\textsubscript{th}=10$	& $E\textsubscript{th}=15$	& $E\textsubscript{th}=20$	\\ \hline
+	Coverage annotiert [\%]		& 32,61						& 43{,}21 					& 51,64						& 59,45\\
+ 	Coverage klassifiziert [\%]	& 29,30						& 34,90 					& 42,46						& 53,78\\
+ 	\ac{MAE} [FE]				& 11,39						& 11,86						& 12,44						& 13,27\\
+ 	F1-Score 					& 0,59						& 0,60						& 0,64						& 0,70\\
+ 	AUC 						& 0,78						& 0,75						& 0,73						& 0,73\\
  	\end{tabular}	
 	\caption{\ac{RF}-Klassifikator}
 	\end{subfigure}
 	\begin{subfigure}{\textwidth}
 	\centering
-	\begin{tabular}{l || c | c | c | c | c}
-	\multicolumn{6}{l}{	}	\\
-								& insgesamt	& $E\textsubscript{th}=5$	& $E\textsubscript{th}=10$	& $E\textsubscript{th}=15$	& $E\textsubscript{th}=20$	\\ \hline
-	Coverage annotiert [\%]		& -			& 32,61						& 43{,}21 					& 51,64						& 59,45\\
- 	Coverage klassifiziert [\%]	& -			& 31,51						& 41,99 					& 51,15						& 59,73\\
- 	\ac{MAE} [FE]				& 21{,}85	& 11,39						& 12,44						& 13,23						& 13,86\\
- 	F1-Score 					& -			& 0,59						& 0,63						& 0,67						& 0,73\\
- 	AUC 						& -			& 0,77						& 0,75						& 0,73						& 0,73\\
+	\begin{tabular}{l || c | c | c | c}
+	\multicolumn{5}{l}{	}	\\
+								& $E\textsubscript{th}=5$	& $E\textsubscript{th}=10$	& $E\textsubscript{th}=15$	& $E\textsubscript{th}=20$	\\ \hline
+	Coverage annotiert [\%]		& 32,61						& 43{,}21 					& 51,64						& 59,45\\
+ 	Coverage klassifiziert [\%]	& 31,51						& 41,99 					& 51,15						& 59,73\\
+ 	\ac{MAE} [FE]				& 11,39						& 12,44						& 13,23						& 13,86\\
+ 	F1-Score 					& 0,59						& 0,63						& 0,67						& 0,73\\
+ 	AUC 						& 0,77						& 0,75						& 0,73						& 0,73\\
  	\end{tabular}	
 	\caption{\ac{XGB}-Klassifikator}
 	\end{subfigure}
@@ -212,26 +213,26 @@ Bei den Regressionsmodellen ist der Einfluss der Variation von $E\textsubscript{
 \begin{table}[H]
 	\begin{subfigure}{\textwidth}
 	\centering
-	\begin{tabular}{l || c | c | c | c | c}
-								& insgesamt	& $E\textsubscript{th}=5$	& $E\textsubscript{th}=10$	& $E\textsubscript{th}=15$	& $E\textsubscript{th}=20$	\\ \hline
-	Coverage annotiert [\%]		& -			& 32,61						& 43{,}21 					& 51,64						& 59,45\\
- 	Coverage klassifiziert [\%]	& -			& 20,19						& 46,36 					& 71,16						& 79,47\\
- 	\ac{MAE} [FE]				& 21{,}85	& 9,83						& 12,57						& 14,61						& 15,39\\
- 	F1-Score 					& -			& 0,52						& 0,64						& 0,72						& 0,78\\
- 	AUC 						& -			& 0,77						& 0,75						& 0,74						& 0,73\\
+	\begin{tabular}{l || c | c | c | c}
+								& $E\textsubscript{th}=5$	& $E\textsubscript{th}=10$	& $E\textsubscript{th}=15$	& $E\textsubscript{th}=20$	\\ \hline
+	Coverage annotiert [\%]		& 32,61						& 43{,}21 					& 51,64						& 59,45\\
+ 	Coverage klassifiziert [\%]	& 20,19						& 46,36 					& 71,16						& 79,47\\
+ 	\ac{MAE} [FE]				& 9,83						& 12,57						& 14,61						& 15,39\\
+ 	F1-Score 					& 0,52						& 0,64						& 0,72						& 0,78\\
+ 	AUC 						& 0,77						& 0,75						& 0,74						& 0,73\\
  	\end{tabular}	
 	\caption{\ac{RF}-Regressor}
 	\end{subfigure}
  	\begin{subfigure}{\textwidth}
 	\centering
-	\begin{tabular}{l || c | c | c | c | c}
-	\multicolumn{6}{l}{	}	\\
-								& insgesamt	& $E\textsubscript{th}=5$	& $E\textsubscript{th}=10$	& $E\textsubscript{th}=15$	& $E\textsubscript{th}=20$	\\ \hline
-	Coverage annotiert [\%]		& -			& 32,61						& 43{,}21 					& 51,64						& 59,45\\
- 	Coverage klassifiziert [\%]	& -			& 26,76						& 47,59 					& 63,74						& 74,18\\
- 	\ac{MAE} [FE]				& 21{,}85	& 10,52						& 12,66						& 14,04						& 14,94\\
- 	F1-Score 					& -			& 0,55						& 0,64						& 0,71						& 0,77\\
- 	AUC 						& -			& 0,75						& 0,74						& 0,73						& 0,73\\
+	\begin{tabular}{l || c | c | c | c}
+	\multicolumn{5}{l}{	}	\\
+								& $E\textsubscript{th}=5$	& $E\textsubscript{th}=10$	& $E\textsubscript{th}=15$	& $E\textsubscript{th}=20$	\\ \hline
+	Coverage annotiert [\%]		& 32,61						& 43{,}21 					& 51,64						& 59,45\\
+ 	Coverage klassifiziert [\%]	& 26,76						& 47,59 					& 63,74						& 74,18\\
+ 	\ac{MAE} [FE]				& 10,52						& 12,66						& 14,04						& 14,94\\
+ 	F1-Score 					& 0,55						& 0,64						& 0,71						& 0,77\\
+ 	AUC 						& 0,75						& 0,74						& 0,73						& 0,73\\
  	\end{tabular}	
 	\caption{\ac{XGB}-Regressor}
 	\end{subfigure}
@@ -348,7 +349,7 @@ Bei den Regressionsmodellen ist, wie in Tabelle\,\ref{fig:var-s-regr} gezeigt, �
 
 Der direkte Vergleich der Verteilung von $E\textsubscript{HR}$ auf den als informativ klassifizierten Segmenten zeigt deutlich, dass bei $s=30$ ein deutlich größerer Teil des als informativ klassifizierten Signals einen kleinen Fehler $E\textsubscript{HR}$ aufweist. Bei $s=5$ dagegen ist der Anteil des Signals mit $E\textsubscript{HR} > 20$ ähnlich groß wie der mit $E\textsubscript{HR} < 5$.
 
- \begin{figure}[H]
+ \begin{figure}[H]%TODO: gleich y-Achsenskalierung!
  	\centering
 		\begin{subfigure}{.45\textwidth}
 			\centering
@@ -370,7 +371,7 @@ Der direkte Vergleich der Verteilung von $E\textsubscript{HR}$ auf den als infor
 
 Neben den bisher betrachteten Daten der Patient*innen liegen außerdem die im Schlaf aufgenommenen Daten von 8 gesunden Personen vor. Da die Beurteilung der Signalqualität bei schlafenden, gesunden Personen bedeutend einfacher ist, wurden diese Daten bis jetzt nicht betrachtet. Abschließend werden diese genutzt, um die Performance der Modell für Daten mit anderen Aufnahmebedingungen zu Testen. Getestet werden 10-Sekunden lange Segmente mit dem Schwellwert $E\textsubscript{th} = 20$.
 
-Schon bei der Betrachtung der Daten fällt der Unterschied der Signalqualität insgesamt auf: Während bei den betrachteten Daten mit $E\textsubscript{th} = 20$ eine Coverage von 59,45\,\% durch die Annotation erreicht werden, liegt sie bei den Daten der gesunden Proband*innen bei 83,96\,\%. Auch liegt der durchschnittliche \ac{MAE} aller Daten bei den gesunden Personen bei 13,76\,\si{FE} im Vergleich zu 21,85\,\si{FE} bei tatsächlichen Patient*innen.
+Schon bei der Betrachtung der Daten fällt der Unterschied der Signalqualität insgesamt auf: Während bei den zuvor betrachteten Daten mit $E\textsubscript{th} = 20$ eine Coverage von 59,45\,\% durch die Annotation erreicht werden, liegt sie bei den Daten der gesunden Proband*innen bei 83,96\,\%. Auch liegt der durchschnittliche \ac{MAE} aller Daten bei den gesunden Personen bei 13,76\,\si{FE} im Vergleich zu 21,85\,\si{FE} bei tatsächlichen Patient*innen.
 
 Die Daten werden auf den trainierten Modellen ohne weitere Anpassungen getestet. Es zeigt sich, dass die Klassifikation auch auf unbekannten Daten mit anderen Aufnahmebedingungen funktioniert. Die Ergebnisse für die vier Modelle sind in Tabelle \ref{fig:res-healthy-data} abgebildet. Es zeigt sich erneut, dass die Regressionsmodelle eine höhere Coverage bei einem ebenfalls höheren \ac{MAE} erreichen. Während die Performance der Klassifikationsmodelle auch bei den unbekannten Daten sehr ähnlich ist, zeigt sich bei den Regressionsmodellen, dass das \ac{RF}-Modell bei der \ac{AUC}, dem F1-Score und der Accuracy etwas besser abschneidet. Allerdings ist auch der \ac{MAE} leicht höher - bei einer ebenfalls leicht höheren Coverage.
 
