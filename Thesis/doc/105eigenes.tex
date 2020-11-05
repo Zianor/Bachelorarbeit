@@ -1,6 +1,6 @@
 \chapter{Synthese}\label{synthese}
 
-Die Untersuchungen in Kapitel \ref{analyse} haben gezeigt, dass die existierenden untersuchten Verfahren nicht ausreichend sind, um die Qualität von \ac{BKG}-Signal aus Langzeitaufnahmen von Patient*innen zu beurteilen. Deshalb werden weitere Möglichkeiten zu diesem Zweck untersucht und der Fokus dabei vor allem auf die Konstruktion und Analyse der Eingabemerkmale gelegt. Es wird eine Auswahl von Modellen zum Testen getroffen und ein Basisklassifikator zum Vergleich dieser Modelle entwickelt.
+Die Untersuchungen in Kapitel \ref{analyse} haben gezeigt, dass die existierenden untersuchten Verfahren sich nur bedingt eignen, die Qualität von \ac{BKG}-Signal aus Langzeitaufnahmen von Patient*innen zu beurteilen. Deshalb werden weitere Möglichkeiten zu diesem Zweck untersucht und der Fokus dabei vor allem auf die Konstruktion und Analyse der Eingabemerkmale gelegt. Es wird eine Auswahl von Modellen zum Testen getroffen und ein Basisklassifikator zum Vergleich dieser Modelle entwickelt.
 
 \section{Merkmalskonstruktion}
 
@@ -103,7 +103,7 @@ Eine andere Möglichkeit der Merkmalsreduktion ist die Transformation in einen n
 
 Eine Untersuchung der Mutual Information der verbleibenden Merkmale (Abbildung \ref{fig:mutual-inf-own}) zeigt, dass $\text{SQI}\textsubscript{min}$ mit Abstand am meisten davon besitzt. Auch die anderen Merkmale, die Informationen über den \ac{SQI} beinhalten, zählen zu den Merkmalen mit mehr Mutual Information mit der Annotation der Daten. Zu diesen zählen auch die beiden herzratenbezogenen Merkmale $\text{diff}\textsubscript{data}$ und $\text{diff}\textsubscript{acf}$. Die übernommenen noch verbleibenden vier statistischen Merkmale sind die, die am wenigsten Mutual Information mit dem Ziel teilen.
 
-\begin{figure}[H] %TODO: legende hübscher
+\begin{figure}[H]
 	\centering
 	\includegraphics[scale=0.85]{pic/mutual-inf-own-reduced.pdf}
 	\caption{Mutual Information des reduzierten Merkmalssets mit der binären Annotation}

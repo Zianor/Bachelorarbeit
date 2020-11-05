@@ -4,7 +4,7 @@
 
 Ziel dieser Arbeit war die Untersuchung von Möglichkeiten, die Signalqualität von ballistokardiographischen Signalen mittels Methoden maschinellen Lernens zu beurteilen. Besonderer Fokus lag dabei bei Messdaten von bettlägerigen Patient*innen. Hierzu wurden zunächst die Grundprinzipien des maschinellen Lernens vorgestellt und die Eigenschaften von ballistokardiographischen Signalen untersucht. Auf dieser Basis wurden Besonderheiten der Signalverarbeitungen von \ac{BKG}-Signalen präsentiert und existierende Verfahren zur Beurteilung der Signalqualität vorgestellt.
 
-Die vorliegenden Messdaten wurden vorbereitet und ein geeignetes Verfahren zur Annotation entwickelt. Diese vorbereiteten Daten wurden anschließend genutzt, um die nachimplementierten, existierenden Verfahren zur Beurteilung der Signalqualität zu testen und zu evaluieren. Es zeigte sich, dass diese sich nur bedingt eignen, wenn ein großer Teil des Signals von schlechter Qualität ist, wie es bei den untersuchten Daten der Fall ist. Daher wurden Merkmale entwickelt, anhand derer die Signalqualität beurteilt werden kann.
+Die vorliegenden Messdaten wurden vorbereitet und ein geeignetes Verfahren zur Annotation entwickelt. Diese vorbereiteten Daten wurden anschließend genutzt, um die nachimplementierten, existierenden Verfahren zur Beurteilung der Signalqualität zu testen und zu evaluieren. Es zeigte sich, dass diese sich nur bedingt eignen, wenn ein großer Teil des Signals von schlechter Qualität ist, wie es bei in Betten aufgenommenen \ac{BKG}-Signalen häufig der Fall ist, besonders wenn diese aus Messungen tagsüber stammen. Daher wurden Merkmale entwickelt, anhand derer die Signalqualität beurteilt werden kann.
 
 Zur Untersuchung dieser Merkmale wurden insgesamt vier Modelle maschinellen Lernens ausgewählt: Regression und Klassifikation jeweils mit \acl{RF}s und Gradient Boosted Trees. Diese Modelle sind robust und schnell lernend und eignen sich somit für eine Evaluation verschiedener Einflüsse wie beispielsweise die Merkmalsauswahl, die Länge der Segmente, die beurteilt werden sollen und der Schwellwert, der für die Klassifikation verwendet wird. Um die Modelle an Besonderheiten wie Lücken in den Daten anzupassen, wurde ein eigenes Modell entwickelt, das eine bestehende Implementierung eines Modells maschinellen Lernens erweitert. Um Regressionsverfahren für eine Klassifikation nutzen zu können, wurde auch hierfür ein Modell entwickelt, dass die Vorhersagen des Regressionsmodell in eine binäre Klassifikation umwandelt und zusätzlich Wahrscheinlichkeiten zu den Klassifikationen liefern kann.
 
@@ -20,6 +20,6 @@ Eine Betrachtung der Wahrscheinlichkeiten der Klassenzugehörigkeiten kann detai
 
 Auch könnte untersucht werden, ob eine Kombination von Modellen, Segmentlängen und Schwellwerten genutzt werden kann um zunächst eine gröbere Klassifikation vorzunehmen und diese anschließend zu verfeinern.
 
-
+%TODO: bin ich weiter als vorher? Was bedeuten die Ergebnisse? Habe ich die Welt besser gemacht? Ich habe was erreicht! (im ganzen Kapitel + auch in der Auswertung) + ins Abstract! Im Gesamtkontext einordnen
 
 

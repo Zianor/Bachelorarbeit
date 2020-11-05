@@ -33,16 +33,16 @@ Bei einer ersten Betrachtung von \ac{MAE} in \si{FE}, Coverage und Accuracy wird
   
  	\centering
  	\begin{tabular}{l || c | c | c}
- 									& \ac{MAE}			& Coverage		& Accuracy\\ \hline
- 		insgesamt 					& 21{,}85\,\si{FE}	& -				& - \\
- 		annotiert					& 3{,}28	\,\si{FE}	& 43{,}22\,\%	& - \\ \hline
- 		$q_{th}=0{,}4, c_{th}=50$	& 12{,}30\,\si{FE}	& 20{,}95\,\%	& 0{,}65\\
- 		$q_{th}=0{,}4, c_{th}=75$	& 9{,}57	\,\si{FE}	& 11{,}78\,\%	& 0{,}63\\
- 		$q_{th}=0{,}4, c_{th}=100$	& 8{,}77	\,\si{FE}	& 5{,}26\,\%		& 0{,}60\\ \hline
- 		$q_{th}=0{,}3, c_{th}=50$	& 21{,}36\,\si{FE}	& 58{,}73\,\%	& 0{,}55\\
- 		$q_{th}=0{,}3, c_{th}=75$	& 17{,}97\,\si{FE}	& 37{,}87\,\%	& 0{,}62\\
- 		$q_{th}=0{,}3, c_{th}=100$	& 13{,}45\,\si{FE}	& 19{,}25\,\%	& 0{,}63\\ \hline
- 		$q_{th}=0{,}2, c_{th}=75$	& 21{,}39\,\si{FE}	& 96{,}43\,\%	& 0{,}44\\
+ 									& \ac{MAE} [\,\si{FE}]	& Coverage [	\%]	& Accuracy\\ \hline
+ 		insgesamt 					& 21{,}85				& -				& - \\
+ 		annotiert					& 3{,}28					& 43{,}22		& - \\ \hline
+ 		$q_{th}=0{,}4, c_{th}=50$	& 12{,}30				& 20{,}95		& 0{,}65\\
+ 		$q_{th}=0{,}4, c_{th}=75$	& 9{,}57					& 11{,}78		& 0{,}63\\
+ 		$q_{th}=0{,}4, c_{th}=100$	& 8{,}77					& 5{,}26			& 0{,}60\\ \hline
+ 		$q_{th}=0{,}3, c_{th}=50$	& 21{,}36				& 58{,}73		& 0{,}55\\
+ 		$q_{th}=0{,}3, c_{th}=75$	& 17{,}97				& 37{,}87		& 0{,}62\\
+ 		$q_{th}=0{,}3, c_{th}=100$	& 13{,}45				& 19{,}25		& 0{,}63\\ \hline
+ 		$q_{th}=0{,}2, c_{th}=75$	& 21{,}39				& 96{,}43		& 0{,}44\\
  	\end{tabular}
  	\caption[Fehler und Coverage der Klassifikation nach der Ähnlichkeit der Intervallschätzer des CLIE-Algorithmus für verschiedene Schwellwerte im Vergleich zum gesamten Signal und der Annotation]{Fehler und Coverage für verschiedene Schwellwerte im Vergleich zum gesamten Signal und der Annotation}
  	\label{fig:brueser-sqi-MAE-Coverage}
@@ -67,7 +67,7 @@ Bei einer ersten Betrachtung von \ac{MAE} in \si{FE}, Coverage und Accuracy wird
 % \end{figure}
  
  
- \begin{figure}[h]%TODO: gleiche y-Achse
+ \begin{figure}[H]
  	\centering
 		\begin{subfigure}{.45\textwidth}
 			\centering
@@ -103,7 +103,7 @@ Bei einer ersten Betrachtung von \ac{MAE} in \si{FE}, Coverage und Accuracy wird
 
 \subsection{Schwellwertbasierte Artefakterkennung}
 
-Für das zweite getestete Verfahren werden lediglich zwei Schwellwerte $T_1$ und $T_2$ benötigt, die auf Standardabweichung, Minimum, Maximum und Durchschnitt des Signals beruhen. Die Klassifikation ist ein einfacher Vergleich. \citeauthor{Pino2015} verwenden sehr kleine Fenster, die hier aufgrund fehlender Robustheit der Annotation nicht verwendet werden können.\footcite[]{Pino2015} Stattdessen wird der Algorithmus sowohl auf 10\,Sekunden- als auch 4\,Sekunden-Segmenten getestet, damit sichtbar wird, ob die Segmentlänge einen Einfluss auf das Ergebnis hat.
+Für das zweite getestete Verfahren werden lediglich zwei Schwellwerte $T_1$ und $T_2$ benötigt, die auf Standardabweichung, Minimum, Maximum und Durchschnitt des Signals beruhen. Die Klassifikation ist ein einfacher Vergleich. \citeauthor{Pino2015} verwenden sehr kleine Fenster, die hier aufgrund fehlender Robustheit der Annotation nicht verwendet werden können.\footcite[]{Pino2015} Stattdessen wird der Algorithmus sowohl auf 10\,Sekunden- als auch 4\,Sekunden-Segmenten getestet, um schlechte Ergebnisse bedingt durch eine bestimmte Segmentlänge auszuschließen.%TODO: Formulierung checken
 
 Die Tests mit beiden Segmentlängen zeigen, dass dieses Verfahren für die in dieser Arbeit untersuchten Daten nicht nutzbar ist, da bei beiden über 95\,\% der Daten als informativ klassifiziert werden, darunter auch Segmente, bei denen $E\textsubscript{HR}$ maximal ist. Weiterführende Evaluation bietet hier keine weiteren Erkenntnisse. Dieses Verfahren ist damit nicht weiter nutzbar.
 
@@ -116,14 +116,14 @@ Insgesamt zeigen bereits Accuracy und \ac{MAE}, siehe Tabelle \ref{fig:ml-statis
 \begin{table}[H]
 	\centering
  	\begin{tabular}{l || c | c | c | c | c}
- 					& \ac{MAE}			& Coverage		& \makecell{Accuracy\\(Testset)}	& \makecell{Accuracy\\(Kreuzvalidierung Trainingsset)}	& AUC\\ \hline
- 		insgesamt 	& 21{,}84\,\si{FE}	& -				& - 									& -														& -\\
- 		annotiert	& 3{,}28\,\si{FE}	& 43{,}22\,\%	& - 									& -														& -\\ \hline
- 		\acs{LDA}	& 21{,}84\,\si{FE}	& 84{,}81\,\%	& 0{,}49								& 0{,}51												& 0,53\\
- 		\acs{SVM}	& 22{,}06\,\si{FE}	& 88{,}14\,\%	& 0{,}47								& 0{,}55												& 0,53\\
- 		\acs{DT}	& 19{,}47\,\si{FE}	& 70{,}39\,\%	& 0{,}55								& 0{,}55												& 0,59\\
- 		\acs{RF}	& 20{,}14\,\si{FE}	& 62{,}02\,\%	& 0{,}55								& 0{,}58												& 0,59\\
- 		\acs{MLP}	& 18{,}41\,\si{FE}	& 42{,}04\,\%	& 0{,}56								& 0{,}54												& 0,58\\
+ 					& \makecell{\ac{MAE}\\{[\,\si{FE}]}}	& \makecell{Coverage\\{[\,\%]}}	& \makecell{Accuracy\\(Testset)}	& \makecell{Accuracy\\(Kreuzvalidierung Trainingsset)}	& AUC\\ \hline
+ 		insgesamt 	& 21{,}84				& -				& - 									& -														& -\\
+ 		annotiert	& 3{,}28					& 43{,}22\,\%	& - 									& -														& -\\ \hline
+ 		\acs{LDA}	& 21{,}84				& 84{,}81\,\%	& 0{,}49								& 0{,}51												& 0,53\\
+ 		\acs{SVM}	& 22{,}06				& 88{,}14\,\%	& 0{,}47								& 0{,}55												& 0,53\\
+ 		\acs{DT}	& 19{,}47				& 70{,}39\,\%	& 0{,}55								& 0{,}55												& 0,59\\
+ 		\acs{RF}	& 20{,}14				& 62{,}02\,\%	& 0{,}55								& 0{,}58												& 0,59\\
+ 		\acs{MLP}	& 18{,}41				& 42{,}04\,\%	& 0{,}56								& 0{,}54												& 0,58\\
  	\end{tabular}
  	\caption[Fehler und Coverage der Klassifikation für die verschiedenen Modellen des maschinellen Lernens mit statistischen Merkmalen im Vergleich um gesamten Signal und der Annotation]{Fehler und Coverage für die verschiedenen Modelle im Vergleich zum gesamten Signal und der Annotation}
  	\label{fig:ml-statistical-MAE-Coverage}
@@ -131,7 +131,7 @@ Insgesamt zeigen bereits Accuracy und \ac{MAE}, siehe Tabelle \ref{fig:ml-statis
 
 Bei einer ähnlich hohen, beziehungsweise höheren Coverage als die der Annotation ist der deutlich höhere \ac{MAE} der Klassifikation in falsch-positiven Segmenten begründet. Der Anteil von Segmenten mit einem Fehler $E\textsubscript{HR}$ größer als 20\,\si{FE} ist bei beiden Modellen mit 35 bis 40\,\% ähnlich hoch. Zusätzlich sind 0{,}002\,\% der vom \ac{RF} als informativ klassifizierten Segmente solche, bei den $E\textsubscript{HR}$ maximal ist. Das bedeutet, dass die falsch-positiv klassifizierten Segmente bei beiden Klassifikatoren keine Randfälle sind. Der \ac{MAE} der falsch-negativen Klassifikationen beträgt beim \ac{RF} 4,07\,\si{FE} und beim \ac{MLP} 3{,}39\,\si{FE}, ist also leicht höher als der \ac{MAE} aller informativen Segmente, aber nicht relevant. Auch bei diesen handelt es sich demnach nicht um Randfälle.
  	
- \begin{figure}[H] %TODO: y-Achsenbeschriftung
+ \begin{figure}[H]
  	\centering
 		\begin{subfigure}{.45\textwidth}
 			\centering
@@ -170,7 +170,7 @@ Obwohl keines der Verfahren sehr gute Ergebnisse für die vorliegenden Daten lie
 
 Zunächst wird betrachtet, ob die Merkmale untereinander und mit $E\textsubscript{HR}$ und der Annotation korreliert sind. Da die Merkmale das Segment gemeinschaftlich statistisch beschreiben ist eine hohe Korrelation untereinander erwartet und zeigt sich auch. Eine Ausnahme bilden Kurtosis, Mittelwert und Schiefe. Die Anzahl der Nulldurchgänge ist ebenfalls nur schwächer mit den restlichen Mermalen korreliert. Außerdem zeigt sich bei der Betrachtung des in Abbildung \ref{fig:corr-heatmap-statistical} abgebildeten Korrelationsdiagramms, dass die Korrelation zu $E\textsubscript{HR}$ und der Annotation nicht signifikant ist. Auch bei paarweiser Visualisierung zeigt sich, dass sich anhand keines untersuchten Merkmalspaares informative von nicht informativen Segmenten unterscheiden lassen.
 
-\begin{figure}[H] %TODO: Label rotiert, jedes label in x-Achse
+\begin{figure}[H]
 	\centering
 	\includegraphics[scale=0.95]{pic/corr-heatmap-statistical.pdf}
 	\caption{Korrelationsdiagramm der statistischen Merkmale, $E\textsubscript{HR}$ und der binären Annotation}
@@ -226,5 +226,5 @@ Die Ergebnisse dieses \acl{RF}s mit reduzierter Merkmalsanzahl können mit dem i
  	\label{fig:ml-statistical-reduced-comparison}
  \end{table}
 
-Anhand der statistischen Merkmale kann also keine zuverlässige Klassifikation für den Schwellwert $E\textsubscript{HR} = 10\,\si{FE}$ vorgenommen werden. Vermutlich sorgt die große Variation der in Betten aufgenommenen \ac{BKG}-Signale dafür, dass sich die Signale nicht statistisch verallgemeinern lassen. Auch die reine Betrachtung der Ähnlichkeit der Intervallschätzer führt zu einem im Verhältnis zur Coverage hohen \ac{MAE}. Es müssen also weitere Merkmale gefunden werden, die allein oder ergänzend zu den bereits betrachteten eine bessere Aussage zu der Signalqualität ermöglichen.
+Anhand der statistischen Merkmale kann also keine zuverlässige Klassifikation für den Schwellwert $E\textsubscript{HR} = 10\,\si{FE}$ vorgenommen werden. Vermutlich sorgt die große Variation der in Betten aufgenommenen \ac{BKG}-Signale dafür, dass sich die Signale nicht statistisch verallgemeinern lassen. Auch die reine Betrachtung der Ähnlichkeit der Intervallschätzer führt zu einem im Verhältnis zur Coverage hohen \ac{MAE}. Es müssen also weitere Merkmale gefunden werden, die allein oder ergänzend zu den bereits betrachteten eine bessere Aussage zu der Signalqualität ermöglichen. %TODO: so ne Aussage ins Fazit
 
