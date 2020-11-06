@@ -136,4 +136,3 @@ class RegressionClassifier(BaseEstimator, ClassifierMixin):
         y = [False if curr > self.threshold else True for curr in y]
         return accuracy_score(y, self.predict(X))
 \end{lstlisting}
-
