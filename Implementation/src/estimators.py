@@ -34,6 +34,7 @@ class QualityEstimator:
         self.features = self._get_features().copy()
         self.target = self.data['informative'].copy()
         self.patient_id = self.data['patient_id'].copy()
+        self.y_lim= 50
 
     @staticmethod
     def _get_informative_names():
@@ -130,7 +131,9 @@ class QualityEstimator:
         data = pd.Series(arr, index=['$<5$', '$5-10$', '$10-15$', '$15-20$', '$20-666$', '$667$'])
         plt.figure(figsize=utils.get_plt_normal_size())
         plt.bar(x=data.index, height=data.values)
-        plt.xlabel('$E\\textsubscript{HR}$ in FE')
+        plt.xlabel('$E\\textsubscript{HR}$ [FE]')
+        plt.ylabel("Anteil [\\%]")
+        plt.ylim((0, self.y_lim))
         if name:
             plt.title(name)
         if path is not None:
@@ -307,6 +310,7 @@ class BrueserSingleSQI(QualityEstimator):
         self.informative_info['sqi_hr_diff_rel'] = self.informative_info['sqi_hr_diff_rel'].replace(np.nan, 667)
         self.informative_info['sqi_hr_error'] = self.informative_info['sqi_hr_error'].replace(np.nan, 667)
         self.coverage_threshold = coverage_threshold
+        self.y_lim = 75
 
     def _load_segments(self):
         """
@@ -350,7 +354,8 @@ class BrueserSingleSQI(QualityEstimator):
             # data_subset = data_subset[~np.isclose(data_subset['sqi_hr_error'], 667)]
             return np.mean(data_subset['sqi_hr_error'])
         # data_subset = data_subset[~np.isclose(data_subset['error'], 667)]
-        return np.mean(data_subset['error'])
+        return np.mean(data_subset['error']), np.std(data_subset['error'])
+
 
     def get_mean_squared_error(self, indices, labels=None, use_brueser_hr=False):
         data_subset = self.informative_info.loc[indices]
@@ -470,6 +475,7 @@ class MLStatisticalEstimator(QualityEstimator):
                 self.model = grid_search.best_estimator_
         else:
             raise Exception("No model found at given path")
+        self.y_lim = 50
 
     def _load_segments(self):
         path_hr = utils.get_statistical_features_csv_path(self.data_folder, self.segment_length, self.overlap_amount,
