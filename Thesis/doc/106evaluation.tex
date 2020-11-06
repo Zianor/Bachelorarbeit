@@ -240,6 +240,7 @@ Bei den Regressionsmodellen ist der Einfluss der Variation von $E\textsubscript{
 	\label{fig:var-eth-regr}
 \end{table}
 
+
 Auch hier wird die Coverage unter bestimmten Fehlern $E\textsubscript{HR}$ untersucht. Die Ergebnisse der Regressionsmodelle für niedrige $E\textsubscript{th}$ weisen eine deutlich geringere Coverage auf, aber für $E\textsubscript{th} = 20$ wird nahezu alles informative Signal erkannt. Vor allem fällt auf, dass bei $E\textsubscript{th}= 5\text{\,}\si{FE}$ sehr viel Signal mit nur geringem Fehler nicht erkannt wird. Der Vergleich zwischen $E\textsubscript{th}= 5\text{\,}\si{FE}$ und $E\textsubscript{th}= 20\text{\,}\si{FE}$ beim \ac{RF}-Regressor ist in Tabelle\,\ref{fig:rf-regr-cov-eth} gezeigt.
 
 \begin{table}[H]
@@ -254,6 +255,16 @@ Auch hier wird die Coverage unter bestimmten Fehlern $E\textsubscript{HR}$ unter
  	\caption{Coverage unter bestimmten Fehlern $E\textsubscript{HR}$ nach Klassifikation mittels \ac{RF}-Regressor für verschiedene Schwellwerte der Annotation}
  	\label{fig:rf-regr-cov-eth}
 \end{table}
+
+
+Bei der Betrachtung von Coverage und \ac{MAE} aller vier Modelle mit den verschiedenen Schwellwerten $E\textsubscript{th}$ im Vergleich zeigt, dass der Tradeoff zwischen Coverage und \ac{MAE} einen nahezu linearen Zusammenhang bildet (Abbildung\,\ref{fig:threshold-variation}. %TODO: pls check
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.95]{pic/threshold-variation.pdf}
+ 	\caption{Graphische Darstellung des Zusammenhangs von \ac{MAE} und Coverage abhängig von dem gewählten Schwellwert $E\textsubscript{th}$}
+ 	\label{fig:threshold-variation}
+\end{figure}
 
 Die Untersuchungen zeigen, dass die Wahl von $E\textsubscript{th}$ einen großen Einfluss vor allem auf die erreichte Coverage der Klassifikation hat. Auch hier muss abgewogen werden, ob eine hohe Genauigkeit oder eine hohe Coverage wichtiger ist, allerdings ist der Gewinn der Coverage durch die Wahl eines höheren Schwellwertes $E\textsubscript{th}$ in den meisten Fällen vermutlich größer.
 
@@ -349,7 +360,7 @@ Bei den Regressionsmodellen ist, wie in Tabelle\,\ref{fig:var-s-regr} gezeigt, �
 
 Der direkte Vergleich der Verteilung von $E\textsubscript{HR}$ auf den als informativ klassifizierten Segmenten zeigt deutlich, dass bei $s=30$ ein deutlich größerer Teil des als informativ klassifizierten Signals einen kleinen Fehler $E\textsubscript{HR}$ aufweist. Bei $s=5$ dagegen ist der Anteil des Signals mit $E\textsubscript{HR} > 20$ ähnlich groß wie der mit $E\textsubscript{HR} < 5$.
 
- \begin{figure}[H]%TODO: gleich y-Achsenskalierung!
+ \begin{figure}[H]
  	\centering
 		\begin{subfigure}{.45\textwidth}
 			\centering
@@ -364,6 +375,15 @@ Der direkte Vergleich der Verteilung von $E\textsubscript{HR}$ auf den als infor
  	\caption{Verteilung von $E\textsubscript{HR}$ bei den vom \ac{RF}-Regressor als informativ klassifizierten Segmenten mit verschiedenen Segmentlängen $s$}
  	\label{fig:rf-regr-var-s-positives}
  \end{figure}
+ 
+ Betrachtet man alle Modelle im Vergleich, indem man den Zusammenhang von \ac{MAE} und Coverage graphisch darstellt, siehe Abbildung\,\ref{fig:segment-length-variation}, zeigt sich, dass die Unterschiede der Modelle mit variierender Segmentlänge sichtbar sind. Das Modell mit geringstem \ac{MAE} und geringster Coverage ist der \ac{RF}-Klassifikator, das mit höchstem \ac{MAE} und Coverage ist der \ac{RF}-Regressor. Auch zeigt sich erneut dass jeweils Regressions- und KLassifikationsmodelle eine hohe Ähnlichkeit der Ergebnisse zeigen. %TODO: pls check
+ 
+ \begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.95]{pic/segment-length-variation.pdf}
+ 	\caption{Graphische Darstellung des Zusammenhangs von \ac{MAE} und Coverage abhängig von der Segmentlänge $s$}
+ 	\label{fig:segment-length-variation}
+\end{figure}
 
  Bei der Bewertung muss jedoch auch beachtet werden, dass die Herzrate über die Berechnung des Medians der geschätzten Intervalllängen bestimmt wird, also dementsprechend mit steigender Segmentlänge auch robuster wird. Auch hier gilt aus diesem Grund, dass die Wahl der Segmentlänge von dem Anwendungsfall abhängt, tendenziell aber längere Segmente zu besseren Ergebnissen führen.
 
