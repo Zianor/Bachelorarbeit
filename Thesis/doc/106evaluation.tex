@@ -2,7 +2,7 @@
 
 Im Folgenden werden die entwickelten Modelle untersucht und evaluiert. Für die beiden \acl{RF}-Modelle wird die Implementierung von \texttt{sklearn} genutzt, für die Gradient Boosted Trees die Bibliothek \texttt{XGBoost}, da das dort verwendete \acl{XGB} besser ist als die Implementierung in \texttt{sklearn}.\footcite[Kapitel 10]{Harrison2019} Die Ergebnisse der Modelle werden sowohl für das reduzierte als auch das vollständige Merkmalsset berechnet, verglichen und aufbauend darauf die Merkmalsauswahl optimiert. Außerdem wird der Einfluss der gewählten Segmentlänge und des gewählten Schwellwertes der Annotation untersucht. Für alle Untersuchungen wird das gleiche Testset wie in Kapitel \ref{analyse} verwendet.
 
-\section{Modellevaluation} %TODO: besserer Titel? Merkmalsauswahl?
+\section{Evaluation der Modelle}
 
 Zunächst werden alle Modelle sowohl mit dem vollständigen Merkmalsset als auch dem reduzierten Merkmalsset verglichen; die Ergebnisse sind in Tabelle \ref{fig:comparison-all} gezeigt. Insgesamt zeigt sich bereits, dass eine deutlich höhere Coverage als bei der reinen Betrachtung der Intervallschätzer des CLIE-Algorithmus erreicht wird. Diese lag beispielsweise für $q\textsubscript{th} = 0.3$ bei 20,93\,\% mit einem \ac{MAE} von 13,90\,\si{FE}. Die Ergebnisse der Klassifikation mit Gradient Boosted Trees und \acl{RF}s sind zunächst ähnlich. Bei der Regression erreichen Gradient Boosted Trees eine sehr hohe Coverage von über 80\,\% mit einem zu den anderen Modellen verhältnismäßig hohen \ac{MAE} von über 16\,\si{FE}.
 
@@ -376,7 +376,7 @@ Der direkte Vergleich der Verteilung von $E\textsubscript{HR}$ auf den als infor
  	\label{fig:rf-regr-var-s-positives}
  \end{figure}
  
- Betrachtet man alle Modelle im Vergleich, indem man den Zusammenhang von \ac{MAE} und Coverage graphisch darstellt, siehe Abbildung\,\ref{fig:segment-length-variation}, zeigt sich, dass die Unterschiede der Modelle mit variierender Segmentlänge sichtbar sind. Das Modell mit geringstem \ac{MAE} und geringster Coverage ist der \ac{RF}-Klassifikator, das mit höchstem \ac{MAE} und Coverage ist der \ac{RF}-Regressor. Auch zeigt sich erneut dass jeweils Regressions- und KLassifikationsmodelle eine hohe Ähnlichkeit der Ergebnisse zeigen. %TODO: pls check
+ Betrachtet man alle Modelle im Vergleich, indem man den Zusammenhang von \ac{MAE} und Coverage graphisch darstellt, siehe Abbildung\,\ref{fig:segment-length-variation}, zeigt sich, dass die Unterschiede der Modelle mit variierender Segmentlänge sichtbar sind. Das Modell mit geringstem \ac{MAE} und geringster Coverage ist der \ac{RF}-Klassifikator, das mit höchstem \ac{MAE} und Coverage ist der \ac{RF}-Regressor. Auch zeigt sich erneut dass jeweils Regressions- und Klassifikationsmodelle eine hohe Ähnlichkeit der Ergebnisse zeigen. %TODO: pls check
  
  \begin{figure}[H]
 	\centering
