@@ -33,7 +33,7 @@ In diesem Kapitel wird eine Einführung in das Thema der Signalverarbeitung und 
 	\end{align*}
  	
  	Dabei berechnet $E_\textsubscript{Corr}$ eine modifizierte Autokorrelationsfunktion, mit $E_\textsubscript{AMDF}$ wird die Differenz des Signals bei verschiedenen Abständen miteinbezogen und mit $E_\textsubscript{MAP}$ werden die maximale Amplituden von zwei beliebigen Samples über das ganze Fenster berechnet. AMDF steht für \textit{modified average magnitude difference function} und MAP für \textit{maximum amplitude pairs}. Diese Schätzer entsprechen jeweils einer Wahrscheinlichkeitsfunktion, die beschreibt wie wahrscheinlich es ist, dass $n$ dem tatsächlichen Schlag-zu-Schlag-Intervall entspricht. Durch Skalierung können sie in Wahrscheinlichkeitsdichtefunktionen verwandelt werden. Durch Kombination dieser drei Funktionen wird nun der wahrscheinlichste Wert für $N$ ermittelt:
- 	\[ N_{opt} = \argmax_{N} p(N|E\textsubscript{Corr}, E\textsubscript{AMDF}, E\textsubscript{MAP}) \]
+ 	\[ N\textsubscript{opt} = \argmax_{N} p(N|E\textsubscript{Corr}, E\textsubscript{AMDF}, E\textsubscript{MAP}) \]
  	
 	Nach dem Satz von Bayes kann die Wahrscheinlichkeit, dass $N$ der tatsächlichen Intervalllänge entspricht, auch wie folgt ausgedrückt werden:
 	
@@ -108,7 +108,7 @@ In diesem Kapitel wird eine Einführung in das Thema der Signalverarbeitung und 
 	
 	\begin{eqnarray*}
 		&T_1 &= \frac{\text{max} + \text{min}}{2},\notag\\
-		&T_2 &= \text{mean} + 1{,}1 * \text{std}.\notag
+		&T_2 &= \text{mean} + 1{,}1 \cdot \text{std}.\notag
 	\end{eqnarray*}
 	
 	Ein Segment wird als informativ klassifiziert, wenn $T_1 \leq T_2$ ist. Die Länge des \textit{moving window} ist mit einer Sekunde bei einer Abtastrate von 200 Hz benannt. Untersucht wurden sowohl Freiwillige im Labor, als auch im Krankenhauswartezimmer für eine sehr kurze Messdauer von ein bis zwei Minuten. Mit diesem Ansatz wurde bei mehr als 50\,\% der Laborgruppe eine Coverage zwischen 87\,\% und 95\,\% erreicht. Die Coverage der im Krankenhaus aufgenommenen Gruppe war bedeutend niedriger; hier lagen 50 \% der Messungen zwischen 48\,\% und 95\,\% Coverage. Zu der Genauigkeit der Herzschlagdetektion auf den akzeptierten Signalteilen wird keine Aussage in Zahlen getroffen, sondern nur der folgende Bland-Altman Graph gezeigt.
@@ -136,7 +136,7 @@ In diesem Kapitel wird eine Einführung in das Thema der Signalverarbeitung und 
 		\item Mittelwert
 		\item Standardabweichung
 		\item Schiefe
-		\item Kurtosis
+		\item Kurtosis\footnote{Die Kurtosis ist eine Maßzahl für die Steilheit einer Wahrscheinlichkeitsfunktion}
 		\item Spannweite
 		\item Interquartilspannweite
 		\item mittlere absolute Abweichung
@@ -178,7 +178,7 @@ In diesem Kapitel wird eine Einführung in das Thema der Signalverarbeitung und 
 	\begin{figure}[H]
 		\centering
 		\includegraphics[width=\textwidth]{pic/data-prep-classes.png}
-		\caption[Klassendiagramm der Datenstruktur für die Messdaten]{Klassendiagramm der Datenstruktur für die Messdaten}
+		\caption[Klassendiagramm der Datenstruktur für die Messdaten]{Klassendiagramm der Datenstruktur für die Messdaten.}
 		\label{fig:data-prep-class}
 	\end{figure}
 	
@@ -196,7 +196,7 @@ In diesem Kapitel wird eine Einführung in das Thema der Signalverarbeitung und 
 	\begin{figure}[H]
 		\centering
 		\includegraphics[width=\textwidth]{pic/ecg-hr-estimation.png}
-		\caption[Aktivitätsdiagramm der Herzratenschätzung auf dem EKG-Referenzsignal]{Aktivitätsdiagramm der Herzratenschätzung auf dem EKG-Referenzsignal}
+		\caption{Aktivitätsdiagramm der Herzratenschätzung auf dem EKG-Referenzsignal.}
 		\label{fig:ecg-hr-estimation}
 	\end{figure}
 
@@ -206,7 +206,7 @@ In diesem Kapitel wird eine Einführung in das Thema der Signalverarbeitung und 
 	\begin{figure}[H]
 		\centering
 		\includegraphics{pic/ecg-patient-26.pdf}
-		\caption[\ac{EKG}-Herzratenschätzungen auf sich überlappenden 10-Sekunden-Segmenten für Patient*in 26]{\ac{EKG}-Herzratenschätzungen auf sich überlappenden 10-Sekunden-Segmenten für Patient*in 26. Fusioniert lokal zeigt die Fusion ohne Miteinbeziehung der Umgebung, Fusioniert Umgebung die oben beschriebene Fusion}
+		\caption[\ac{EKG}-Herzratenschätzungen auf sich überlappenden 10-Sekunden-Segmenten für Patient*in 26]{\ac{EKG}-Herzratenschätzungen auf sich überlappenden 10-Sekunden-Segmenten für Patient*in 26. Fusioniert lokal zeigt die Fusion ohne Miteinbeziehung der Umgebung, Fusioniert Umgebung die oben beschriebene Fusion.}
 		\label{fig:ecg-patient-26}
 	\end{figure}
 
@@ -217,7 +217,7 @@ In diesem Kapitel wird eine Einführung in das Thema der Signalverarbeitung und 
 	\begin{figure}[H]
 		\centering
 		\includegraphics{pic/label-distribution.pdf}
-		\caption[Verteilung der Label je nach maximal zulässiger Abweichung]{Verteilung der Label je nach maximal zulässiger Abweichung}
+		\caption{Verteilung der Labels je nach maximal zulässiger Abweichung.}
 		\label{fig:label-distribution}
 	\end{figure}
 	
@@ -226,7 +226,7 @@ In diesem Kapitel wird eine Einführung in das Thema der Signalverarbeitung und 
 	\begin{figure}[H]
 		\centering
 		\includegraphics{pic/data-stats-10.pdf}
-		\caption[Verteilung der Label pro Patient*in]{Verteilung der Label pro Patient*in für maximal 10\,\% Abweichung}
+		\caption[Verteilung der Labels pro Patient*in]{Verteilung der Label pro Patient*in für maximal 10\,\% Abweichung.}
 		\label{fig:data-stats-15}
 	\end{figure}
 	
@@ -236,13 +236,13 @@ In diesem Kapitel wird eine Einführung in das Thema der Signalverarbeitung und 
 		E\textsubscript{HR} \hat{=} \Delta\text{HR}\textsubscript{abs} \cdot 2.
 	\end{align*}
 	
-	Wenn keine Herzrate auf dem \ac{BKG}-Signal ermittelt werden konnte, wird $E\textsubscript{HR}$ auf den maximalen Wert 667 gesetzt, da das der maximal möglichen relativen Abweichung von Herzraten zwischen 30 und 200 Schlägen pro Minute entspricht. Für $E\textsubscript{HR}$ wird im Folgenden die Einheit Fehlereinheit \si{FE} verwendet. Die Verteilung von $E\textsubscript{HR}$, dargestellt in Abbildung \ref{fig:class-histo}, zeigt, dass Segmente mit Fehlern von mehr als 20\,\si{FE} und solche mit Fehlern unter 5\,\si{FE} jeweils die beiden größten Gruppen bilden.
+	Wenn keine Herzrate aus dem \ac{BKG}-Signal ermittelt werden konnte, wird $E\textsubscript{HR}$ auf den maximalen Wert 667 gesetzt, da das der maximal möglichen relativen Abweichung von Herzraten zwischen 30 und 200 Schlägen pro Minute entspricht. Für $E\textsubscript{HR}$ wird im Folgenden die Einheit Fehlereinheit \si{FE} verwendet. Die Verteilung von $E\textsubscript{HR}$, dargestellt in Abbildung \ref{fig:class-histo}, zeigt, dass Segmente mit Fehlern von mehr als 20\,\si{FE} und solche mit Fehlern unter 5\,\si{FE} jeweils die beiden größten Gruppen bilden.
 	
 	
 	\begin{figure}[H]
 		\centering
 		\includegraphics{pic/data-E-HR-bar.pdf}
-		\caption[Verteilung von $E\textsubscript{HR}$ auf allen Messdaten]{Verteilung von $E\textsubscript{HR}$}
+		\caption[Verteilung von $E\textsubscript{HR}$ auf allen Messdaten.]{Verteilung von $E\textsubscript{HR}$.}
 		\label{fig:class-histo}
 	\end{figure}
 	

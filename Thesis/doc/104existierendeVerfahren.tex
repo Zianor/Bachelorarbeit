@@ -4,19 +4,19 @@ In diesem Kapitel werden die vorgestellten Daten näher untersucht. Das beinhalt
 
 \section{Aufbau und Evaluation der Verfahren}
 
-Um Modelle zur Beurteilung der Signalqualität anzuwenden und zu untersuchen, müssen sowohl die verwendeten Merkmale extrahiert als auch die Ergebnisse evaluiert werden. In den hier durchgeführten Untersuchungen wurde die Segmentlänge standardmäßig auf 10\,Sekunden festgelegt und der Abstand der Segmente auf 1\,Sekunde, wodurch sich die Segmente zu je 90\,\% überlappen. Diese Segmentlänge wird zum einen häufiger verwendet\footcite{Yu2020, Sadek2016, Orphanidou2015}, zum anderen bietet sie eine ausreichend große Robustheit für die Annotation der Daten. Die für die Verfahren jeweils benötigten Merkmale werden segmentweise extrahiert und serialisiert. Zusätzlich zu den verwendeten Merkmalen werden allgemeine Informationen über die Segmente gespeichert. Dazu gehören Patient*innen-ID, EKG-Herzrate, BKG-Herzrate, absoluter und relativer Fehler, $E\textsubscript{HR}$ und die binäre Annotation. Für letztere wird als Standard $E\textsubscript{HR} = 10$ als Schwellwert verwendet.
+Um Modelle zur Beurteilung der Signalqualität anzuwenden und zu untersuchen, müssen sowohl die verwendeten Merkmale extrahiert als auch die Ergebnisse evaluiert werden. In den hier durchgeführten Untersuchungen wurde die Segmentlänge standardmäßig auf 10\,Sekunden festgelegt und der Abstand der Segmente auf 1\,Sekunde, wodurch sich die Segmente zu je 90\,\% überlappen. Diese Segmentlänge wird zum einen häufig verwendet\footcite{Yu2020, Sadek2016, Orphanidou2015}, zum anderen bietet sie eine ausreichend große Robustheit für die Annotation der Daten. Die für die Verfahren jeweils benötigten Merkmale werden segmentweise extrahiert und serialisiert. Zusätzlich zu den verwendeten Merkmalen werden allgemeine Informationen über die Segmente gespeichert. Dazu gehören Patient*innen-ID, EKG-Herzrate, BKG-Herzrate, absoluter und relativer Fehler, $E\textsubscript{HR}$ und die binäre Annotation. Für letztere wird als Standard $E\textsubscript{HR} = 10$ als Schwellwert verwendet.
 
 Diese Daten werden anschließend in Trainings- und Testset aufgeteilt. Um diese beiden Gruppen inhaltlich vollständig zu trennen und auszuschließen, dass auf teilweise bekannten Daten validiert wird, geschieht die Trennung anhand der Patient*innen-IDs, sodass Segmente einer Person lediglich in einem der beiden Sets verwendet werden. Das Testset in dieser Arbeit entspricht einem Drittel der Patient*innen, die restlichen zwei Drittel werden zur Datenexploration, zur Merkmalskonstruktion und zum Training verwendet. Die Verteilung von $E\textsubscript{HR}$ im Testset ist in Abbildung \ref{fig:validation-set} gezeigt. Von den existierenden Verfahren benötigen zwei keine Trainingsphase; um vergleichbare Ergebnisse zu erhalten, wird auch bei diesen bei der Evaluation nur das Testset betrachtet.
 
 \begin{figure}[h]
 	\centering
 	\includegraphics{pic/mlp-statistical-testset.pdf}
-	\caption[Verteilung von $E\textsubscript{HR}$ auf dem Testset]{Verteilung von $E\textsubscript{HR}$ auf dem Testset, wobei 667\,\si{FE} dem maximalen Fehler entspricht}
+	\caption[Verteilung von $E\textsubscript{HR}$ auf dem Testset]{Verteilung von $E\textsubscript{HR}$ auf dem Testset, wobei 667\,\si{FE} dem maximalen Fehler entspricht.}
 	\label{fig:validation-set}
 \end{figure}
 
 
-Wie schon in Kapitel \ref{artefakterkennung} beschrieben, sind bei der Verarbeitung von medizinischen Signalen zwei Kenngrößen wichtig: Die Coverage und die Qualität des Signals, in diesem Fall also die Genauigkeit der geschätzten Herzrate im Vergleich zur Referenz. Diese beiden müssen gegeneinander aufgewogen werden und werden aus diesem Grund beide betrachtet. Die Qualität der Modelle kann zunächst anhand der binären Klassifikation beurteilt werden. Da diese aber keine Auskunft darüber enthält, wie nah klassifiziertes Signal an dem Schwellwert für $E\textsubscript{HR}$ liegt, wird das in einer tiefergehenden Evaluation ebenfalls betrachtet. Im Zuge dessen wird sowohl der Fehler auf dem als informativ klassifizierten Signal betrachtet als auch die Coverage in Bezug auf das ganze Signal für verschiedene Fehlergrößen. Insbesondere falsch klassifiziertes Signal, also Falsch-Negative und Falsch-Positive, ist interessant, um zu beurteilen, ob Fehlklassifikationen lediglich im Grenzbereich $E\textsubscript{HR} \approx 10$\,\si{FE} oder allgemein vorkommen.
+Wie schon in Kapitel \ref{artefakterkennung} beschrieben, sind bei der Verarbeitung von medizinischen Signalen zwei Kenngrößen wichtig: Die Coverage und die Qualität des Signals, in diesem Fall also die Genauigkeit der geschätzten Herzrate im Vergleich zur Referenz. Diese beiden müssen gegeneinander aufgewogen werden und werden aus diesem Grund beide betrachtet. Die Qualität der Modelle kann zunächst anhand der binären Klassifikation beurteilt werden. Da diese aber keine Auskunft darüber enthält, wie nah ein klassifiziertes Signal an dem Schwellwert für $E\textsubscript{HR}$ liegt, wird das in einer tiefergehenden Evaluation ebenfalls betrachtet. Insbesondere falsch klassifiziertes Signal, also Falsch-Negative und Falsch-Positive, ist interessant, um zu beurteilen, ob Fehlklassifikationen lediglich im Grenzbereich $E\textsubscript{HR} \approx 10$\,\si{FE} oder allgemein vorkommen. Im Zuge der tiefergehenden Evaluation wird sowohl der Fehler auf dem als informativ klassifizierten Signal betrachtet als auch die Coverage in Bezug auf das ganze Signal für verschiedene Fehlergrößen. %TODO: drüberlesen ob Absatz komisch
 
 \section{Anwendung existierender Verfahren}
 
@@ -44,7 +44,7 @@ Bei einer ersten Betrachtung von \ac{MAE} in \si{FE}, Coverage und Accuracy wird
  		$q_{th}=0{,}3, c_{th}=100$	& 13{,}45				& 19{,}25		& 0{,}63\\ \hline
  		$q_{th}=0{,}2, c_{th}=75$	& 21{,}39				& 96{,}43		& 0{,}44\\
  	\end{tabular}
- 	\caption[Fehler und Coverage der Klassifikation nach der Ähnlichkeit der Intervallschätzer des CLIE-Algorithmus für verschiedene Schwellwerte im Vergleich zum gesamten Signal und der Annotation]{Fehler und Coverage für verschiedene Schwellwerte im Vergleich zum gesamten Signal und der Annotation}
+ 	\caption[Fehler und Coverage der Klassifikation nach der Ähnlichkeit der Intervallschätzer des CLIE-Algorithmus für verschiedene Schwellwerte im Vergleich zum gesamten Signal und der Annotation.]{Fehler und Coverage für verschiedene Schwellwerte im Vergleich zum gesamten Signal und der Annotation.}
  	\label{fig:brueser-sqi-MAE-Coverage}
  	\end{table}
  	
@@ -79,7 +79,7 @@ Bei einer ersten Betrachtung von \ac{MAE} in \si{FE}, Coverage und Accuracy wird
  			\includegraphics[scale=0.7]{pic/brueser03-positives.pdf}
  			\caption[$q_{th}=0.3$]{$q_{th}=0.3$}
  		\end{subfigure}
- 	\caption[Verteilung von $E\textsubscript{HR}$ bei den als informativ klassifizierten Segmenten durch Betrachtung der Ähnlichkeit der \ac{CLIE}-Intervallschätzer]{Verteilung von $E\textsubscript{HR}$ bei den als informativ klassifizierten Segmenten}
+ 	\caption[Verteilung von $E\textsubscript{HR}$ bei den als informativ klassifizierten Segmenten durch Betrachtung der Ähnlichkeit der \ac{CLIE}-Intervallschätzer.]{Verteilung von $E\textsubscript{HR}$ bei den als informativ klassifizierten Segmenten.}
  	\label{fig:brueser-positives}
  \end{figure}
  
@@ -94,7 +94,7 @@ Bei einer ersten Betrachtung von \ac{MAE} in \si{FE}, Coverage und Accuracy wird
  		$E\textsubscript{HR} < 15$\,\si{FE} 	&  51{,}64\,\% 	& 23,35\,\% 					& 9,22\,\%	\\
  		$E\textsubscript{HR} < 20$\,\si{FE} 	&  59{,}38\,\% 	& 25,12\,\% 					& 9,47\,\%\\
  	\end{tabular}
- 	\caption[Coverage unter bestimmten Fehlern $E\textsubscript{HR}$ vor und nach Klassifikation durch Betrachtung der Ähnlichkeit der \ac{CLIE}-Intervallschätzer]{Coverage unter bestimmten Fehlern $E\textsubscript{HR}$ vor und nach Klassifikation}
+ 	\caption[Coverage unter bestimmten Fehlern $E\textsubscript{HR}$ vor und nach Klassifikation durch Betrachtung der Ähnlichkeit der \ac{CLIE}-Intervallschätzer.]{Coverage unter bestimmten Fehlern $E\textsubscript{HR}$ vor und nach Klassifikation.}
  	\label{fig:brueser-coverage}
  \end{table}
  
@@ -125,7 +125,7 @@ Insgesamt zeigen bereits Accuracy und \ac{MAE}, siehe Tabelle \ref{fig:ml-statis
  		\acs{RF}	& 20{,}14				& 62{,}02\,\%	& 0{,}55								& 0{,}58												& 0,59\\
  		\acs{MLP}	& 18{,}41				& 42{,}04\,\%	& 0{,}56								& 0{,}54												& 0,58\\
  	\end{tabular}
- 	\caption[Fehler und Coverage der Klassifikation für die verschiedenen Modellen des maschinellen Lernens mit statistischen Merkmalen im Vergleich um gesamten Signal und der Annotation]{Fehler und Coverage für die verschiedenen Modelle im Vergleich zum gesamten Signal und der Annotation}
+ 	\caption[Fehler und Coverage der Klassifikation für die verschiedenen Modellen des maschinellen Lernens mit statistischen Merkmalen im Vergleich um gesamten Signal und der Annotation.]{Fehler und Coverage für die verschiedenen Modelle im Vergleich zum gesamten Signal und der Annotation.}
  	\label{fig:ml-statistical-MAE-Coverage}
 \end{table}
 
@@ -143,7 +143,7 @@ Bei einer ähnlich hohen, beziehungsweise höheren Coverage als die der Annotati
  			\includegraphics[scale=0.7]{pic/mlp-statistical-positives.pdf}
  			\caption[MLP]{MLP}
  		\end{subfigure}
- 	\caption[Verteilung von $E\textsubscript{HR}$ bei den als informativ klassifizierten Segmenten nach Klassifikation mittels statistischen Merkmalen]{Verteilung von $E\textsubscript{HR}$ bei den als informativ klassifizierten Segmenten}
+ 	\caption[Verteilung von $E\textsubscript{HR}$ bei den als informativ klassifizierten Segmenten nach Klassifikation mittels statistischen Merkmalen.]{Verteilung von $E\textsubscript{HR}$ bei den als informativ klassifizierten Segmenten.}
  	\label{fig:ml-statistical-positives}
  \end{figure}
  
@@ -158,7 +158,7 @@ Bei einer ähnlich hohen, beziehungsweise höheren Coverage als die der Annotati
  		$E\textsubscript{HR} < 15$\,\si{FE} 	&  51{,}66\,\% 	& 34,66\,\% 	& 24,34\,\%	\\
  		$E\textsubscript{HR} < 20$\,\si{FE} 	&  59{,}40\,\% 	& 38,52\,\% 	& 27,45\,\%\\
  	\end{tabular}
- 	\caption[Coverage unter bestimmten Fehlern $E\textsubscript{HR}$ vor und nach Klassifikation mittels statistischen Merkmalen]{Coverage unter bestimmten Fehlern $E\textsubscript{HR}$ vor und nach Klassifikation}
+ 	\caption[Coverage unter bestimmten Fehlern $E\textsubscript{HR}$ vor und nach Klassifikation mittels statistischen Merkmalen.]{Coverage unter bestimmten Fehlern $E\textsubscript{HR}$ vor und nach Klassifikation.}
  	\label{fig:ml-statistical-coverage}
  \end{table}
  
@@ -173,7 +173,7 @@ Zunächst wird betrachtet, ob die Merkmale untereinander und mit $E\textsubscrip
 \begin{figure}[H]
 	\centering
 	\includegraphics[scale=0.95]{pic/corr-heatmap-statistical.pdf}
-	\caption{Korrelationsdiagramm der statistischen Merkmale, $E\textsubscript{HR}$ und der binären Annotation}
+	\caption{Korrelationsdiagramm der statistischen Merkmale, $E\textsubscript{HR}$ und der binären Annotation.}
 	\label{fig:corr-heatmap-statistical}
 \end{figure}
 
@@ -182,7 +182,7 @@ Weiteren Einblick ermöglicht die Analyse des \ac{RF}, da bei diesem ermittelt w
 \begin{figure}[H]
 	\centering
 	\includegraphics[scale=0.95]{pic/rf-cl-statistical.pdf}
-	\caption{Wichtigkeit der Merkmale für den \ac{RF}-Klassifikator mit statistischen Merkmalen}
+	\caption{Wichtigkeit der Merkmale für den \ac{RF}-Klassifikator mit statistischen Merkmalen.}
 	\label{fig:rf-statistical-importances}
 \end{figure}
 
@@ -202,7 +202,7 @@ Da eine hohe Korrelation zwischen einzelnen Merkmalen, wie sie auch bei den stat
 \begin{figure}[H]
 	\centering
 	\includegraphics[scale=0.85]{pic/rf-reduced-statistical.pdf}
-	\caption{Wichtigkeit der Merkmale für den \ac{RF}-Klassifikator mit reduziertem Merkmalsset statistischer Merkmale}
+	\caption{Wichtigkeit der Merkmale für den \ac{RF}-Klassifikator mit reduziertem Merkmalsset statistischer Merkmale.}
 	\label{fig:rf-statistical-reduced}
 \end{figure}
 
@@ -222,7 +222,7 @@ Die Ergebnisse dieses \acl{RF}s mit reduzierter Merkmalsanzahl können mit dem i
  		\makecell[l]{Accuracy\\(Kreuzvalidierung\\Trainingsset)}	& -					& 0{,}52			& 0,51\\\hline
  		AUC														& -					& 0,59				& 0,50
  	\end{tabular}
- 	\caption{Random Forest mit reduzierter Merkmalszahl im Vergleich zu allen 13 statistischen Merkmalen}
+ 	\caption{Random Forest mit reduzierter Merkmalszahl im Vergleich zu allen 13 statistischen Merkmalen.}
  	\label{fig:ml-statistical-reduced-comparison}
  \end{table}
 

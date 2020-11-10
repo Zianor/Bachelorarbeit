@@ -4,7 +4,7 @@ Die Untersuchungen in Kapitel \ref{analyse} haben gezeigt, dass die existierende
 
 \section{Merkmalskonstruktion}
 
-Grundsätzlich muss zwischen zwei Eingabeformen unterschieden werden: Der bisher betrachteten Eingabe von Merkmalen und die Eingabe des Signals selbst. Letzteres hat den Vorteil, dass keine Informationen verloren gehen können. Allerdings ist das Training so sehr rechen- und damit auch zeitaufwändig und die Merkmale, die zur Beurteilung der Signalqualität genutzt werden, sind nur schwer nachvollziehbar. Aus diesen Gründen wird in dieser Arbeit die Eingabe von Merkmalen untersucht.
+Grundsätzlich muss zwischen zwei Eingabeformen unterschieden werden: Der bisher betrachteten Eingabe von Merkmalen und der Eingabe des Signals selbst. Letzteres hat den Vorteil, dass keine Informationen verloren gehen können. Allerdings ist das Training so sehr rechen- und damit auch zeitaufwändig und die Merkmale, die zur Beurteilung der Signalqualität genutzt werden, sind nur schwer nachvollziehbar. Aus diesen Gründen wird in dieser Arbeit die Eingabe von Merkmalen untersucht.
 
 Neben der Konstruktion von neuen Merkmalen können ebenfalls die Ergebnisse aus Kapitel \ref{analyse} verwendet werden, das bedeutet das reduzierte Set statistischer Merkmale und der \ac{SQI} des \ac{CLIE}-Algorithmus, bzw. die Coverage durch Intervalle, deren \ac{SQI} über einem Schwellwert $q\textsubscript{th}$ liegt. Das Vorgehen bei der Konstruktion neuer Merkmale besteht darin, diese zunächst zu sammeln und anschließend zu untersuchen, Zusammenhänge zu ermitteln und mit den gewonnenen Erkenntnissen die Merkmale zu reduzieren und in Relation zueinander zu setzen.
 
@@ -73,7 +73,7 @@ Die Korrelationen sind in dem erzeugten Korrelationsdiagramm, das in Abbildung \
 \begin{figure}[H]
 	\centering
 	\includegraphics{pic/corr-heatmap-own.pdf}
-	\caption{Korrelationsdiagramm aller entwickelten Merkmale, $E\textsubscript{HR}$ und der binären Annotation}
+	\caption{Korrelationsdiagramm aller entwickelten Merkmale, $E\textsubscript{HR}$ und der binären Annotation.}
 	\label{fig:corr-heatmap-own}
 \end{figure}
  
@@ -82,13 +82,13 @@ Auch bei diesen Merkmalen wird mit dem Python-Paket \texttt{rfimp} ermittelt, we
 \begin{figure}[H] %TODO: legende hübscher
 	\centering
 	\includegraphics{pic/mutual-inf-own.pdf}
-	\caption{Visualisierung der Mutual Information zwischen allen Merkmalen und der binären Annotation}
+	\caption{Visualisierung der Mutual Information zwischen allen Merkmalen und der binären Annotation.}
 	\label{fig:mutual-inf-own-all}
 \end{figure}
 
-Es zeigt sich, dass Standardabweichung und Spannweite der Werte jeweils die Vorhersage des anderen Wertes ermöglichen. Aus diesem Grund werden $\text{P}\textsubscript{std}$, $\text{std}\textsubscript{std}$ und $\text{IL}\textsubscript{range}$ als Merkmale verworfen. Das gleiche gilt für $\text{SQI}\textsubscript{max}$. Auch bietet $E\textsubscript{abs}$ keinen Mehrgewinn zu der Standardabweichung des Segments. Die Merkmale $\text{ratio}\textsubscript{acf}$ und $\text{diff}\textsubscript{acf}$ sind durch ihre Definition stark miteinander korreliert und da die Untersuchung zeigt, dass $\text{diff}\textsubscript{acf}$ schlechter vorhergesagt werden kann und weniger Mutual Informationen mit der Zielgröße hat, wird $\text{ratio}\textsubscript{acf}$ verworfen. Das Gleiche gilt für $\text{ratio}\textsubscript{data}$. Wie zu erwarten war, korrelieren $\text{SQI}\textsubscript{median}$ und $\text{SQI}\textsubscript{mean}$ stark miteinander. Die mit \texttt{rfimp} berechneten Abhängigkeiten zeigen, dass der Median schlechter vorhergesagt werden kann und mehr Information über die Zielgröße enthält, weshalb $\text{SQI}\textsubscript{mean}$ verworfen wird.
+Es zeigt sich, dass Standardabweichung und Spannweite der Werte jeweils die Vorhersage des anderen Wertes ermöglichen. Aus diesem Grund werden $\text{P}\textsubscript{std}$, $\text{std}\textsubscript{std}$ und $\text{IL}\textsubscript{range}$ als Merkmale verworfen. Das gleiche gilt für $\text{SQI}\textsubscript{max}$. Auch bietet $E\textsubscript{abs}$ keinen Mehrgewinn zu der Standardabweichung des Segments. Die Merkmale $\text{ratio}\textsubscript{acf}$ und $\text{diff}\textsubscript{acf}$ sind durch ihre Definition stark miteinander korreliert und da die Untersuchung zeigt, dass $\text{diff}\textsubscript{acf}$ schlechter vorhergesagt werden kann und mehr Mutual Information mit der Zielgröße hat, wird $\text{ratio}\textsubscript{acf}$ verworfen. Das Gleiche gilt für $\text{ratio}\textsubscript{data}$. Wie zu erwarten war, korrelieren $\text{SQI}\textsubscript{median}$ und $\text{SQI}\textsubscript{mean}$ stark miteinander. Die mit \texttt{rfimp} berechneten Abhängigkeiten zeigen, dass der Median schlechter vorhergesagt werden kann und mehr Information über die Zielgröße enthält, weshalb $\text{SQI}\textsubscript{mean}$ verworfen wird.
 
-Nach Reduktion um diese Merkmale wird die Berechnung der Abhängigkeiten wiederholt. Es zeigen sich weitere Abhängigkeiten jeweils zwischen $\text{P}\textsubscript{mean}$ und der Standardabweichung und $\text{std}\textsubscript{std}$ und $\text{P}\textsubscript{range}$, weshalb Standardabweichung und $\text{range}\textsubscript{std}$ verworfen werden. Keine der erkannten Abhängigkeiten ist unerwartet. Dieser Prozess erlaubt jedoch, vermutete Abhängigkeiten zu bestätigen und die Merkmale zu verwenden, die einen höheren Informationsgehalt haben.
+Nach Reduktion um diese Merkmale wird die Berechnung der Abhängigkeiten wiederholt. Es zeigen sich weitere Abhängigkeiten jeweils zwischen $\text{P}\textsubscript{mean}$ und der Standardabweichung und $\text{range}\textsubscript{std}$ und $\text{P}\textsubscript{range}$, weshalb Standardabweichung und $\text{range}\textsubscript{std}$ verworfen werden. Keine der erkannten Abhängigkeiten ist unerwartet. Dieser Prozess erlaubt jedoch, vermutete Abhängigkeiten zu bestätigen und die Merkmale zu verwenden, die einen höheren Informationsgehalt haben.
 
 Damit verbleiben insgesamt 20 Merkmale. Die Reduktion der Merkmale ermöglicht schnelleres Training und durch die weniger stark korrelierten Merkmale stabilere Modelle. Dennoch muss bei der Evaluation der Modelle untersucht werden, wie sich die Reduktion der Merkmale auswirkt.
 
@@ -97,7 +97,7 @@ Eine andere Möglichkeit der Merkmalsreduktion ist die Transformation in einen n
 \begin{figure}[H] %TODO: legend into graphic
 	\centering
 	\includegraphics[width=0.7\textwidth]{pic/pca-own-reduced.pdf}
-	\caption{Transformation der Merkmale mittels PCA in einen zweidimensionalen Merkmalsraum}
+	\caption{Transformation der Merkmale mittels PCA in einen zweidimensionalen Merkmalsraum.}
 	\label{fig:pca-own-reduced}
 \end{figure}
 
@@ -106,7 +106,7 @@ Eine Untersuchung der Mutual Information der verbleibenden Merkmale (Abbildung \
 \begin{figure}[H]
 	\centering
 	\includegraphics[scale=0.85]{pic/mutual-inf-own-reduced.pdf}
-	\caption{Mutual Information des reduzierten Merkmalssets mit der binären Annotation}
+	\caption{Mutual Information des reduzierten Merkmalssets mit der binären Annotation.}
 	\label{fig:mutual-inf-own}
 \end{figure}
 
@@ -118,16 +118,16 @@ Die Auswahl beschränkt sich auf zwei Modelle, den \acl{RF} und den Gradient Boo
 
 Beide Modelle eignen sich sowohl für Regression als auch Klassifikation. Dies wird genutzt, um die Unterschiede der Ergebnisse und der Wichtigkeit der einzelnen Merkmale für beide Arten von Algorithmen zu vergleichen. Bei einer Regression kann der Fehler $E\textsubscript{HR}$ vorhergesagt werden und mit einem Schwellwert in eine binäre Klassifikation umgewandelt werden. Dies ermöglicht einen einfachen Vergleich von Klassifikation und Regression. Damit ergeben sich insgesamt vier Lernmodelle: Jeweils Regression und Klassifikation mit einem \ac{RF} und einem Gradient Boosting Tree.
 
-Ein mögliches Probleme bei Regressionsmodellen für die Vorhersage von $E\textsubscript{HR}$ ist, dass kleine Werte relevanter für die spätere Klassifikation sind, das Modell aber den Fehler allgemein minimiert. Das ist besonders problematisch, wenn bei großen Werten von $E\textsubscript{HR}$ auch der Fehler größer wird und diese den Lernprozess stark beeinflussen, obwohl sie für die Klassifikation nicht relevant sind. Idealerweise wird die Fehlerfunktion in diesem Fall gewichtet. Da das im Rahmen dieser Arbeit nicht möglich ist, wird - um diese Problematik zumindest zu verkleinern - eine Möglichkeit implementiert, die Zielgröße $E\textsubscript{HR}$ mit der Wurzelfunktion zu skalieren. Der Wurzelexponent wird dabei zum Hyperparameter des Modells.
+Ein mögliches Problem bei Regressionsmodellen für die Vorhersage von $E\textsubscript{HR}$ ist, dass kleine Werte relevanter für die spätere Klassifikation sind, das Modell aber den Fehler allgemein minimiert. Das ist besonders problematisch, wenn bei großen Werten von $E\textsubscript{HR}$ auch der Fehler größer wird und diese den Lernprozess stark beeinflussen, obwohl sie für die Klassifikation nicht relevant sind. Idealerweise wird die Fehlerfunktion in diesem Fall gewichtet. Da das im Rahmen dieser Arbeit nicht möglich ist, wird - um diese Problematik zumindest zu verkleinern - eine Möglichkeit implementiert, die Zielgröße $E\textsubscript{HR}$ mit der Wurzelfunktion zu skalieren. Der Wurzelexponent wird dabei zum Hyperparameter des Modells.
 
 
 %TODO: Klassendiagramm? herausstellen, dass viel Arbeit? ist es das?
 Um die Evaluation der verschiedenen Modelle zu vereinfachen, wird eine Wrapper-Klasse entwickelt, die das Laden der Daten, das Hyperparameter-Tuning und die Evaluation der Ergebnisse bündelt. Außerdem werden im Zuge dessen die Modelle nach dem Training serialisiert, um sie für eine spätere Verwendung zu speichern. Dem Konstruktor der Wrapper-Klasse werden Lernmodell, Dateiname zum Laden oder Speichern des Modells und die Hyperparamater, von denen die optimale Auswahl getroffen wird, übergeben. Wenn kein Lernmodell übergeben wird, wird automatisch versucht, die Datei mit dem übergebenen Namen zu laden. Optional kann eine Featureauswahl angegeben werden, die für das Modell verwendet werden soll. Des Weiteren werden die Eigenschaften des Datensets übergeben; das bedeutet die verwendete Segmentlänge, der Abstand, in dem die Segmente erzeugt werden, und der verwendete Threshold. Wurde das Datenset noch nicht erzeugt, wird dies nachgeholt. Sind Hyperparameter angegeben, wird das Hyperparameter-Tuning mit einer Kreuzvalidierung auf dem Trainingsset durchgeführt, wobei jeweils ein*e Patient*in zum Testen ausgelassen wird. Bei dem Hyperparameter-Tuning für die statistischen Merkmale wurde die Accuracy optimiert. Da diese bei nicht balancierten Datensets an Aussagekraft verliert und nicht zwischen Falsch-Positiven und Falsch-Negativen unterscheidet, wird hier die \ac{AUC} optimiert. Diese bietet außerdem den Vorteil, dass untersucht wird, wie gut sich die Klassen durch das Modell voneinander trennen lassen - unabhängig von der Qualität der Klassifikation selbst.
 
 
-Da bei der Erzeugung der Merkmale Lücken entstehen können, wenn für das Segment keine Intervallschätzungen existieren, werden diese Segmente unabhängig von dem verwendeten Lernmodell als nicht informativ klassifiziert. Auch beim Training werden Datenpunkte, deren Merkmale lückenhaft sind, ausgeschlossen. Um diese Besonderheit in der Evaluation berücksichtigen zu können, wird ein eigener Klassifikator \texttt{OwnClassifier} entwickelt, der von dem Basisklassifikator der Bibliothek \texttt{sklearn} erbt. Diesem wird ein anderes Modell übergeben und um oben genannte Eigenschaften erweitert. Für die Berechnung der \ac{AUC} ist es nötig, für jeden getesteten Datenpunkt die Wahrscheinlichkeiten der Klassenzugehörigkeit berechnen zu können. Für lückenhafte Datenpunkte wird zurückgegeben, dass die Wahrscheinlichkeit, dass diese nicht-informativ sind, 1 ist. Für alle anderen wird die Wahrscheinlichkeit des darin eingebundenen Modells zurückgegeben.% TODO:Ablauf?
+Da bei der Erzeugung der Merkmale Lücken entstehen können, wenn für das Segment keine Intervallschätzungen existieren, werden diese Segmente unabhängig von dem verwendeten Lernmodell als nicht informativ klassifiziert. Auch beim Training werden Datenpunkte, deren Merkmale lückenhaft sind, ausgeschlossen. Um diese Besonderheit in der Evaluation berücksichtigen zu können, wird ein eigener Klassifikator \texttt{OwnClassifier} entwickelt, der von dem Basisklassifikator der Bibliothek \texttt{sklearn} erbt. Diesem wird ein anderes Modell übergeben, dass er um oben genannte Eigenschaften erweitert. Für die Berechnung der \ac{AUC} ist es nötig, für jeden getesteten Datenpunkt die Wahrscheinlichkeiten der Klassenzugehörigkeit berechnen zu können. Für lückenhafte Datenpunkte wird zurückgegeben, dass die Wahrscheinlichkeit, dass diese nicht-informativ sind, 1 ist. Für alle anderen wird die Wahrscheinlichkeit des darin eingebundenen Modells zurückgegeben.% TODO:Ablauf?
 
-Bei den Regressionsmodellen muss zusätzlich die Umwandlung in eine binäre Klassifikation durchgeführt werden.  Auch hierfür wird eine Unterklasse des Basisklassifikators von \texttt{sklearn} erzeugt. Da dieser nur im Zusammenhang mit dem oben beschriebenen Klassifikator genutzt wird, ist eine Filterung der lückenhaften Datenpunkte nicht nötig. Auch hier wird das eingebundene Modell zunächst unabhängig trainiert, sodass es $E\textsubscript{HR}$ vorhersagen kann. Der vorhergesagte Fehler wird anschließend mit dem gewählten Schwellwert verglichen und anhand dieses Vergleiches klassifiziert. Da das Modell eine Regression durchführt, gibt es keine Wahrscheinlichkeiten zu den Klassenzugehörigkeiten der Vorhersagen. Hier muss also eine Funktion gefunden werden, die eine Berechnung dieser möglich macht. Die Schwierigkeit liegt darin, dass die Verteilung nicht symmetrisch ist, da der Schwellwert der Klassifikation nicht mittig in den möglichen Werten für $E\textsubscript{HR}$ liegt. Voraussetzung für eine mögliche Funktion $f$ ist, dass die Wahrscheinlichkeit beider Klassen 0,5 ist, wenn das vorausgesagte $E\textsubscript{HR}$ gleich dem genutzten Schwellwert $E\textsubscript{th}$ ist. Außerdem muss die Wahrscheinlichkeit, dass das Segment informativ ist, 1 sein, wenn der vorhergesagte Fehler 0 ist:
+Bei den Regressionsmodellen muss zusätzlich die Umwandlung in eine binäre Klassifikation durchgeführt werden.  Auch hierfür wird eine Unterklasse des Basisklassifikators von \texttt{sklearn} erzeugt. Da dieser nur im Zusammenhang mit dem oben beschriebenen Klassifikator genutzt wird, ist eine Filterung der lückenhaften Datenpunkte nicht nötig. Auch hier wird das eingebundene Modell zunächst unabhängig trainiert, sodass es $E\textsubscript{HR}$ vorhersagen kann. Der vorhergesagte Fehler wird anschließend mit dem gewählten Schwellwert verglichen und das Segment anhand dieses Vergleiches klassifiziert. Da das Modell eine Regression durchführt, gibt es keine Wahrscheinlichkeiten zu den Klassenzugehörigkeiten der Vorhersagen. Hier muss also eine Funktion gefunden werden, die eine Berechnung dieser möglich macht. Die Schwierigkeit liegt darin, dass die Verteilung nicht symmetrisch ist, da der Schwellwert der Klassifikation nicht mittig in den möglichen Werten für $E\textsubscript{HR}$ liegt. Voraussetzung für eine mögliche Funktion $f$ ist, dass die Wahrscheinlichkeit beider Klassen 0,5 ist, wenn das vorausgesagte $E\textsubscript{HR}$ gleich dem genutzten Schwellwert $E\textsubscript{th}$ ist. Außerdem muss die Wahrscheinlichkeit, dass das Segment informativ ist, 1 sein, wenn der vorhergesagte Fehler 0 ist:
 
 \begin{align*}
 	&f(0) = 1\\
@@ -137,11 +137,11 @@ Bei den Regressionsmodellen muss zusätzlich die Umwandlung in eine binäre Klas
 
 Gleichzeitig muss sie der erwarteten Verteilung entsprechen, also dass die Wahrscheinlichkeit, dass das Segment informativ ist, mit steigendem vorausgesagten $E\textsubscript{HR}$ stark sinkt und gegen 0 geht. Aufgrund dieser Eigenschaften wurde eine Exponentialfunktion gewählt, deren Parameter abhängig von dem gewählten Schwellwert $E\textsubscript{th}$ leicht berechnet werden können. Aus den zuvor definierten Voraussetzungen ergeben sich die Parameter der Funktion:
 \[
-	f(E\textsubscript{HR}) = \text{exp}^{\frac{\text{ln}(0,5)}{E\textsubscript{th}}}
+	f(E\textsubscript{HR}) = \text{e}^{\frac{\text{ln}(0,5)}{E\textsubscript{th}}}
 \]
 Die Wahrscheinlichkeit, dass das Segment nicht informativ ist, ergibt sich durch $1-f(E\textsubscript{HR})$.
 
-Die entwickelten Modelle ermöglichen also eine Voraussage trotz lückenhafter Daten und die vollständige Umwandlung einer Regression in eine Klassifikation unter Beachtung der Schnittstellen von \texttt{sklearn}. Die entwickelte Wrapper-Klasse ermöglicht eine Bündelung von Hyperparameter-Tuning, Training, Vorhersage und Evaluation. Damit können auch andere Modelle und andere Daten einfach untersucht werden.
+Die entwickelten Modelle ermöglichen also eine Voraussage trotz lückenhafter Daten und eine vollständige Umwandlung einer Regression in eine Klassifikation unter Beachtung der Schnittstellen von \texttt{sklearn}. Die entwickelte Wrapper-Klasse ermöglicht eine Bündelung von Hyperparameter-Tuning, Training, Vorhersage und Evaluation. Damit können auch andere Modelle und andere Daten einfach untersucht werden.
 
 
 
