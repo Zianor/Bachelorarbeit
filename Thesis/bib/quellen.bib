@@ -29,13 +29,17 @@ volume = {38},
 year = {1992}
 }
 
-@article{Howell2019,
-author = {Howell, Luis and Porr, Bernd},
-doi = {10.5281/ZENODO.3588108},
-mendeley-groups = {BA},
-month = {dec},
-title = {{Popular ECG R peak detectors written in python}},
-year = {2019}
+@software{Howell2019,
+  author       = {Luis Howell and
+                  Bernd Porr},
+  title        = {Popular ECG R peak detectors written in python},
+  month        = aug,
+  year         = 2019,
+  publisher    = {Zenodo},
+  version      = {0.9.6},
+  doi          = {10.5281/zenodo.3357365},
+  url          = {https://doi.org/10.5281/zenodo.3357365}
+}
 }
 
 @MISC{DIN,
@@ -52,20 +56,20 @@ author = {Porr, Bernd and Howell, Luis},
 doi = {10.1101/722397},
 mendeley-groups = {BA},
 title = {{R-peak detector stress test with a new noisy ECG database reveals significant performance differences amongst popular detectors}},
-year = {2019}
+year = {2019},
+journal = {bioRxiv}
 }
 
 
 @inproceedings{Elgendi2010,
-abstract = {In this paper, we investigate the QRS frequency bands in ECG signals. Any QRS detection algorithm accuracy depends on the frequency range of ECG being processed. The QRS complex has different morphology and frequency band for different arrhythmias and noises in ECG signals. A standard bandpass range that maximizes the signal (QRS complex)-to-noise (T-waves, 60 Hz, EMG, etc.) ratio will be useful in ECG monitoring and diagnostic tools. A sensitive QRS detection algorithm has been introduced to compare the performance of using different frequency bands. The results shows that the recommended bandpass frequency range for detecting QRS complexes is 8-20Hz which the best signal-to-noise ratio.},
-author = {Elgendi, Mohamed and Jonkman, Mirjam and Deboer, Friso},
-booktitle = {BIOSIGNALS 2010 - Proceedings of the 3rd International Conference on Bio-inpsired Systems and Signal Processing, Proceedings},
-isbn = {9789896740184},
-keywords = {ECG,QRS detection,QRS spectrum},
-mendeley-groups = {BA},
-pages = {428--431},
-title = {{Frequency bands effects on QRS detection}},
-year = {2010}
+title = "Frequency bands effects on QRS detection",
+abstract = "In this paper, we investigate the QRS frequency bands in ECG signals. Any QRS detection algorithm accuracy depends on the frequency range of ECG being processed. The QRS complex has different morphology and frequency band for different arrhythmias and noises in ECG signals. A standard bandpass range that maximizes the signal (QRS complex)-to-noise (T-waves, 60 Hz, EMG, etc.) ratio will be useful in ECG monitoring and diagnostic tools. A sensitive QRS detection algorithm has been introduced to compare the performance of using different frequency bands. The results shows that the recommended bandpass frequency range for detecting QRS complexes is 8-20Hz which the best signal-to-noise ratio.",
+author = "Mohamed Elgendi and Mirjam Jonkman and {De Boer}, Friso",
+year = "2010",
+isbn = "978-989-674-018-4",
+volume = "1",
+pages = "428--431",
+booktitle = "BIOSIGNALS 2010 - Proceedings of the 3rd International Conference on Bio-inpsired Systems and Signal Processing"
 }
 
 
@@ -82,7 +86,6 @@ month = {aug},
 number = {8},
 pages = {2230--2237},
 pmid = {32011272},
-publisher = {Institute of Electrical and Electronics Engineers Inc.},
 title = {{Ballistocardiography can estimate beat-to-beat heart rate accurately at night in patients after vascular intervention}},
 volume = {24},
 year = {2020}
@@ -240,8 +243,7 @@ year = {2011}
 @article{Gordon1877,
 abstract = {A PERSON standing erect in a perfectly easy posture on the bed of an ordinary spring weighing-machine, and maintain-ing, as far as possible, perfect stillness, will be found, if the instrument is delicately adjusted, to impart a rhythmic move-ment to the index, synchronous with the pulse and according to the following rule:-At each occurrence of systole in the heart, the needle will be vigorously deflected toward the zero point of the dial, and in the intervals of systolic action will return by a slower movement to the starting point; this point nearly coinciding with the point at which the needle would rest if the subject were laid horizontally on the bed of the instrument. The return of the needle is effected by a series of secondary vibrations which appear to bear an appreciable but imperfect analogy to corresponding features in the sphyg-mograph. This phenomenon may very easily be verified, but in re-peating the experiment it should be borne in mind that the following are desiderata:-That the skeleton of the subject be brought as nearly as possible into contact with the instrument and that the hip-and knee-joints be so disposed as to secure the maximum possible of rigidity in a perpendicular direction. It does not appear that this phenomenon has heretofore been anticipated by any process of theorising, or turned to any useful account. It may therefore be permitted me to point out what may prove to be its phenomenal cause and practical conse-quences. As to its cause-When the heart is contracting it propels blood in all directions; but the greatest column is propelled downward, along the aorta, almost in the direction of the axis of the body. If, therefore, we disregard all blood that is pro-pelled upward, and make a compensating abatement from that which is propelled downward, there will remain a certain mass of blood which at each contraction of the heart is forced 25},
 author = {Gordon, J W},
-journal = {Journal of anatomy and physiology},
-mendeley-groups = {Seminararbeit/nur zum Verlinken,Seminararbeit/verwendet},
+journal = {Journal of Anatomy and Physiology},
 number = {Pt 3},
 pages = {533--6},
 pmid = {17231163},
@@ -308,16 +310,15 @@ title = {{Unconstrained cardiorespiratory and body movement monitoring system fo
 volume = {43},
 year = {2005}
 }
-@misc{Nizami2013,
+@article{Nizami2013,
 abstract = {Artifact detection (AD) techniques minimize the impact of artifacts on physiologic data acquired in critical care units (CCU) by assessing quality of data prior to clinical event detection (CED) and parameter derivation (PD). This methodological review introduces unique taxonomies to synthesize over 80 AD algorithms based on these six themes: 1) CCU; 2) physiologic data source; 3) harvested data; 4) data analysis; 5) clinical evaluation; and 6) clinical implementation. Review results show that most published algorithms: a) are designed for one specific type of CCU; b) are validated on data harvested only from one OEM monitor; c) generate signal quality indicators (SQI) that are not yet formalized for useful integration in clinical workflows; d) operate either in standalone mode or coupled with CED or PD applications; e) are rarely evaluated in real-time; and f) are not implemented in clinical practice. In conclusion, it is recommended that AD algorithms conform to generic input and output interfaces with commonly defined data: 1) type; 2) frequency; 3) length; and 4) SQIs. This shall promote: a) reusability of algorithms across different CCU domains; b) evaluation on different OEM monitor data; c) fair comparison through formalized SQIs; d) meaningful integration with other AD, CED and PD algorithms; and e) real-time implementation in clinical workflows. {\textcopyright} 2008-2011 IEEE.},
 author = {Nizami, Shermeen and Green, James R. and McGregor, Carolyn},
 booktitle = {IEEE Reviews in Biomedical Engineering},
 doi = {10.1109/RBME.2013.2243724},
 issn = {19373333},
-mendeley-groups = {Seminararbeit/verwendet},
 pages = {127--142},
-publisher = {Institute of Electrical and Electronics Engineers},
-title = {{Implementation of artifact detection in critical care: A methodological review}},
+journal = {IEEE Reviews in Biomedical Engineering},
+title = {{Implementation of Artifact Detection in Critical Care: A Methodological Review}},
 volume = {6},
 year = {2013}
 }
@@ -325,15 +326,10 @@ year = {2013}
 abstract = {The identification of invalid data in recordings obtained using wearable sensors is of particular importance since data obtained from mobile patients is, in general, noisier than data obtained from nonmobile patients. In this paper, we present a signal quality index (SQI), which is intended to assess whether reliable heart rates (HRs) can be obtained from electrocardiogram (ECG) and photoplethysmogram (PPG) signals collected using wearable sensors. The algorithms were validated on manually labeled data. Sensitivities and specificities of 94{\%} and 97{\%} were achieved for the ECG and 91{\%} and 95{\%} for the PPG. Additionally, we propose two applications of the SQI. First, we demonstrate that, by using the SQI as a trigger for a power-saving strategy, it is possible to reduce the recording time by up to 94{\%} for the ECG and 93{\%} for the PPG with only minimal loss of valid vital-sign data. Second, we demonstrate how an SQI can be used to reduce the error in the estimation of respiratory rate (RR) from the PPG. The performance of the two applications was assessed on data collected from a clinical study on hospital patients who were able to walk unassisted.},
 author = {Orphanidou, Christina and Bonnici, Timothy and Charlton, Peter and Clifton, David and Vallance, David and Tarassenko, Lionel},
 doi = {10.1109/JBHI.2014.2338351},
-file = {:Users/zianor/Library/Application Support/Mendeley Desktop/Downloaded/Orphanidou et al. - 2015 - Signal-quality indices for the electrocardiogram and photoplethysmogram Derivation and applications to wirele.pdf:pdf},
 issn = {21682194},
 journal = {IEEE Journal of Biomedical and Health Informatics},
-keywords = {Battery life,electrocardiogram (ECG),photoplethysmogram (PPG),respiratory rate (RR),signal quality,telemonitoring,wearable sensors},
-mendeley-groups = {Seminararbeit/verwendet},
-month = {may},
 number = {3},
 pages = {832--838},
-publisher = {Institute of Electrical and Electronics Engineers Inc.},
 title = {{Signal-quality indices for the electrocardiogram and photoplethysmogram: Derivation and applications to wireless monitoring}},
 volume = {19},
 year = {2015}
@@ -377,9 +373,7 @@ file = {:Users/zianor/Library/Application Support/Mendeley Desktop/Downloaded/Pi
 isbn = {9781424492718},
 issn = {1557170X},
 keywords = {standard deviation},
-mendeley-groups = {Seminararbeit/BKG Artefakterkennung,Seminararbeit/verwendet},
 pages = {7622--7625},
-publisher = {Institute of Electrical and Electronics Engineers Inc.},
 title = {{Noninvasive ambulatory measurement system of cardiac activity}},
 volume = {2015-November},
 year = {2015}
@@ -420,7 +414,6 @@ isbn = {9781457702204},
 issn = {1557170X},
 mendeley-groups = {Seminararbeit/verwendet},
 pages = {2484--2487},
-publisher = {Institute of Electrical and Electronics Engineers Inc.},
 title = {{Sensor data quality processing for vital signs with opportunistic ambient sensing}},
 volume = {2016-October},
 year = {2016}
@@ -435,7 +428,7 @@ journal = {American Journal of Physiology-Legacy Content},
 mendeley-groups = {Seminararbeit,Seminararbeit/verwendet},
 number = {1},
 pages = {1--28},
-title = {{Studies on the Estimation of Cardiac Ouptut in Man, and of Abnormalities in Cardiac Function, From the Heart'S Recoil and the Blood'S Impacts; the Ballistocardiogram}},
+title = {{Studies on the Estimation of Cardiac Ouptut in Man, and of Abnormalities in Cardiac Function, From the Heart's Recoil and the Blood's Impacts; the Ballistocardiogram}},
 volume = {127},
 year = {1939}
 }

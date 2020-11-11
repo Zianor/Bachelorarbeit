@@ -20,7 +20,8 @@ class OwnClassifier(BaseEstimator, ClassifierMixin):
         """Fits the underlying model to a binary label
 
         :param X: input samples {array-like, sparse matrix} of shape (n_samples, n_features}
-        param y: target label"""
+        param y: target label
+        """
         if type(X) is not pd.DataFrame:
             X = pd.DataFrame(X)
         if type(y) is not pd.Series:
@@ -37,8 +38,10 @@ class OwnClassifier(BaseEstimator, ClassifierMixin):
     def predict(self, X):
         """Predict class for X
 
-        :param X: input samples {array-like, sparse matrix} of shape (n_samples, n_features}
-        :returns: np array of shape (n_samples,) with binary labels"""
+        :param X: input samples {array-like, sparse matrix} of shape
+        		  (n_samples, n_features}
+        :returns: np array of shape (n_samples,) with binary labels
+        """
         if type(X) is not pd.DataFrame:
             X = pd.DataFrame(X)
         mask_nan = X.isna().any(axis=1)
@@ -58,8 +61,10 @@ class OwnClassifier(BaseEstimator, ClassifierMixin):
     def predict_proba(self, X):
         """Predicts the probability of both classes for given feature vectors
 
-        :param X: input samples {array-like, sparse matrix} of shape (n_samples, n_features}
-        :returns: class probabilites in the order [False, True] in form (n_samples,2)"""
+        :param X: input samples {array-like, sparse matrix} of shape
+        		  (n_samples, n_features)
+        :returns: class probabilites in the order [False, True] in form (n_samples,2)
+        """
         if type(X) is not pd.DataFrame:
             X = pd.DataFrame(X)
         mask_nan = X.isna().any(axis=1)
@@ -85,7 +90,8 @@ class RegressionClassifier(BaseEstimator, ClassifierMixin):
     def fit(self, X, y):
         """Fits the underlying model to a continuous target
         
-        :param X: input samples {array-like, sparse matrix} of shape (n_samples, n_features}
+        :param X: input samples {array-like, sparse matrix} of shape
+        		  (n_samples, n_features}
         :param y: needs to be continuous target
         """
         y = np.power(y, 1/self.scale_sqrt)
@@ -96,8 +102,10 @@ class RegressionClassifier(BaseEstimator, ClassifierMixin):
     def predict(self, X):
         """Predict class for X
 
-        :param X: input samples {array-like, sparse matrix} of shape (n_samples, n_features}
-        :returns: np array of shape (n_samples,) with binary labels"""
+        :param X: input samples {array-like, sparse matrix} of shape
+        		  (n_samples, n_features}
+        :returns: np array of shape (n_samples,) with binary labels
+        """
         y_continuous = self.model.predict(X)
         y_continuous = np.power(y_continuous, self.scale_sqrt)
         y = [False if curr > self.threshold else True for curr in y_continuous]
@@ -117,22 +125,26 @@ class RegressionClassifier(BaseEstimator, ClassifierMixin):
     def predict_proba(self, X):
         """Predicts the probability of both classes for given feature vectors
 
-        :param X: input samples {array-like, sparse matrix} of shape (n_samples, n_features}
-        :returns: class probabilites in the order [False, True] in form (n_samples,2)"""
+        :param X: input samples {array-like, sparse matrix} of shape
+        		  (n_samples, n_features}
+        :returns: class probabilites in the order [False, True] in form (n_samples,2)
+        """
         y_continuous = self.model.predict(X)
         y_continuous = np.power(y_continuous, self.scale_sqrt)
         # e function with f(th)=0.5
-        proba_true = np.array([np.math.exp(np.log(0.5)/self.threshold * y) for y in y_continuous])
+        proba_true = np.array([np.math.exp(np.log(0.5)/self.threshold * y)
+        					   for y in y_continuous])
         proba_false = 1 - proba_true
         ret = np.ones(shape=(len(y_continuous), 2))
-        ret[:, 0] = proba_false  # TODO: clean up
+        ret[:, 0] = proba_false
         ret[:, 1] = proba_true
         return ret
 
     def score(self, X, y):
         """Calculates accuracy score for given input-output pairs
         
-        :return: accuracy score"""
+        :return: accuracy score
+        """
         y = [False if curr > self.threshold else True for curr in y]
         return accuracy_score(y, self.predict(X))
 \end{lstlisting}

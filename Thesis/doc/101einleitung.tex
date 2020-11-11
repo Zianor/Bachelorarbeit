@@ -1,19 +1,15 @@
 \chapter{Einleitung}\label{einleitung}
 
-%TODO: will ich das weglassen? \section{Motivation}
-
 Der derzeitige demographische Wandel stellt das Gesundheitssystem vor eine große Herausforderung: Es gibt immer mehr Patient*innen, die medizinische Überwachung und Versorgung im Alter benötigen. Eine kontinuierliche autonome Überwachung von Vitalparametern im Krankenhaus oder auch Zuhause erlaubt es, Erkrankungen frühzeitig zu erkennen und zu beobachten, ohne dass große Personalkapazitäten vonnöten sind.
 
-Für diesen Anwendungszweck eignen sich vor allem Messmethoden, die die Patient*innen %TODO: Silbentrennung
-im Alltag nicht einschränken und wenig invasiv sind. Im Englischen wird dies mit dem Begriff \textit{unobtrusive} bezeichnet. Da es keine zufriedenstellende deutsche Entsprechung gibt, wird dieser im Folgenden nicht übersetzt. Solche \textit{unobtrusive} Messmethoden benötigen meist keinen direkten Körper- oder Hautkontakt, liefern aber Information über Atmung und Herzschlag. Die Herausforderung bei einem so ermitteltem Signal besteht in der Signalverarbeitung, da Messungenauigkeiten und Alltagsbewegungen zu Störungen im Signal führen. Nicht informatives, also nicht für die Verarbeitung geeignetes Signal muss aber zwingend identifiziert werden, da die Ergebnisse ansonsten stark verfälscht würden.
+Für diesen Anwendungszweck eignen sich vor allem Messmethoden, die die Patient*innen im Alltag nicht einschränken und wenig invasiv sind. Im Englischen wird dies mit dem Begriff \textit{unobtrusive} bezeichnet. Da es keine zufriedenstellende deutsche Entsprechung gibt, wird dieser im Folgenden nicht übersetzt. Solche \textit{unobtrusive} Messmethoden benötigen meist keinen direkten Körper- oder Hautkontakt, liefern aber Information über Atmung und Herzschlag. Die Herausforderung bei einem so ermittelten Signal besteht in der Signalverarbeitung, da Messungenauigkeiten und Alltagsbewegungen zu Störungen im Signal führen. Nicht informatives, also nicht für die Verarbeitung geeignetes Signal muss aber zwingend identifiziert werden, da die Ergebnisse ansonsten stark verfälscht würden.
 
-Eine solche \textit{unobtrusive} Messmethode ist die \acf{BKG}. Sensoren lassen sich beispielsweise in Betten und Stühlen integrieren. Aufgezeichnet werden Aktivitäten des Herzens und der Lunge. Die Signalmorphologie variiert jedoch sowohl zwischen den Patient*innen als auch innerhalb %TODO: Alternative zu "innerhalb", bei?
-einer Person sehr stark, wodurch die automatische Beurteilung der Signalqualität erschwert wird. Dies ist jedoch essentiell, um eine aussagekräftige Signalverarbeitung zu ermöglichen. Besonders bei in Betten aufgenommenen Signalen ist deren Variation in Kombination mit Artefakten durch z.\,B. Körperbewegungen problematisch.  
+Eine solche \textit{unobtrusive} Messmethode ist die \acf{BKG}. Sensoren lassen sich beispielsweise in Betten und Stühlen integrieren. Aufgezeichnet werden Aktivitäten des Herzens und der Lunge. Die Signalmorphologie variiert jedoch sowohl zwischen den Patient*innen als auch innerhalb einer Person sehr stark, wodurch die automatische Beurteilung der Signalqualität erschwert wird. Dies ist jedoch essentiell, um eine aussagekräftige Signalverarbeitung zu ermöglichen. Besonders bei in Betten aufgenommenen Signalen ist deren Variation in Kombination mit Artefakten durch z.\,B. Körperbewegungen problematisch.  
  
 
 \section{Ziel der Arbeit}
 
-Die Möglichkeiten zur Beurteilung der Signalqualität von \ac{BKG}-Signalen mittels maschinellen Lernens werden untersucht. Im besonderen Fokus liegen dabei Langzeitaufnahmen von bettlägerigen Patient*innen, sowohl nachts als auch tagsüber. Diese  haben sich in der Vergangenheit als besonders anfällig für geringe Signalqualität gezeigt.\footcite{HoogAntink2020}
+Die Möglichkeiten zur Beurteilung der Signalqualität von \ac{BKG}-Signalen mittels maschinellen Lernens werden untersucht. Im besonderen Fokus liegen dabei Langzeitaufnahmen von bettlägerigen Patient*innen, sowohl nachts als auch tagsüber. Diese  haben sich in der Vergangenheit als besonders anfällig für geringe Signalqualität gezeigt.\footcite[Vgl.][]{HoogAntink2020}
 
 Dafür werden zunächst die vorliegenden Daten aufbereitet und existierende Verfahren der Artefakterkennung für diese getestet und bewertet. Anschließend wird das Signal auf mögliche Merkmale untersucht und Verfahren entwickelt, die Aussagen über die Signalqualität ermöglichen. Anhand dieses Wissens werden Modelle des maschinellen Lernens ausgewählt und getestet. Zusätzlich wird untersucht, welchen Einfluss Annotation und Eingabeform der Daten auf das Ergebnis haben.
 
@@ -21,14 +17,14 @@ Langfristig soll ermöglicht werden, \acf{BKG} im medizinischen Alltag auch in u
 
 \section{Gliederung}
 
-Zunächst wird in \textbf{Kapitel \ref{grundlagen}} ein allgemeiner Überblick über den medizinischen und technischen Hintergrund gegeben, der nötig ist, um die vorliegende Arbeit zu verstehen.
+Zunächst wird in \textbf{Kapitel\,\ref{grundlagen}} ein allgemeiner Überblick über den medizinischen und technischen Hintergrund gegeben, der nötig ist, um die vorliegende Arbeit zu verstehen.
 
-In \textbf{Kapitel \ref{signalverarbeitung}} wird das Thema der Verarbeitung ballistokardiographischer Signale näher betrachtet. Dazu gehört die Detektion von Herzschlägen bei \ac{BKG}-Signalen, existierende Verfahren zur Artefakterkennung und die Vorverarbeitung der vorliegenden Messdaten.
+In \textbf{Kapitel\,\ref{signalverarbeitung}} wird das Thema der Verarbeitung ballistokardiographischer Signale näher betrachtet. Dazu gehört die Detektion von Herzschlägen bei \ac{BKG}-Signalen, existierende Verfahren zur Artefakterkennung und die Vorverarbeitung der vorliegenden Messdaten.
 
-Anschließend werden in \textbf{Kapitel \ref{analyse}} die vorgestellten existierenden Verfahren mit den vorliegenden Messdaten getestet, evaluiert und eine Analyse der Daten durchgeführt.
+Anschließend werden in \textbf{Kapitel\,\ref{analyse}} die vorgestellten existierenden Verfahren mit den vorliegenden Messdaten getestet, evaluiert und eine Analyse der Daten durchgeführt.
 
-Aufbauend darauf werden in \textbf{Kapitel \ref{synthese}} weitere Merkmale konstruiert, untersucht und reduziert und eine Modellauswahl und Basis für den Vergleich verschiedener Modelle getroffen.
+Aufbauend darauf werden in \textbf{Kapitel\,\ref{synthese}} weitere Merkmale konstruiert, untersucht und reduziert und eine Modellauswahl und Basis für den Vergleich verschiedener Modelle getroffen.
 
-In \textbf{Kapitel \ref{evaluation}} werden die Modelle verglichen und evaluiert. Anhand der trainierten Modelle werden die Merkmale erneut betrachtet und der Einfluss der Segmentlänge und des Schwellwertes der Annotation untersucht.
+In \textbf{Kapitel\,\ref{evaluation}} werden die Modelle verglichen und evaluiert. Anhand der trainierten Modelle werden die Merkmale erneut betrachtet und der Einfluss der Segmentlänge und des Schwellwertes der Annotation untersucht.
 
-Die Ergebnisse der Arbeit werden in \textbf{Kapitel \ref{zusammenfassung}} zusammengefasst und ein Ausblick gegeben, wie darauf aufgebaut werden kann.
+Die Ergebnisse der Arbeit werden in \textbf{Kapitel\,\ref{zusammenfassung}} zusammengefasst und ein Ausblick gegeben, wie darauf aufgebaut werden kann.

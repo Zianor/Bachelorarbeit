@@ -4,7 +4,7 @@ In diesem Kapitel wird eine Einführung in das Thema der Signalverarbeitung und 
 
 \section{Grundsätzliches}
 
-	Kardiorespiratorische Signale sind durch die quasiperiodische Natur des Herzens und der Lunge selbst quasiperiodisch. Zwei zyklische Vorgänge werden gleichzeitig gemessen, lassen sich aber durch eine Bandpass-Filterung nach ihren unterschiedlichen Frequenzen filtern. Der Normbereich für die Atemfrequenz liegt bei \numrange{12}{25} Atemzügen pro Minute, alles ober- und unterhalb wird als abnormal betrachtet. Bei der Herzfrequenz wird ein Bereich von \numrange{30}{200} Schlägen pro Minute erwartet. Dabei entsprechen 30 Schläge pro Minute der Pulsabsenkung in der Nacht, der Ruhepuls selbst ist höher. Grundsätzlich gibt es verschiedene Arten der Signalverarbeitung: Algorithmen, die im Zeitbereich arbeiten, solche, die im Frequenzbereich arbeiten und Algorithmen, die beides kombinieren. Dabei ist zu beachten, dass bei frequenzbasierten Algorithmen durch die Analyse von spektralen Eigenschaften zunächst nur durchschnittliche Frequenzen ermittelt werden. Dies ist für einige medizinische Anwendungen ausreichend, für andere wie z.\,B. die Ermittlung der \ac{HRV} allerdings nicht. Algorithmen, die auf dem Zeitbereich arbeiten, basieren oft auf Wissen über die Morphologie des physiologischen Signals. Durch die Eigenschaften der \ac{BKG}-Signale, vor allem durch die variable Morphologie ist dies schwieriger als bei anderen kardiorespiratorischen Signalen. %TODO: dies evtl unklar
+	Kardiorespiratorische Signale sind durch die quasiperiodische Natur des Herzens und der Lunge selbst quasiperiodisch. Zwei zyklische Vorgänge werden gleichzeitig gemessen, lassen sich aber durch eine Bandpass-Filterung nach ihren unterschiedlichen Frequenzen filtern. Der Normbereich für die Atemfrequenz liegt bei \numrange{12}{25} Atemzügen pro Minute, alles ober- und unterhalb wird als abnormal betrachtet. Bei der Herzfrequenz wird ein Bereich von \numrange{30}{200} Schlägen pro Minute erwartet. Dabei entsprechen 30 Schläge pro Minute der Pulsabsenkung in der Nacht, der Ruhepuls selbst ist höher. Grundsätzlich gibt es verschiedene Arten der Signalverarbeitung: Algorithmen, die im Zeitbereich arbeiten, solche, die im Frequenzbereich arbeiten und Algorithmen, die beides kombinieren. Dabei ist zu beachten, dass bei frequenzbasierten Algorithmen durch die Analyse von spektralen Eigenschaften zunächst nur durchschnittliche Frequenzen ermittelt werden. Dies ist für einige medizinische Anwendungen ausreichend, für andere wie z.\,B. die Ermittlung der \ac{HRV} allerdings nicht. Algorithmen, die auf dem Zeitbereich arbeiten, basieren oft auf Wissen über die Morphologie des physiologischen Signals. Durch die Eigenschaften der \ac{BKG}-Signale, vor allem durch die variable Morphologie, ist die Nutzung von Wissen über die Morphologie schwieriger als bei anderen kardiorespiratorischen Signalen.
 	\citeauthor{Paalasmaa2015} sagen dazu:
 
 	\begin{quote}\textit{The properties of the BCG signal vary so much in practice that no simple filtering rule can be devised for an accurate and reliable beat-to-beat interval detection.}\footcite{Paalasmaa2015}\end{quote}
@@ -13,7 +13,7 @@ In diesem Kapitel wird eine Einführung in das Thema der Signalverarbeitung und 
 
 \section{Detektion von Herzschlägen}\label{CLIE}
 
-	In dieser Arbeit wird der von \citeauthor{Bruser2013}\footcite{Bruser2013} entwickelte Algorithmus, der \acf{CLIE} verwendet und im Folgenden hier vorgestellt. Der Algorithmus beruht auf der in Kapitel \ref{ballistokardiographie} vorgestellten Annahme, dass sich aufeinander folgenden Herzschläge ähneln und schätzt die Herzrate anhand der Selbstähnlichkeit des Signals.
+	In dieser Arbeit wird der von \citeauthor{Bruser2013}\footcite[Vgl.][]{Bruser2013} entwickelte Algorithmus, der \acf{CLIE} verwendet und im Folgenden hier vorgestellt. Der Algorithmus beruht auf der in Kapitel\,\ref{ballistokardiographie} vorgestellten Annahme, dass aufeinander folgende Herzschläge sich ähneln, und schätzt die Herzrate anhand der Selbstähnlichkeit des Signals.
 
 
 	Der Algorithmus iteriert mit einem \textit{Moving window} über das mit einem Bandpass gefilterte Signal. Es werden zwei Schwellwerte für die Intervalllänge $T$ genutzt, $T_\textsubscript{min}$ und $T_\textsubscript{max}$, basierend auf dem bekanntem Bereich der Herzrate von 30 bis 200 Schlägen pro Minute. Die Länge des Analysefensters $w_i$ entspricht $2 \cdot T_\textsubscript{max}$, sodass mindestens zwei vollständige Herzschläge enthalten sind. $f_s$ beschreibt dabei die Abtastrate des untersuchten Signals.
@@ -32,7 +32,7 @@ In diesem Kapitel wird eine Einführung in das Thema der Signalverarbeitung und 
 		E\textsubscript{MAP}[N] &= \max_{v \in \{0,...,n\}}(w[v]+w[v-N]).
 	\end{align*}
  	
- 	Dabei berechnet $E_\textsubscript{Corr}$ eine modifizierte Autokorrelationsfunktion, mit $E_\textsubscript{AMDF}$ wird die Differenz des Signals bei verschiedenen Abständen miteinbezogen und mit $E_\textsubscript{MAP}$ werden die maximale Amplituden von zwei beliebigen Samples über das ganze Fenster berechnet. AMDF steht für \textit{modified average magnitude difference function} und MAP für \textit{maximum amplitude pairs}. Diese Schätzer entsprechen jeweils einer Wahrscheinlichkeitsfunktion, die beschreibt wie wahrscheinlich es ist, dass $n$ dem tatsächlichen Schlag-zu-Schlag-Intervall entspricht. Durch Skalierung können sie in Wahrscheinlichkeitsdichtefunktionen verwandelt werden. Durch Kombination dieser drei Funktionen wird nun der wahrscheinlichste Wert für $N$ ermittelt:
+ 	Dabei berechnet $E_\textsubscript{Corr}$ eine modifizierte Autokorrelationsfunktion, mit $E_\textsubscript{AMDF}$ wird die Differenz des Signals bei verschiedenen Abständen miteinbezogen und mit $E_\textsubscript{MAP}$ werden die maximalen Amplituden von zwei beliebigen Samples über das ganze Fenster berechnet. AMDF steht für \textit{modified average magnitude difference function} und MAP für \textit{maximum amplitude pairs}. Diese Schätzer entsprechen jeweils einer Wahrscheinlichkeitsfunktion, die beschreibt, wie wahrscheinlich es ist, dass $n$ dem tatsächlichen Schlag-zu-Schlag-Intervall entspricht. Durch Skalierung können sie in Wahrscheinlichkeitsdichtefunktionen verwandelt werden. Durch Kombination dieser drei Funktionen wird nun der wahrscheinlichste Wert für $N$ ermittelt:
  	\[ N\textsubscript{opt} = \argmax_{N} p(N|E\textsubscript{Corr}, E\textsubscript{AMDF}, E\textsubscript{MAP}) \]
  	
 	Nach dem Satz von Bayes kann die Wahrscheinlichkeit, dass $N$ der tatsächlichen Intervalllänge entspricht, auch wie folgt ausgedrückt werden:
@@ -41,19 +41,19 @@ In diesem Kapitel wird eine Einführung in das Thema der Signalverarbeitung und 
 		p(N|E\textsubscript{Corr}, E\textsubscript{AMDF}, E\textsubscript{MAP}) = \frac{p(E\textsubscript{Corr}, E\textsubscript{AMDF}, E\textsubscript{MAP} | N) p(N)}{p(E\textsubscript{Corr}, E\textsubscript{AMDF}, E\textsubscript{MAP})}
 	\]
 	
-	Da $p(E\textsubscript{Corr}, E\textsubscript{AMDF}, E\textsubscript{MAP})$ unabhängig von $N$ ist, kann es für die Ermittlung der wahrscheinlichsten Intervalllänge $T_\textsubscript{opt}$ vernachlässigt werden. Unter den Annahmen, dass die Ergebnisse der drei Schätzer nicht voneinander, sondern nur von $N$ abhängen und dass $N$ gleichverteilt ist, kann $T_\textsubscript{opt}$ wie folgt ermittelt werden: %TODO: kommt Funktion aus dem nichts?
-	
+	Da $p(E\textsubscript{Corr}, E\textsubscript{AMDF}, E\textsubscript{MAP})$ unabhängig von $N$ ist, kann es für die Ermittlung der wahrscheinlichsten Intervalllänge $T_\textsubscript{opt}$ vernachlässigt werden. Unter den Annahmen, dass die Ergebnisse der drei Schätzer nicht voneinander, sondern nur von $N$ abhängen und dass $N$ gleichverteilt ist, kann $T_\textsubscript{opt}$ wie folgt ermittelt werden:
+		
 	\begin{align*}
 		E_f[N] &= E\textsubscript{Corr}[N] \cdot E\textsubscript{AMDF}[N] \cdot E\textsubscript{MAP}[N],\\
 		N\textsubscript{opt} &= \argmax_{n} E_f[N]	
 	\end{align*}
 	
-	Durch lineare Skalierung erhält man auch hier eine Dichtefunktion. Abbildung \ref{fig:estimator-fusion} zeigt die 3 einzelnen Dichtefunktionen und die fusionierte Funktion. In letzterer zeigt ein deutlicher Hochpunkt $N\textsubscript{opt}$.
+	Durch lineare Skalierung erhält man auch hier eine Dichtefunktion. Abbildung\,\ref{fig:estimator-fusion} zeigt die 3 einzelnen Dichtefunktionen und die fusionierte Funktion. In letzterer zeigt ein deutlicher Hochpunkt $N\textsubscript{opt}$.
 	
 	 \begin{figure}[H]
 		\centering
 		\includegraphics[width=0.5\textwidth]{pic/estimator-fusion.png}
-		\caption[Intervallschätzer nach \citeauthor{Bruser2013}]{Die drei Intervallschätzer und ihre Fusion\footnotemark}
+		\caption[Intervallschätzer nach \citeauthor{Bruser2013}.]{Die drei Intervallschätzer und ihre Fusion.\protect\footnotemark}
 		\label{fig:estimator-fusion}
 		
 	\end{figure}
@@ -63,40 +63,40 @@ In diesem Kapitel wird eine Einführung in das Thema der Signalverarbeitung und 
 
 \section{Artefakterkennung}\label{artefakterkennung}
 	
-	Artefakte sind irrelevante Signalteile mit variierender Amplitude, Frequenz und Dauer, die das physiologische Signal stören.\footcite{Nizami2013} Das Ziel der Artefakterkennung ist es, nur die Teile des Signals zu verarbeiten, die Vitalparameter enthalten. Bewegungsartefakte, Sensorstörungen und ähnliches, die diese Parameter überlagern, sollen die Verarbeitung nicht beeinflussen. Dabei ist die Quelle der Störung selbst irrelevant, allerdings sollten keine medizinisch induzierten Abnormalitäten als gestörtes Signal klassifiziert werden. Insgesamt ist es für aussagekräftige Messungen wünschenswert, eine hohe Coverage zu erreichen, das heißt einen möglichst hohen Anteil an Signal zu verwenden. \citeauthor{Sadek2016} unterscheidet zwischen informativem und nicht-informativem Signal. Informatives Signal enthält mit \textit{noise} gemischtes Signal von guter Qualität, aus dem Vitalparameter ohne weiteres extrahiert werden können. Im Gegensatz dazu sind die Informationen bei nicht-informativem Signal so mit Artefakten und \textit{noise} vermischt, dass vor Extraktion der Vitalparameter weitere individuelle Verarbeitung nötig ist oder die Extraktion von physiologischen Eigenschaften unmöglich ist. Teils wird die Signalqualität auch mit so genannten \acp{SQI} gemessen, die je nach \ac{SQI} und Anwendungsfall verschiedene Aussagen haben. Im klinischen Kontext genutzte Artefakterkennung verwendet oft relativ einfaches Preprocessing.\footcite{Nizami2013} Außerdem sind in den meisten Algorithmen bestimmte Informationen \textit{hard coded}. Das kann zum einen etwas wie Typ oder Frequenz der Daten sein, aber auch demographische Informationen über die Patient*innen wie Alter, Gewicht oder medizinischer Zustand.\footcite{Nizami2013}
+	Artefakte sind irrelevante Signalteile mit variierender Amplitude, Frequenz und Dauer, die das physiologische Signal stören.\footcite[Vgl.][]{Nizami2013} Das Ziel der Artefakterkennung ist es, nur die Teile des Signals zu verarbeiten, die Vitalparameter enthalten. Bewegungsartefakte, Sensorstörungen und ähnliches, die diese Parameter überlagern, sollen die Verarbeitung nicht beeinflussen. Dabei ist die Quelle der Störung selbst irrelevant, allerdings sollten keine medizinisch induzierten Abnormalitäten als gestörtes Signal klassifiziert werden. Insgesamt ist es für aussagekräftige Messungen wünschenswert, eine hohe Coverage zu erreichen, das heißt einen möglichst hohen Anteil an Signal zu verwenden. \citeauthor{Sadek2016} unterscheidet zwischen informativem und nicht-informativem Signal. Informatives Signal enthält mit \textit{noise} gemischtes Signal von guter Qualität, aus dem Vitalparameter ohne weiteres extrahiert werden können.\footcite[Vgl.][]{Sadek2016} Im Gegensatz dazu sind die Informationen bei nicht-informativem Signal so mit Artefakten und \textit{noise} vermischt, dass vor Extraktion der Vitalparameter weitere individuelle Verarbeitung nötig ist oder die Extraktion von physiologischen Eigenschaften unmöglich ist. Teils wird die Signalqualität auch mit so genannten \acp{SQI} gemessen, die je nach \ac{SQI} und Anwendungsfall verschiedene Aussagen haben. Im klinischen Kontext genutzte Artefakterkennung verwendet oft relativ einfaches Preprocessing.\footcite[Vgl.][]{Nizami2013} Außerdem sind in den meisten Algorithmen bestimmte Informationen \textit{hard coded}. Das kann zum einen etwas wie Typ oder Frequenz der Daten sein, aber auch demographische Informationen über die Patient*innen wie Alter, Gewicht oder medizinischer Zustand.\footcite[Vgl.][]{Nizami2013}
 		
 	\begin{figure}[H]
 		\centering
 		\includegraphics[width=0.5\textwidth]{pic/ad_flussdiagramm}
-		\caption[Flussdiagramm eines Algorithmus zur Beurteilung der Signalqualität]{Flussdiagramm eines Algorithmus zur Beurteilung der Signalqualität\protect\footnotemark}
+		\caption[Flussdiagramm eines Algorithmus zur Beurteilung der Signalqualität.]{Flussdiagramm eines Algorithmus zur Beurteilung der Signalqualität.\protect\footnotemark}
 		\label{fig:ecg-ad}
 	\end{figure}
 	\footnotetext{Entnommen aus \cite{Orphanidou2015}.}
 	
-	Um einen Eindruck über übliche Beurteilung der Signalqualität bei anderen kardiorespiratorischen Signalen zu bekommen, wird in Abbildung \ref{fig:ecg-ad} ein Beispiel für \ac{EKG} und \ac{PPG} gezeigt. In jeweils 10-Sekunden Fenstern wird zunächst eine Segmentierung der Herzschläge durchgeführt und anschließend vier Kriterien überprüft, die jeweils ausreichend sind, um die Signalqualität als schlecht zu klassifizieren. Im ersten Kriterium wird geprüft ob die Herzrate zwischen 40 und 180 Schlägen pro Minute liegt. Im zweiten Schritt wird sichergestellt, dass kein Schlag fehlt, indem geprüft wird, ob alle Intervalle kürzer als drei Sekunden sind. Eine Intervalllänge von 3 Sekunden entspräche über eine Minute einer Herzrate von 20 Schlägen pro Minute. Anschließend wird geprüft, ob die Herzrate nur in einem begrenzten Bereich variiert; das Verhältnis der maximalen zur minimalen Intervalllänge muss kleiner als $2.2$ sein. Abschließend wird geprüft, ob die Korrelation mit einem erstellten Template einen gewissen Schwellwert nicht unterschreitet. Dieser Algorithmus enthält übliche Techniken der Signalbeurteilung: Eine Begrenzung der akzeptierten Herzrate und Herzratenvariabilität und dem Vergleich mit einem zuvor erstellten Template.
+	Um einen Eindruck über übliche Beurteilung der Signalqualität bei anderen kardiorespiratorischen Signalen zu bekommen, wird in Abbildung\,\ref{fig:ecg-ad} ein Beispiel für \ac{EKG} und \ac{PPG} gezeigt. In jeweils 10-Sekunden Fenstern wird zunächst eine Segmentierung der Herzschläge durchgeführt und anschließend vier Kriterien überprüft, die jeweils ausreichend sind, um die Signalqualität als schlecht zu klassifizieren. Im ersten Kriterium wird geprüft ob die Herzrate zwischen 40 und 180 Schlägen pro Minute liegt. Im zweiten Schritt wird sichergestellt, dass kein Schlag fehlt, indem geprüft wird, ob alle Intervalle kürzer als drei Sekunden sind. Eine Intervalllänge von 3 Sekunden entspräche über eine Minute einer Herzrate von 20 Schlägen pro Minute. Anschließend wird geprüft, ob die Herzrate nur in einem begrenzten Bereich variiert; das Verhältnis der maximalen zur minimalen Intervalllänge muss kleiner als $2{,}2$ sein. Abschließend wird geprüft, ob die Korrelation mit einem erstellten Template einen gewissen Schwellwert nicht unterschreitet. Dieser Algorithmus enthält übliche Techniken der Signalbeurteilung: Eine Begrenzung der akzeptierten Herzrate und Herzratenvariabilität und dem Vergleich mit einem zuvor erstellten Template.
 	
 	Bei ballistokardiographischen Signalen gestaltet sich auch die Beurteilung der Signalqualität schwieriger als bei anderen kardiorespiratorischen Signalen. Zusätzlich zu der gegebenen Variabilität durch die Atmung ist eine Problematik, dass plötzliche Veränderungen der Signalmorphologie bei Positionsänderungen zuvor erstellte Templates obsolet machen und auch andere Schwellwerte nicht mehr angemessen sind.
 	
-	Bei Artefakten in \ac{BKG}-Signalen kann zwischen Artefakten mit hoher und mit niedriger Energie unterschieden werden. Artefakte mit hoher Energie, wie in Abbildung \ref{fig:high-energy-artifact} gezeigt entstehen, weil Bewegungen stärkere Krafteinwirkungen verursachen als Atmung und Herzschlag. Diese Tatsache wird häufig zur Erkennung von Bewegungen verwendet. Artefakte mit niedriger Energie, wie in Abbildung \ref{fig:low-energy-artifact} gezeigt, sind weniger auffällig.
+	Bei Artefakten in \ac{BKG}-Signalen kann zwischen Artefakten mit hoher und mit niedriger Energie unterschieden werden. Artefakte mit hoher Energie, wie in Abbildung\,\ref{fig:high-energy-artifact} gezeigt entstehen, weil Bewegungen stärkere Krafteinwirkungen verursachen als Atmung und Herzschlag. Diese Tatsache wird häufig zur Erkennung von Bewegungen verwendet. Artefakte mit niedriger Energie, wie in Abbildung\,\ref{fig:low-energy-artifact} gezeigt, sind weniger auffällig.
 	
 	\begin{figure}[H]
 		\centering
-		\begin{subfigure}{0.48\linewidth}
+		\begin{subfigure}{0.45\linewidth}
 			\centering
-      		\includegraphics[width=\textwidth]{pic/high-energy-artifacts.png}
+      		\includegraphics[width=0.95\textwidth]{pic/high-energy-artifacts.png}
 			\caption{Hohe Energie}
 			\label{fig:high-energy-artifact}
     	\end{subfigure}
     	\hfill
-    	\begin{subfigure}{0.48\linewidth}
+    	\begin{subfigure}{0.45\linewidth}
     		\centering
-      		\includegraphics[width=\textwidth]{pic/low-energy-artifacts.png}
+      		\includegraphics[width=0.95\textwidth]{pic/low-energy-artifacts.png}
 			\caption{Niedrige Energie}
 			\label{fig:low-energy-artifact}
     	\end{subfigure}
-    	\caption{Artefakte in \ac{BKG}-Signalen}
-	\end{figure} %TODO: welches Bruser paper ist Quelle?
-	
+    	\caption{Artefakte in \ac{BKG}-Signalen.\protect\footnotemark}
+	\end{figure}
+	\footnotetext{Graphik von C. Brüser}
 		
 	Bei der Betrachtung verschiedener Ansätze zur Signalverarbeitung und Artefakterkennung bei \ac{BKG}-Signalen ist auffällig, dass Proband*innen oft angewiesen werden, sich möglichst wenig zu bewegen. Das ist bei der Messung im Alltag, insbesondere bei Messungen in Betten nicht realistisch. Dazu kommt, dass beim Einsatz im Alltag auch Kontakt mit der Person nicht immer gewährleistet ist, z.\,B. wenn diese sich aufrichtet. \citeauthor{HoogAntink2020} haben festgestellt, dass bei Messsystemen in Betten besonders Messungen tagsüber große Signalteile von schlechter Qualität aufweisen, deutlich mehr als nachts. Dies ist durch gesteigerte Aktivität tagsüber erklärbar. Ebenfalls im \textit{unobtrusive} Kontext nicht zielführende Methoden zur Artefakterkennung verwenden eine \ac{EKG}-Referenz.
 	
@@ -116,17 +116,18 @@ In diesem Kapitel wird eine Einführung in das Thema der Signalverarbeitung und 
 	\begin{figure}[H]
 		\centering
 		\includegraphics[width=0.5\textwidth]{pic/bland-altman-pino.png}
-		\caption[Genauigkeit der Herzratenberechnung bei schwellwertbasierter Artefakterkennung]{Bland-Altman Graph zwischen von \ac{EKG} und \ac{BKG} berechneter \ac{HR}.\protect\footnotemark}
+		\caption[Genauigkeit der Herzratenberechnung bei schwellwertbasierter Artefakterkennung.]{Bland-Altman Graph zwischen von \ac{EKG} und \ac{BKG} berechneter \ac{HR}.\protect\footnotemark}
 		\label{fig:bland-altman-pino}
 	\end{figure}
 	\footnotetext{Entnommen aus \cite{Pino2015}}
+	\pagebreak %TODO: achtung pagebreak
 	
 	Hier zeigt sich, dass beim Großteil des hier betrachteten Signals die \ac{HR} größtenteils mit einer Genauigkeit von $\pm 3$ Schläge pro Minute bestimmt werden konnte. Allerdings handelt es sich hier um im Sitzen gemessenes Signal, bei dem die Variabilität geringer ist als bei in Betten aufgenommenem \ac{BKG}.
 	
 	
 	\subsection{Maschinelles Lernen mit statistischen Merkmalen}\label{ml-beschreibung}	
 	
-	Ein Algorithmus zur Beurteilung der Signalqualität mittels maschinellen Lernens wird von \citeauthor{Sadek2016} in \citetitle{Sadek2016} beschrieben.\footcite{Sadek2016} Betrachtet werden \ac{BKG}-Signale, die in einem Massagesessel aufgenommen werden, also ebenfalls im Sitzen aufgenommenes Signal, bei dem eine geringere Variabilität als in dem hier untersuchten Anwendungsfall erwartet wird.
+	Ein Algorithmus zur Beurteilung der Signalqualität mittels maschinellen Lernens wird von \citeauthor{Sadek2016} in \citetitle{Sadek2016} beschrieben.\footcite[Vgl.][]{Sadek2016} Betrachtet werden \ac{BKG}-Signale, die in einem Massagesessel aufgenommen werden, also ebenfalls im Sitzen aufgenommenes Signal, bei dem eine geringere Variabilität als in dem hier untersuchten Anwendungsfall erwartet wird.
 	
 	Die vorliegenden Daten wurden manuell von Expert*innen als informativ oder nicht informativ klassifiziert und in 10-Sekunden-Segmente, die sich nicht überlappen, aufgeteilt. Insgesamt waren 58\,\% der Daten als informativ und 42\,\% als nicht-informativ gelabelt. Von diesen Segmenten wurden nach einer Bandpass-Filterung auf \numrange{1}{12}\,Hz 13 statistische Merkmale berechnet:
 
@@ -152,11 +153,11 @@ In diesem Kapitel wird eine Einführung in das Thema der Signalverarbeitung und 
 	
 	\subsection{Ähnlichkeit der Intervallschätzer des CLIE-Algorithmus}\label{brueserQI}
 	
-	Ein weiteres Maß für die Signalqualität basiert auf dem in Kapitel \ref{CLIE} vorgestellten Algorithmus zur Intervallschätzung. Dieser \acl{SQI} misst, wie einig sich die drei Intervallschätzer sind. Wenn diese sich uneinig sind, ist der \ac{SQI} bei 0, je ähnlicher sich die Schätzungen sind, desto höher ist er. Für jedes Fenster $i$ wird er wie folgt berechnet: \[ q = \frac{E_f[n\textsubscript{opt}, i]}{\sum E_f[n, i]} \] %TODO welche range hat q
+	Ein weiteres Maß für die Signalqualität basiert auf dem in Kapitel\,\ref{CLIE} vorgestellten Algorithmus zur Intervallschätzung. Dieser \acl{SQI} misst, wie einig sich die drei Intervallschätzer sind. Wenn diese sich uneinig sind, ist der \ac{SQI} bei 0, je ähnlicher sich die Schätzungen sind, desto höher ist er. Für jedes Fenster $i$ wird er wie folgt berechnet: \[ q = \frac{E_f[n\textsubscript{opt}, i]}{\sum E_f[n, i]} \]
 	
 	Bei der Ermittlung der konkreten Schlag-zu-Schlag Intervalle wird von dem \ac{SQI} $q$ äquivalent zu den geschätzten Intervalllängen der Median berechnet. Schätzungen dessen Qualität unter einem Schwellwert $q\textsubscript{th}$ werden verworfen. Die Wahl von $q\textsubscript{th}$ hängt von der gewünschten Genauigkeit und Coverage ab, je höher die gewünschte Genauigkeit, desto niedriger die Coverage.
 	
-	Dieser \ac{SQI} wird in der Literatur\footcite[Bspw.][]{HoogAntink2020, Zink2017} mit unterschiedlich gewähltem $q\textsubscript{th}$ genutzt und erreicht damit bei der \ac{BKG}-Messung in Betten während der Nacht bei gesunden Patient*innen gute Ergebnisse. \citeauthor{Bruser2013}\footcite{Bruser2013} erreichen zum Beispiel bei acht gesunden Proband*innen durchschnittlich eine Coverage von $85\,\%$ bei einem Fehler zur \ac{EKG}-Referenz von \num{0{,}61}\,\% Schlägen pro Minute.\footcite{Bruser2013} Bei Patient*innen im Krankenhaus zeigte sich, dass sowohl die Ergebnisse bezüglich der Coverage als auch der Genauigkeit bedeutend schlechter sind. So erreichen \citeauthor{HoogAntink2020}\footcite{HoogAntink2020} bei 14 Patient*innen durchschnittlich \num{40}\,\% Coverage bei einem Fehler von \num{2{,}16}\,\% Schlägen pro Minute. Werden nur die nächtlichen Aufnahmen betrachtet, wird eine Coverage von \num{52}\,\% bei einem Fehler von \num{1{,}29}\,\% Schlägen pro Minute erreicht. Bei der Berechnung letzterer Ergebnisse wurden zusätzlich Intervallschätzungen verworfen, deren relative Abweichung vom Median der anderen Schätzungen einen bestimmten Schwellwert überschreitet.\footcite{HoogAntink2020}
+	Dieser \ac{SQI} wird in der Literatur\footcite[Bspw.][]{HoogAntink2020, Zink2017} mit unterschiedlich gewähltem $q\textsubscript{th}$ genutzt und erreicht damit bei der \ac{BKG}-Messung in Betten während der Nacht bei gesunden Patient*innen gute Ergebnisse. \citeauthor{Bruser2013}\footcite{Bruser2013} erreichen zum Beispiel bei acht gesunden Proband*innen durchschnittlich eine Coverage von $85\,\%$ bei einem Fehler zur \ac{EKG}-Referenz von \num{0{,}61}\,\% Schlägen pro Minute.\footcite[Vgl.][]{Bruser2013} Bei Patient*innen im Krankenhaus zeigte sich, dass sowohl die Ergebnisse bezüglich der Coverage als auch der Genauigkeit bedeutend schlechter sind. So erreichen \citeauthor{HoogAntink2020}\footcite{HoogAntink2020} bei 14 Patient*innen durchschnittlich \num{40}\,\% Coverage bei einem Fehler von \num{2{,}16}\,\% Schlägen pro Minute. Werden nur die nächtlichen Aufnahmen betrachtet, wird eine Coverage von \num{52}\,\% bei einem Fehler von \num{1{,}29}\,\% Schlägen pro Minute erreicht. Bei der Berechnung letzterer Ergebnisse wurden zusätzlich Intervallschätzungen verworfen, deren relative Abweichung vom Median der anderen Schätzungen einen bestimmten Schwellwert überschreitet.\footcite[Vgl.][]{HoogAntink2020}
 	
 	Dieser Algorithmus ist der einzige der drei betrachteten, der im Bett aufgenommenes \ac{BKG}-Signal untersucht. Die Ergebnisse sind bei gesunden, schlafenden Patient*innen sehr gut, im tatsächlichen Einsatz im Krankenhaus wird allerdings eine deutlich geringere Coverage bei höherem Fehler erreicht.
 	
@@ -166,32 +167,31 @@ In diesem Kapitel wird eine Einführung in das Thema der Signalverarbeitung und 
 	
 	Gemessen wurde mit einem EMFit QS Bettsensor, der zwischen der Matratze des Krankenhausbettes und dem Bettgestell positioniert wurde. Die Abtastrate des \ac{BKG} betrug 100\,Hz. Das Referenz-\ac{EKG} wurde mit einem Faros 360 Patientenmonitor mit einer Abtastrate von 1\,kHz aufgenommen und hat drei Kanäle. Durch die unterschiedlichen Systemzeiten der beiden Geräte kam es zu einem Drift zwischen den beiden Signalen. Bei den langen Messungen zeigte sich, dass dieser zeitvariant ist.
 	
-	Es liegen also \ac{BKG}-Daten und ein 3-kanaliges \ac{EKG}-Signal vor. Außerdem liegen schon detektierte und nach ihrer Qualität gefilterte Herzschläge mitsamt ihrer Qualität nach dem in Kapitel \ref{brueserQI} beschriebenen \ac{SQI}, der geschätzten Länge und der Länge des Referenzsignals vor. Zusätzlich gibt es zu jedem Paar von \ac{EKG} und \ac{BKG}-Daten einen Vektor, der den zeitvarianten Drift berücksichtigt. Zu jeder Sekunde des \ac{BKG}-Signals wird die entsprechende Sekunde der \ac{EKG}-Referenz benannt.
+	Es liegen also \ac{BKG}-Daten und ein 3-kanaliges \ac{EKG}-Signal vor. Außerdem liegen schon detektierte und nach ihrer Qualität gefilterte Herzschläge mitsamt ihrer Qualität nach dem in Kapitel\,\ref{brueserQI} beschriebenen \ac{SQI}, der geschätzten Länge und der Länge des Referenzsignals vor. Zusätzlich gibt es zu jedem Paar von \ac{EKG} und \ac{BKG}-Daten einen Vektor, der den zeitvarianten Drift berücksichtigt. Zu jeder Sekunde des \ac{BKG}-Signals wird die entsprechende Sekunde der \ac{EKG}-Referenz benannt.
 	
 	\subsection{Vorverarbeitung}
 	
 	Die verschiedenen Daten liegen in unterschiedlichen Formaten und Dateien vor, die zunächst zusammengeführt und vorverarbeitet werden müssen. Dieser Vorgang sowie die entwickelte Datenstruktur werden im Folgenden beschrieben.
 	
-	%TODO: Dateinamen statt .edf und .mat
-	Für jede*n Patient*in existiert eine .mat-Datei, die das rohe \ac{BKG}-Signal und die bereits detektierten Intervalle mit Position, Qualität und Referenzlänge enthält. Die Vektoren zum Ausgleich des Drifts liegen ebenfalls in .mat-Dateien vor. Das Referenzsignal ist im .edf-Format gespeichert. Da die Nummerierung von \ac{BKG}-Daten und \ac{EKG}-Daten variiert, existiert außerdem eine Zuordnung dieser. Das Ziel der entwickelten Datenstruktur ist es, diese Daten zusammenzuführen. Die Klassenstruktur ist in Abbildung \ref{fig:data-prep-class} visualisiert. Die Klasse \textit{DataSeries} enthält alle Daten, die zu einer Person gehören, also das \ac{BKG}-Signal, das \ac{EKG}-Signal und den Vektor, um den Drift auszugleichen. Alle Patient*innen sind in \textit{Data} gesammelt. Dort werden auch alle Daten eingelesen und zugeordnet.
+	Für jede*n Patient*in existiert eine Matlab-Datei, die das rohe \ac{BKG}-Signal und die bereits detektierten Intervalle mit Position, Qualität und Referenzlänge enthält. Die Vektoren zum Ausgleich des Drifts liegen ebenfalls in Matlab-Dateien vor. Das Referenzsignal ist im European Data Format gespeichert. Da die Nummerierung von \ac{BKG}-Daten und \ac{EKG}-Daten variiert, existiert außerdem eine Zuordnung dieser. Das Ziel der entwickelten Datenstruktur ist es, diese Daten zusammenzuführen. Die Klassenstruktur ist in Abbildung\,\ref{fig:data-prep-class} visualisiert. Die Klasse \textit{DataSeries} enthält alle Daten, die zu einer Person gehören, also das \ac{BKG}-Signal, das \ac{EKG}-Signal und den Vektor, um den Drift auszugleichen. Alle Patient*innen sind in \textit{Data} gesammelt. Dort werden auch alle Daten eingelesen und zugeordnet.
 	
-	\begin{figure}[H]
+	\begin{figure}[htb!]
 		\centering
-		\includegraphics[width=\textwidth]{pic/data-prep-classes.png}
-		\caption[Klassendiagramm der Datenstruktur für die Messdaten]{Klassendiagramm der Datenstruktur für die Messdaten.}
+		\includegraphics[width=0.9\textwidth]{pic/data-prep-classes.png}
+		\caption[Klassendiagramm der Datenstruktur für die Messdaten.]{Klassendiagramm der Datenstruktur für die Messdaten.}
 		\label{fig:data-prep-class}
 	\end{figure}
 	
 	Um die Herzraten auf Intervallen bestimmen zu können, müssen sowohl das \ac{BKG}- als auch das \ac{EKG}-Signal vorverarbeitet werden. Da diese Vorverarbeitung durch die große Datenmenge sehr aufwändig ist, werden die Ergebnisse als .csv-Dateien serialisiert. Beim Laden der Daten kann so geprüft werden, ob die Berechnung wiederholt werden muss oder geladen werden kann.
 	
-	Bei der Vorverarbeitung des \ac{BKG}-Signals wird der in Kapitel \ref{CLIE} vorgestellte CLIE-Algorithmus angewendet und die ermittelten Indizes der Intervalle, die geschätzten Intervallängen und der in Kapitel \ref{brueserQI} beschriebene Qualitätsindex gespeichert. Für das \ac{EKG}-Signal wird für alle drei Kanäle eine Detektion der QRS-Komplexe durchgeführt, mit denen die Schlag-zu-Schlag Intervalle ermittelt werden können. Dafür wird die Python-Implementierung von \citeauthor{Howell2019}\footcite{Howell2019} des von \citeauthor{Elgendi2010} beschriebenen Algorithmus\footcite[][]{Elgendi2010} genutzt. Dieser zeigt in einer Untersuchung von \citeauthor{Porr2019} gute Ergebnisse.\footcite{Porr2019}
+	Bei der Vorverarbeitung des \ac{BKG}-Signals wird der in Kapitel\,\ref{CLIE} vorgestellte CLIE-Algorithmus angewendet und die ermittelten Indizes der Intervalle, die geschätzten Intervallängen und der in Kapitel\,\ref{brueserQI} beschriebene Qualitätsindex gespeichert. Für das \ac{EKG}-Signal wird für alle drei Kanäle eine Detektion der QRS-Komplexe durchgeführt, mit denen die Schlag-zu-Schlag Intervalle ermittelt werden können. Dafür wird die Python-Implementierung von \citeauthor{Howell2019}\footcite{Howell2019} des von \citeauthor{Elgendi2010} beschriebenen Algorithmus\footcite[Vgl.][]{Elgendi2010} genutzt. Dieser zeigt in einer Untersuchung von \citeauthor{Porr2019} gute Ergebnisse.\footcite[Vgl.][]{Porr2019}
 	
 	
 	\subsection{Annotation der Daten}\label{annotation}
 	
 	Die vorliegenden Daten sind nicht annotiert. Es ist im Rahmen dieser Arbeit nicht möglich, die Annotation durch Expert*innen durchführen zu lassen, weshalb auf das parallel aufgenommene \ac{EKG} zurückgegriffen wird. Aufgrund des nicht-linearen Drifts der Daten ist eine herzschlaggenaue Synchronisierung schwierig. Aus diesem Grund wurde entschieden, die Annotation bereichsweise vorzunehmen. Für jeden Bereich wird zunächst geprüft, ob ein aussagekräftiges Referenzsignal existiert. Falls nicht, wird der entsprechende Bereich ausgeschlossen und nicht weiter verwendet. Ansonsten wird die durchschnittliche Herzrate sowohl für BKG- als auch EKG-Signal berechnet. Für die Berechnung der Herzfrequenz im \ac{BKG} wird der Median der geschätzten Intervalllängen verwendet. So werden Ausreißer weniger stark gewichtet. Wenn mit den geschätzten Intervalllängen eine Coverage von unter 80\,\% erreicht wird, wird die Herzrate verworfen, da in diesem Fall nur kleine Teile des Signals aussagekräftig sind.
 	
-	Auch bei dem Referenzsignal wird die Herzrate über den Median der Intervalllängen ermittelt. Die Intervalllängen entsprechen hier den Abständen der ermittelten R-Peaks. Da drei \ac{EKG}-Kanäle vorliegen, wird die Herzrate zunächst für jeden Kanal einzeln geschätzt. Falls die geschätzte Herzrate außerhalb des erwarteten Bereichs von 30 bis 200 Schlägen pro Minute liegt, wird der Kanal verworfen. Die Auswahl des Kanals gestaltet sich schwieriger, da auch im Referenzsignal teilweise schlechtes Signal vorliegt. Um dies auszugleichen, wird zur Auswahl des Kanals die Herzrate ebenfalls auf einem doppelt so großem Fenster berechnet. Von diesen drei Herzraten wird die ausgewählt, deren Kanal die geringste Spannweite an Intervalllängen aufweist. Mit Hilfe der geschätzten Herzrate des größeren Fensters wird nun der Kanal für die endgültige Schätzung ausgewählt, der die geringste Abweichung zu der Schätzung des größeren Fensters hat. Der Ablauf ist in Abbildung \ref{fig:ecg-hr-estimation} visualisiert.
+	Auch bei dem Referenzsignal wird die Herzrate über den Median der Intervalllängen ermittelt. Die Intervalllängen entsprechen hier den Abständen der ermittelten R-Peaks. Da drei \ac{EKG}-Kanäle vorliegen, wird die Herzrate zunächst für jeden Kanal einzeln geschätzt. Falls die geschätzte Herzrate außerhalb des erwarteten Bereichs von 30 bis 200 Schlägen pro Minute liegt, wird der Kanal verworfen. Die Auswahl des Kanals gestaltet sich schwieriger, da auch im Referenzsignal teilweise schlechtes Signal vorliegt. Um dies auszugleichen, wird zur Auswahl des Kanals die Herzrate ebenfalls auf einem doppelt so großen Fenster berechnet. Von diesen drei Herzraten wird die ausgewählt, deren Kanal die geringste Spannweite an Intervalllängen aufweist. Mit Hilfe der geschätzten Herzrate des größeren Fensters wird nun der Kanal für die endgültige Schätzung ausgewählt, der die geringste Abweichung zu der Schätzung des größeren Fensters hat. Der Ablauf ist in Abbildung\,\ref{fig:ecg-hr-estimation} visualisiert.
 	
 	\begin{figure}[H]
 		\centering
@@ -201,7 +201,7 @@ In diesem Kapitel wird eine Einführung in das Thema der Signalverarbeitung und 
 	\end{figure}
 
 	
-	Die Auswirkungen dieses Verfahrens sind in Abbildung \ref{fig:ecg-patient-26} sichtbar. Eine Fusion nur auf dem aktuellen Bereich führt zu einigen Fehlern in der Herzratenschätzung, die die Umgebung einbeziehende Fusion führt zu deutlich besseren Ergebnissen. Auch ist hier sichtbar, wie groß die Abweichung einzelner Kanäle ist.
+	Die Auswirkungen dieses Verfahrens sind in Abbildung\,\ref{fig:ecg-patient-26} sichtbar. Eine Fusion nur auf dem aktuellen Bereich führt zu einigen Fehlern in der Herzratenschätzung, die die Umgebung einbeziehende Fusion führt zu deutlich besseren Ergebnissen. Auch ist hier sichtbar, wie groß die Abweichung einzelner Kanäle ist.
 
 	\begin{figure}[H]
 		\centering
@@ -210,9 +210,7 @@ In diesem Kapitel wird eine Einführung in das Thema der Signalverarbeitung und 
 		\label{fig:ecg-patient-26}
 	\end{figure}
 
-
-	% TODO: Referenz Norm hübscher
-	Auf Basis dieser beiden Herzraten $HR\textsubscript{EKG}$ und $HR\textsubscript{BKG}$ wird nun die Annotation vorgenommen. Dabei wurde sich an der Norm für \ac{EKG}-Patientenmonitoren orientiert. Diese schreibt vor, dass die Abweichung der Herzrate maximal 10\,\% oder 5 Schläge pro Minute betragen darf, je nachdem welcher der beiden Werte größer ist\footcite[]{DIN} und wurde hier so übernommen. Wenn eine höhere oder niedrigere Genauigkeit gefordert ist, kann dies auch auf 15\,\% und 7{,}5 Schläge pro Minute oder 5\,\% und 2{,}5 Schläge pro Minute angepasst werden. Die entsprechenden Verteilungen der Labels bei einer binären Klassifikation für 10 Sekunden lange Segmente mit 90 \% Überlappung für 5, 10 und 15\,\% maximale Abweichung sind in Abbildung \ref{fig:label-distribution} zu sehen.
+	Auf Basis dieser beiden Herzraten $HR\textsubscript{EKG}$ und $HR\textsubscript{BKG}$ wird nun die Annotation vorgenommen. Dabei wurde sich an der Norm für \ac{EKG}-Patientenmonitoren orientiert. Diese schreibt vor, dass die Abweichung der Herzrate maximal 10\,\% oder 5 Schläge pro Minute betragen darf, je nachdem welcher der beiden Werte größer ist,\footcite[]{DIN} und wurde hier so übernommen. Wenn eine höhere oder niedrigere Genauigkeit gefordert ist, kann dies auch auf 15\,\% und 7{,}5 Schläge pro Minute oder 5\,\% und 2{,}5 Schläge pro Minute angepasst werden. Die entsprechenden Verteilungen der Labels bei einer binären Klassifikation für 10 Sekunden lange Segmente mit 90 \% Überlappung für 5, 10 und 15\,\% maximale Abweichung sind in Abbildung\,\ref{fig:label-distribution} zu sehen.
 	
 	\begin{figure}[H]
 		\centering
@@ -221,12 +219,12 @@ In diesem Kapitel wird eine Einführung in das Thema der Signalverarbeitung und 
 		\label{fig:label-distribution}
 	\end{figure}
 	
-	Es ist auffällig, dass die Anteile der informativen Segmente stark patient*innenabhängig sind. In Abbildung \ref{fig:data-stats-15} wird dies für 10\,\% maximale Abweichung visualisiert.
+	Es ist auffällig, dass die Anteile der informativen Segmente stark patient*innenabhängig sind. In Abbildung\,\ref{fig:data-stats-15} wird dies für 10\,\% maximale Abweichung visualisiert.
 	
 	\begin{figure}[H]
 		\centering
 		\includegraphics{pic/data-stats-10.pdf}
-		\caption[Verteilung der Labels pro Patient*in]{Verteilung der Label pro Patient*in für maximal 10\,\% Abweichung.}
+		\caption[Verteilung der Labels pro Patient*in.]{Verteilung der Label pro Patient*in für maximal 10\,\% Abweichung.}
 		\label{fig:data-stats-15}
 	\end{figure}
 	
@@ -236,7 +234,7 @@ In diesem Kapitel wird eine Einführung in das Thema der Signalverarbeitung und 
 		E\textsubscript{HR} \hat{=} \Delta\text{HR}\textsubscript{abs} \cdot 2.
 	\end{align*}
 	
-	Wenn keine Herzrate aus dem \ac{BKG}-Signal ermittelt werden konnte, wird $E\textsubscript{HR}$ auf den maximalen Wert 667 gesetzt, da das der maximal möglichen relativen Abweichung von Herzraten zwischen 30 und 200 Schlägen pro Minute entspricht. Für $E\textsubscript{HR}$ wird im Folgenden die Einheit Fehlereinheit \si{FE} verwendet. Die Verteilung von $E\textsubscript{HR}$, dargestellt in Abbildung \ref{fig:class-histo}, zeigt, dass Segmente mit Fehlern von mehr als 20\,\si{FE} und solche mit Fehlern unter 5\,\si{FE} jeweils die beiden größten Gruppen bilden.
+	Wenn keine Herzrate aus dem \ac{BKG}-Signal ermittelt werden konnte, wird $E\textsubscript{HR}$ auf den maximalen Wert 667 gesetzt, da das der maximal möglichen relativen Abweichung von Herzraten zwischen 30 und 200 Schlägen pro Minute entspricht. Für $E\textsubscript{HR}$ wird im Folgenden die Einheit Fehlereinheit \si{FE} verwendet. Die Verteilung von $E\textsubscript{HR}$, dargestellt in Abbildung\,\ref{fig:class-histo}, zeigt, dass Segmente mit Fehlern von mehr als 20\,\si{FE} und solche mit Fehlern unter 5\,\si{FE} jeweils die beiden größten Gruppen bilden.
 	
 	
 	\begin{figure}[H]

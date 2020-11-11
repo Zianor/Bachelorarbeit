@@ -34,7 +34,7 @@ class QualityEstimator:
         self.features = self._get_features().copy()
         self.target = self.data['informative'].copy()
         self.patient_id = self.data['patient_id'].copy()
-        self.y_lim= 50
+        self.y_lim = 50
 
     @staticmethod
     def _get_informative_names():
@@ -624,6 +624,7 @@ class OwnEstimator(QualityEstimator):
         pd.options.mode.use_inf_as_na = True
         self.error_target = self.data['error']
         self.path = os.path.join(utils.get_model_path(), path)
+        self.y_lim = 60
         if clf is not None:
             self.clf = OwnClassifier(model=clf)
             if not os.path.isdir(self.path):
