@@ -1,10 +1,10 @@
 \chapter{Evaluation der Ergebnisse}\label{evaluation}
 
-Im Folgenden werden die entwickelten Modelle untersucht und evaluiert. Für die beiden \acl{RF}-Modelle wird die Implementierung von \texttt{sklearn} genutzt, für die Gradient Boosted Trees die Bibliothek \texttt{XGBoost}, da das dort verwendete \acf{XGB} besser ist als die Implementierung in \texttt{sklearn}.\footcite[Kapitel 10]{Harrison2019} Die Ergebnisse der Modelle werden sowohl für das reduzierte als auch das vollständige Merkmalsset berechnet, verglichen und aufbauend darauf die Merkmalsauswahl optimiert. Außerdem wird der Einfluss der gewählten Segmentlänge und des gewählten Schwellwertes der Annotation untersucht. Für alle Untersuchungen wird das gleiche Testset wie in Kapitel\,\ref{analyse} verwendet.
+Im Folgenden werden die entwickelten Modelle untersucht und evaluiert. Für die beiden \acl{RF}-Modelle wird die Implementierung von \texttt{sklearn} genutzt, für die Gradient Boosted Trees die Bibliothek \texttt{XGBoost}, da das dort verwendete \acf{XGB} besser ist als die Implementierung in \texttt{sklearn}.\footcite[Kapitel 10]{Harrison2019} Die Ergebnisse der Modelle werden sowohl für das reduzierte als auch das vollständige Merkmalsset berechnet, verglichen und aufbauend darauf die Merkmalsauswahl optimiert. Außerdem wird der Einfluss der gewählten Segmentlänge und des gewählten Schwellwertes der Annotation untersucht. Für alle Untersuchungen wird das gleiche Testset wie in Kapitel~\ref{analyse} verwendet.
 
 \section{Evaluation der Modelle}
 
-Zunächst werden alle Modelle sowohl mit dem vollständigen Merkmalsset als auch dem reduzierten Merkmalsset verglichen; die Ergebnisse sind in Tabelle\,\ref{fig:comparison-all} gezeigt. Insgesamt zeigt sich bereits, dass eine deutlich höhere Coverage als bei der reinen Betrachtung der Intervallschätzer des CLIE-Algorithmus erreicht wird. Diese lag beispielsweise für $q\textsubscript{th} = 0.3$ bei 20,93\,\% mit einem \ac{MAE} von 13,90\,\si{FE}. Die Ergebnisse der Klassifikation mit Gradient Boosted Trees und \acl{RF}s sind zunächst ähnlich. Eine Ausnahme bildet das Regressionsmodell mit Gradient Boosted Trees: Es erreicht eine sehr hohe Coverage von über 80\,\% mit einem zu den anderen Modellen verhältnismäßig hohen \ac{MAE} von über 16\,\si{FE}.
+Zunächst werden alle Modelle sowohl mit dem vollständigen Merkmalsset als auch dem reduzierten Merkmalsset verglichen; die Ergebnisse sind in Tabelle~\ref{fig:comparison-all} gezeigt. Insgesamt zeigt sich bereits, dass eine deutlich höhere Coverage als bei der reinen Betrachtung der Intervallschätzer des CLIE-Algorithmus erreicht wird. Diese lag beispielsweise für $q\textsubscript{th} = 0.3$ bei 20,93\,\% mit einem \ac{MAE} von 13,90\,\si{FE}. Die Ergebnisse der Klassifikation mit Gradient Boosted Trees und \acl{RF}s sind zunächst ähnlich. Eine Ausnahme bildet das Regressionsmodell mit Gradient Boosted Trees: Es erreicht eine sehr hohe Coverage von über 80\,\% mit einem zu den anderen Modellen verhältnismäßig hohen \ac{MAE} von über 16\,\si{FE}.
 
 	\begin{table}[htb!]
 	\centering
@@ -30,7 +30,7 @@ Zunächst werden alle Modelle sowohl mit dem vollständigen Merkmalsset als auch
 		\label{fig:comparison-all}
 	\end{table}
 
-Des Weiteren zeigt sich, dass das reduzierte Merkmalsset entgegen der Erwartung zu etwas schlechteren Ergebnissen führt. Eine Betrachtung der Wichtigkeit der Merkmale für die Modelle mit vollständigem Merkmalsset zeigt, dass hier jeweils $\text{ratio}\textsubscript{acf}$ und $\text{ratio}\textsubscript{acf}$ zu den wichtigsten Merkmalen gehören, welche beide kein Teil des reduzierten Merkmalssets sind. In Abbildung\,\ref{fig:rf-clf-all-importances} ist die Verteilung der Relevanz der Merkmale exemplarisch für den \ac{RF}-Klassifikator mit vollständigem Merkmalsset gezeigt. Ein Test mit einem \ac{RF}-Klassifikator mit dem reduzierten Merkmalsset zuzüglich der oben genannten Merkmalen zeigt, dass die Performance vergleichbar mit dem vollständigen Merkmalsset ist und ein \ac{MAE} von 11,97\,\si{FE} bei einer Coverage von 36,51\,\% erreicht wird.
+Des Weiteren zeigt sich, dass das reduzierte Merkmalsset entgegen der Erwartung zu etwas schlechteren Ergebnissen führt. Eine Betrachtung der Wichtigkeit der Merkmale für die Modelle mit vollständigem Merkmalsset zeigt, dass hier jeweils $\text{ratio}\textsubscript{acf}$ und $\text{ratio}\textsubscript{acf}$ zu den wichtigsten Merkmalen gehören, welche beide kein Teil des reduzierten Merkmalssets sind. In Abbildung~\ref{fig:rf-clf-all-importances} ist die Verteilung der Relevanz der Merkmale exemplarisch für den \ac{RF}-Klassifikator mit vollständigem Merkmalsset gezeigt. Ein Test mit einem \ac{RF}-Klassifikator mit dem reduzierten Merkmalsset zuzüglich der oben genannten Merkmalen zeigt, dass die Performance vergleichbar mit dem vollständigen Merkmalsset ist und ein \ac{MAE} von 11,97\,\si{FE} bei einer Coverage von 36,51\,\% erreicht wird.
 
 \begin{figure}[H]
 	\centering
@@ -39,7 +39,7 @@ Des Weiteren zeigt sich, dass das reduzierte Merkmalsset entgegen der Erwartung 
  	\label{fig:rf-clf-all-importances}
 \end{figure}
 
-Bei den folgenden Untersuchungen wird aus diesem Grund das erweiterte reduzierte Merkmalsset verwendet. Die Ergebnisse der vier Modelle sind in Tabelle\,\ref{fig:final-results-comparison} abgebildet. Alle erzielen ähnliche Ergebnisse, wobei die Regressionsmodelle eine etwas höhere Coverage erreichen. Es gibt im Gegensatz zu den vorherigen Ergebnissen keine Ausreißer. Die \ac{AUC} zeigt, dass alle Modelle bei den gegebenen Daten in der Lage sind, informatives und nicht informatives Signal zu separieren.
+Bei den folgenden Untersuchungen wird aus diesem Grund das erweiterte reduzierte Merkmalsset verwendet. Die Ergebnisse der vier Modelle sind in Tabelle~\ref{fig:final-results-comparison} abgebildet. Alle erzielen ähnliche Ergebnisse, wobei die Regressionsmodelle eine etwas höhere Coverage erreichen. Es gibt im Gegensatz zu den vorherigen Ergebnissen keine Ausreißer. Die \ac{AUC} zeigt, dass alle Modelle bei den gegebenen Daten in der Lage sind, informatives und nicht informatives Signal zu separieren.
 %\begin{multicols}{2}
 %\begin{itemize}
 %	\item Mittelwert
@@ -83,7 +83,7 @@ Bei den folgenden Untersuchungen wird aus diesem Grund das erweiterte reduzierte
 \end{table}
 
 	
-Betrachtet man die Wichtigkeit der Merkmale der beiden Klassifikationsmodelle, fällt auf, dass bei dem \ac{XGB}-Klassifikator ein Merkmal allein deutlich wichtiger als alle anderen ist; sowohl beim reduzierten als auch beim vollständigen Merkmalsset. Bei den \ac{RF}-Modellen dagegen ist die Wichtigkeit gleichmäßiger verteilt. Der direkte Vergleich ist in Abbildung\,\ref{fig:importances-comparison-rf-xgb-clf} zu sehen. Trotz der unterschiedlichen Gewichtung der Merkmale erzielen beide Modelle ähnliche Ergebnisse. Allerdings ist der \ac{XGB}-Klassifikator weniger stabil, falls das mit Abstand wichtigste Merkmal $C_{0{,}5}$ gestört wird. Es zeigt aber auch, dass die Ähnlichkeit der Intervallschätzer des \ac{CLIE}-Algorithmus ein gutes Kriterium zur Beurteilung der Signalqualität ist.
+Betrachtet man die Wichtigkeit der Merkmale der beiden Klassifikationsmodelle, fällt auf, dass bei dem \ac{XGB}-Klassifikator ein Merkmal allein deutlich wichtiger als alle anderen ist; sowohl beim reduzierten als auch beim vollständigen Merkmalsset. Bei den \ac{RF}-Modellen dagegen ist die Wichtigkeit gleichmäßiger verteilt. Der direkte Vergleich ist in Abbildung~\ref{fig:importances-comparison-rf-xgb-clf} zu sehen. Trotz der unterschiedlichen Gewichtung der Merkmale erzielen beide Modelle ähnliche Ergebnisse. Allerdings ist der \ac{XGB}-Klassifikator weniger stabil, falls das mit Abstand wichtigste Merkmal $C_{0{,}5}$ gestört wird. Es zeigt aber auch, dass die Ähnlichkeit der Intervallschätzer des \ac{CLIE}-Algorithmus ein gutes Kriterium zur Beurteilung der Signalqualität ist.
 
  \begin{figure}[h]
  	\centering
@@ -101,7 +101,7 @@ Betrachtet man die Wichtigkeit der Merkmale der beiden Klassifikationsmodelle, f
  	\label{fig:importances-comparison-rf-xgb-clf}
  \end{figure}
 
-Bei der Betrachtung der Regressionsmodelle zeigt sich, dass es bei dem \ac{XGB}-Regressor zwei Merkmale gibt, die bedeutend wichtiger als der Rest sind: Erneut $C_{0,5}$ und $\text{ratio}\textsubscript{data}$. Das \ac{RF}-Modell zeigt auch hier eine gleichmäßigere Verteilung der Wichtigkeit der Merkmale. Die Wichtigkeit der übrigen Merkmale ist, wie in Abbildung\,\ref{fig:importances-comparison-rf-xgb-regr} zu sehen, ähnlich verteilt.
+Bei der Betrachtung der Regressionsmodelle zeigt sich, dass es bei dem \ac{XGB}-Regressor zwei Merkmale gibt, die bedeutend wichtiger als der Rest sind: Erneut $C_{0,5}$ und $\text{ratio}\textsubscript{data}$. Das \ac{RF}-Modell zeigt auch hier eine gleichmäßigere Verteilung der Wichtigkeit der Merkmale. Die Wichtigkeit der übrigen Merkmale ist, wie in Abbildung~\ref{fig:importances-comparison-rf-xgb-regr} zu sehen, ähnlich verteilt.
 
  \begin{figure}[h]
  	\centering
@@ -119,7 +119,7 @@ Bei der Betrachtung der Regressionsmodelle zeigt sich, dass es bei dem \ac{XGB}-
  	\label{fig:importances-comparison-rf-xgb-regr}
  \end{figure}
  
- Die \ac{RF}-Modelle gewichten die einzelnen Merkmale bei den vorliegenden Daten ähnlicher als die \ac{XGB}-Modelle. Dennoch sind die Ergebnisse der ersten Evaluation ähnlich. Auch ist die Wichtigkeit der Merkmale zwischen den Klassifikations- und Regressionsmodellen ähnlich. Insgesamt zeigen die Regressionsmodelle aber eine überlegene Performance. Eine genauere Evaluation der Coverage und der Verteilung von $E\textsubscript{HR}$ wird beispielhaft für den \ac{RF}-Regressor durchgeführt. Zum Vergleich werden die Ergebnisse der Klassifizierung anhand der Intervallschätzer des \ac{CLIE}-Algorithmus für $q\textsubscript{th}=0{,}3$ und $c\textsubscript{th}=75$ gezeigt, da mit diesen Schwellwerten ebenfalls eine Reduzierung des \ac{MAE} mit einer vergleichbaren Coverage von 37,87\,\% erreicht wurde. Der Vergleich der erreichten Coverage unter einem bestimmten $E\textsubscript{HR}$, sichtbar in Tabelle\,\ref{fig:own-coverage-default}, zeigt, dass die Coverage für geringe Fehler deutlich erhöht werden konnte. 
+ Die \ac{RF}-Modelle gewichten die einzelnen Merkmale bei den vorliegenden Daten ähnlicher als die \ac{XGB}-Modelle. Dennoch sind die Ergebnisse der ersten Evaluation ähnlich. Auch ist die Wichtigkeit der Merkmale zwischen den Klassifikations- und Regressionsmodellen ähnlich. Insgesamt zeigen die Regressionsmodelle aber eine überlegene Performance. Eine genauere Evaluation der Coverage und der Verteilung von $E\textsubscript{HR}$ wird beispielhaft für den \ac{RF}-Regressor durchgeführt. Zum Vergleich werden die Ergebnisse der Klassifizierung anhand der Intervallschätzer des \ac{CLIE}-Algorithmus für $q\textsubscript{th}=0{,}3$ und $c\textsubscript{th}=75$ gezeigt, da mit diesen Schwellwerten ebenfalls eine Reduzierung des \ac{MAE} mit einer vergleichbaren Coverage von 37,87\,\% erreicht wurde. Der Vergleich der erreichten Coverage unter einem bestimmten $E\textsubscript{HR}$, sichtbar in Tabelle~\ref{fig:own-coverage-default}, zeigt, dass die Coverage für geringe Fehler deutlich erhöht werden konnte. 
  
   \begin{table}[h]
  	\centering
@@ -158,7 +158,7 @@ Bei der Betrachtung der Regressionsmodelle zeigt sich, dass es bei dem \ac{XGB}-
 
 Nachdem die generelle Performance der Modelle untersucht wurde, wird nun der Einfluss des verwendeten Schwellwertes $E\textsubscript{th}$ der Annotation untersucht. Dafür werden die vier Modelle jeweils für vier Schwellwerte $E\textsubscript{th}$ trainiert: $E\textsubscript{th} \in \{5, 10, 15, 20\}$.
 
-Die Ergebnisse der Klassifikationsmodelle sind in Tabelle\,\ref{fig:var-eth-clf} gezeigt. Für diese Modelle ergibt sich für niedrigere Schwellwerte $E\textsubscript{th}$ jeweils eine niedrigere Coverage und ein niedrigerer \ac{MAE}. Die Variation des \ac{MAE} beträgt zwischen $E\textsubscript{th}= 5\,\si{FE}$ und $E\textsubscript{th} = 20\,\si{FE}$ allerdings nur gut 2\,\si{FE} beim \ac{RF}-Klassifikator bzw. 2,5\,\si{FE} beim \ac{XGB}-Klassifikator. Die Coverage kann dabei um ca. 15 Prozentpunkte für das \ac{RF}-Modell und um ca. 18 Prozentpunkte für das \ac{XGB}-Modell erhöht werden. Wie wichtig die Genauigkeit der Herzratenschätzung im Vergleich zur Coverage ist, hängt vom Anwendungsfall ab, allerdings ist der Gewinn durch die deutlich erhöhte Coverage vermutlich in den meisten Fällen größer. Für alle Schwellwerte ist weiterhin eine Trennung der beiden Klassen möglich, wobei jeweils die Modelle mit $E\textsubscript{th}= 5\text{\,}\si{FE}$ die beste Trennung ermöglichen. Es kann also auch sinnvoll sein, lediglich den Schwellwert des Klassifikationsmodells anzupassen. Eine genauere Untersuchung der Auswirkungen durch eine solche Variation ist im Rahmen dieser Arbeit allerdings nicht möglich. In den Untersuchungen zeigt sich ebenfalls, dass der \ac{XGB}-Klassifikator tendenziell eine höhere Coverage bei gleichzeitig höherem \ac{MAE} erreicht als das \ac{RF}-Modell.
+Die Ergebnisse der Klassifikationsmodelle sind in Tabelle~\ref{fig:var-eth-clf} gezeigt. Für diese Modelle ergibt sich für niedrigere Schwellwerte $E\textsubscript{th}$ jeweils eine niedrigere Coverage und ein niedrigerer \ac{MAE}. Die Variation des \ac{MAE} beträgt zwischen $E\textsubscript{th}= 5\,\si{FE}$ und $E\textsubscript{th} = 20\,\si{FE}$ allerdings nur gut 2\,\si{FE} beim \ac{RF}-Klassifikator bzw. 2,5\,\si{FE} beim \ac{XGB}-Klassifikator. Die Coverage kann dabei um ca. 15 Prozentpunkte für das \ac{RF}-Modell und um ca. 18 Prozentpunkte für das \ac{XGB}-Modell erhöht werden. Wie wichtig die Genauigkeit der Herzratenschätzung im Vergleich zur Coverage ist, hängt vom Anwendungsfall ab, allerdings ist der Gewinn durch die deutlich erhöhte Coverage vermutlich in den meisten Fällen größer. Für alle Schwellwerte ist weiterhin eine Trennung der beiden Klassen möglich, wobei jeweils die Modelle mit $E\textsubscript{th}= 5\text{\,}\si{FE}$ die beste Trennung ermöglichen. Es kann also auch sinnvoll sein, lediglich den Schwellwert des Klassifikationsmodells anzupassen. Eine genauere Untersuchung der Auswirkungen durch eine solche Variation ist im Rahmen dieser Arbeit allerdings nicht möglich. In den Untersuchungen zeigt sich ebenfalls, dass der \ac{XGB}-Klassifikator tendenziell eine höhere Coverage bei gleichzeitig höherem \ac{MAE} erreicht als das \ac{RF}-Modell.
 
 \begin{table}[H]
 	\begin{subfigure}{\textwidth}
@@ -190,7 +190,7 @@ Die Ergebnisse der Klassifikationsmodelle sind in Tabelle\,\ref{fig:var-eth-clf}
 	\label{fig:var-eth-clf}
 \end{table}
 
-Betrachtet man die Coverage unter bestimmten Fehlern für $E\textsubscript{th}= 5\text{\,}\si{FE}$ und $E\textsubscript{th}= 20\text{\,}\si{FE}$ im Vergleich, wird deutlich, dass durch eine Erhöhung von $E\textsubscript{th}$ in der Annotation auch Segmente mit niedrigem Fehler deutlich zuverlässiger miterfasst werden. Der direkte Vergleich ist in Tabelle\,\ref{fig:xgb-clf-cov-eth} für den \ac{XGB}-Klassifikator gezeigt.
+Betrachtet man die Coverage unter bestimmten Fehlern für $E\textsubscript{th}= 5\text{\,}\si{FE}$ und $E\textsubscript{th}= 20\text{\,}\si{FE}$ im Vergleich, wird deutlich, dass durch eine Erhöhung von $E\textsubscript{th}$ in der Annotation auch Segmente mit niedrigem Fehler deutlich zuverlässiger miterfasst werden. Der direkte Vergleich ist in Tabelle~\ref{fig:xgb-clf-cov-eth} für den \ac{XGB}-Klassifikator gezeigt.
 
 \begin{table}[H]
 	\centering
@@ -205,7 +205,7 @@ Betrachtet man die Coverage unter bestimmten Fehlern für $E\textsubscript{th}= 
  	\label{fig:xgb-clf-cov-eth}
 \end{table}
 
-Bei den Regressionsmodellen ist der Einfluss der Variation von $E\textsubscript{th}$ deutlich stärker, wie in Tabelle\,\ref{fig:var-eth-regr} zu sehen ist. Hier variiert der \ac{MAE} um ca. 5,5\,\si{FE} für das \ac{RF}-Modell und um ca. 4,5\,\si{FE} für den \ac{XGB}-Regressor. Die Coverage zeigt eine stärkere Variation von knapp 60\,\% für das \ac{RF}- bzw. knapp 50\,\% für das \ac{XGB}-Modell. Auch sind die erreichten durchschnittlichen Fehler für $E\textsubscript{th}= 20\text{\,}\si{FE}$ um 1 bis 2\,\si{FE} höher als bei den Klassifikationsmodellen und für $E\textsubscript{th}= 5\text{\,}\si{FE}$ jeweils 1 bis 2\,\si{FE} niedriger. Die \ac{AUC} dagegen verhält sich ähnlich zu den Klassifikationsmodellen.
+Bei den Regressionsmodellen ist der Einfluss der Variation von $E\textsubscript{th}$ deutlich stärker, wie in Tabelle~\ref{fig:var-eth-regr} zu sehen ist. Hier variiert der \ac{MAE} um ca. 5,5\,\si{FE} für das \ac{RF}-Modell und um ca. 4,5\,\si{FE} für den \ac{XGB}-Regressor. Die Coverage zeigt eine stärkere Variation von knapp 60\,\% für das \ac{RF}- bzw. knapp 50\,\% für das \ac{XGB}-Modell. Auch sind die erreichten durchschnittlichen Fehler für $E\textsubscript{th}= 20\text{\,}\si{FE}$ um 1 bis 2\,\si{FE} höher als bei den Klassifikationsmodellen und für $E\textsubscript{th}= 5\text{\,}\si{FE}$ jeweils 1 bis 2\,\si{FE} niedriger. Die \ac{AUC} dagegen verhält sich ähnlich zu den Klassifikationsmodellen.
 
 \begin{table}[H]
 	\begin{subfigure}{\textwidth}
@@ -238,7 +238,7 @@ Bei den Regressionsmodellen ist der Einfluss der Variation von $E\textsubscript{
 \end{table}
 
 
-Auch hier wird die Coverage unter bestimmten Fehlern $E\textsubscript{HR}$ untersucht. Die Ergebnisse der Regressionsmodelle für niedrige $E\textsubscript{th}$ weisen eine deutlich geringere Coverage auf, aber für $E\textsubscript{th} = 20$ wird nahezu alles informative Signal erkannt. Vor allem fällt auf, dass bei $E\textsubscript{th}= 5\text{\,}\si{FE}$ sehr viel Signal mit nur geringem Fehler nicht erkannt wird. Der Vergleich zwischen $E\textsubscript{th}= 5\text{\,}\si{FE}$ und $E\textsubscript{th}= 20\text{\,}\si{FE}$ beim \ac{RF}-Regressor ist in Tabelle\,\ref{fig:rf-regr-cov-eth} gezeigt.
+Auch hier wird die Coverage unter bestimmten Fehlern $E\textsubscript{HR}$ untersucht. Die Ergebnisse der Regressionsmodelle für niedrige $E\textsubscript{th}$ weisen eine deutlich geringere Coverage auf, aber für $E\textsubscript{th} = 20$ wird nahezu alles informative Signal erkannt. Vor allem fällt auf, dass bei $E\textsubscript{th}= 5\text{\,}\si{FE}$ sehr viel Signal mit nur geringem Fehler nicht erkannt wird. Der Vergleich zwischen $E\textsubscript{th}= 5\text{\,}\si{FE}$ und $E\textsubscript{th}= 20\text{\,}\si{FE}$ beim \ac{RF}-Regressor ist in Tabelle~\ref{fig:rf-regr-cov-eth} gezeigt.
 
 \begin{table}[H]
 	\centering
@@ -254,7 +254,7 @@ Auch hier wird die Coverage unter bestimmten Fehlern $E\textsubscript{HR}$ unter
 \end{table}
 
 
-Bei der Betrachtung von Coverage und \ac{MAE} aller vier Modelle mit den verschiedenen Schwellwerten $E\textsubscript{th}$ im Vergleich zeigt sich, dass der Tradeoff zwischen Coverage und \ac{MAE} nahezu linear ist (Abbildung\,\ref{fig:threshold-variation}).
+Bei der Betrachtung von Coverage und \ac{MAE} aller vier Modelle mit den verschiedenen Schwellwerten $E\textsubscript{th}$ im Vergleich zeigt sich, dass der Tradeoff zwischen Coverage und \ac{MAE} nahezu linear ist (Abbildung~\ref{fig:threshold-variation}).
 
 \begin{figure}[H]
 	\centering
@@ -269,7 +269,7 @@ Die Untersuchungen zeigen, dass die Wahl von $E\textsubscript{th}$ einen großen
 
 Neben dem Einfluss des Schwellwertes der Annotation $E\textsubscript{th}$ wird auch der Einfluss der verwendeten Segmentlänge $s$ untersucht. Für diese Untersuchung wird aufgrund der Ergebnisse der vorherigen Untersuchungen $E\textsubscript{th}=20$ gewählt. Untersuchte Segmentlängen sind 5, 10, 20 und 30 Sekunden.
 
-Bei den Klassifikationsmodellen zeigt sich deutlich, dass mit steigender Segmentlänge die Coverage höher und der \ac{MAE} niedriger wird, siehe Tabelle\,\ref{fig:var-s-clf}. Es muss zusätzlich beachtet werden, dass der \ac{MAE} über die Segmente insgesamt mit steigender Segmentlänge ebenfalls sinkt, die Verbesserung also eventuell darin begründet ist. Auch der F1-Score steigt mit der Segmentlänge; die \ac{AUC} dagegen wird etwas niedriger. Bei dem \ac{RF}-Modell sind die Veränderungen in \ac{MAE} und Coverage etwas größer als bei dem \ac{XGB}-Klassifikator. Alles in allem führen größere Segmente bei den Klassifikationsmodellen zu besseren Ergebnissen bezüglich Coverage und \ac{MAE}, allerdings lassen sich die beiden Klassen nach \ac{AUC} etwas schlechter voneinander trennen. 
+Bei den Klassifikationsmodellen zeigt sich deutlich, dass mit steigender Segmentlänge die Coverage höher und der \ac{MAE} niedriger wird, siehe Tabelle~\ref{fig:var-s-clf}. Es muss zusätzlich beachtet werden, dass der \ac{MAE} über die Segmente insgesamt mit steigender Segmentlänge ebenfalls sinkt, die Verbesserung also eventuell darin begründet ist. Auch der F1-Score steigt mit der Segmentlänge; die \ac{AUC} dagegen wird etwas niedriger. Bei dem \ac{RF}-Modell sind die Veränderungen in \ac{MAE} und Coverage etwas größer als bei dem \ac{XGB}-Klassifikator. Alles in allem führen größere Segmente bei den Klassifikationsmodellen zu besseren Ergebnissen bezüglich Coverage und \ac{MAE}, allerdings lassen sich die beiden Klassen nach \ac{AUC} etwas schlechter voneinander trennen. 
 
 \begin{table}[H]
 	\begin{subfigure}{\textwidth}
@@ -304,7 +304,7 @@ Bei den Klassifikationsmodellen zeigt sich deutlich, dass mit steigender Segment
 	\label{fig:var-s-clf}
 \end{table}
 
-Betrachtet man die Coverage aufgeschlüsselt nach bestimmten Fehlern $E\textsubscript{HR}$, zeigt sich, dass der Fehler wie schon beschrieben bei längeren Segmenten niedriger ist, aber auch, dass die Klassifikation bei längeren Segmenten näher an der Annotation ist. Für den \ac{RF}-Klassifikator ist die Coverage für die Segmentlängen $s=5$ und $s=30$ in Tabelle\,\ref{fig:rf-clf-cov-s} aufgeschlüsselt.
+Betrachtet man die Coverage aufgeschlüsselt nach bestimmten Fehlern $E\textsubscript{HR}$, zeigt sich, dass der Fehler wie schon beschrieben bei längeren Segmenten niedriger ist, aber auch, dass die Klassifikation bei längeren Segmenten näher an der Annotation ist. Für den \ac{RF}-Klassifikator ist die Coverage für die Segmentlängen $s=5$ und $s=30$ in Tabelle~\ref{fig:rf-clf-cov-s} aufgeschlüsselt.
 
 \begin{table}[H]
 	\centering
@@ -320,7 +320,7 @@ Betrachtet man die Coverage aufgeschlüsselt nach bestimmten Fehlern $E\textsubs
  	\label{fig:rf-clf-cov-s}
 \end{table}
 
-Bei den Regressionsmodellen ist, wie in Tabelle\,\ref{fig:var-s-regr} gezeigt, ähnliches zu beobachten. Hier ist der Effekt auf den \ac{MAE} etwas stärker als bei den Klassifikationsmodellen; bei beiden Modellen beträgt die Veränderung über 2\,\si{FE}. Auch hier ist er beim \ac{RF}-Modell etwas stärker. Die Veränderung der Coverage ist beim \ac{RF}-Regressor dagegen minimal; zwischen $s=5$ und $s=30$ beträgt der Unterschied nur knapp 1,5 Prozentpunkte. Auch beim \ac{XGB}-Modell ist die Veränderung der Coverage weniger stark als bei den Klassifikationsmodellen, aber zumindest bei ca. 8 Prozentpunkten.
+Bei den Regressionsmodellen ist, wie in Tabelle~\ref{fig:var-s-regr} gezeigt, ähnliches zu beobachten. Hier ist der Effekt auf den \ac{MAE} etwas stärker als bei den Klassifikationsmodellen; bei beiden Modellen beträgt die Veränderung über 2\,\si{FE}. Auch hier ist er beim \ac{RF}-Modell etwas stärker. Die Veränderung der Coverage ist beim \ac{RF}-Regressor dagegen minimal; zwischen $s=5$ und $s=30$ beträgt der Unterschied nur knapp 1,5 Prozentpunkte. Auch beim \ac{XGB}-Modell ist die Veränderung der Coverage weniger stark als bei den Klassifikationsmodellen, aber zumindest bei ca. 8 Prozentpunkten.
 
 
 \begin{table}[H]
@@ -373,7 +373,7 @@ Der direkte Vergleich der Verteilung von $E\textsubscript{HR}$ auf den als infor
  	\label{fig:rf-regr-var-s-positives}
  \end{figure}
  
- Betrachtet man alle Modelle im Vergleich, indem man den Zusammenhang von \ac{MAE} und Coverage graphisch darstellt, siehe Abbildung\,\ref{fig:segment-length-variation}, zeigt sich, dass die Unterschiede der Modelle mit variierender Segmentlänge sichtbar sind. Das Modell mit geringstem \ac{MAE} und geringster Coverage ist der \ac{RF}-Klassifikator, das mit höchstem \ac{MAE} und Coverage ist der \ac{RF}-Regressor. Auch zeigt sich erneut, dass jeweils Regressions- und Klassifikationsmodelle eine hohe Ähnlichkeit der Ergebnisse zeigen. Auch wird sehr deutlich, dass bei gleichem Fehler die Regressionsmodelle eine höhere Coverage erreichen. So variiert bei einem \ac{MAE} von knapp über 14\,\si{FE} die Coverage zwischen ca. 45\,\% und ca. 80\,\%. Das Modell mit der höchsten Coverage ist dabei der \ac{RF}-Regressor.
+ Betrachtet man alle Modelle im Vergleich, indem man den Zusammenhang von \ac{MAE} und Coverage graphisch darstellt, siehe Abbildung~\ref{fig:segment-length-variation}, zeigt sich, dass die Unterschiede der Modelle mit variierender Segmentlänge sichtbar sind. Das Modell mit geringstem \ac{MAE} und geringster Coverage ist der \ac{RF}-Klassifikator, das mit höchstem \ac{MAE} und Coverage ist der \ac{RF}-Regressor. Auch zeigt sich erneut, dass jeweils Regressions- und Klassifikationsmodelle eine hohe Ähnlichkeit der Ergebnisse zeigen. Auch wird sehr deutlich, dass bei gleichem Fehler die Regressionsmodelle eine höhere Coverage erreichen. So variiert bei einem \ac{MAE} von knapp über 14\,\si{FE} die Coverage zwischen ca. 45\,\% und ca. 80\,\%. Das Modell mit der höchsten Coverage ist dabei der \ac{RF}-Regressor.
  
  \begin{figure}[H]
 	\centering
@@ -390,7 +390,7 @@ Neben den bisher betrachteten Daten der Patient*innen liegen außerdem die im Sc
 
 Schon bei der Betrachtung der Daten fällt der Unterschied der Signalqualität insgesamt auf: Während bei den zuvor betrachteten Daten mit $E\textsubscript{th} = 20$ eine Coverage von 59,45\,\% durch die Annotation erreicht werden, liegt sie bei den Daten der gesunden Proband*innen bei 83,96\,\%. Auch liegt der durchschnittliche \ac{MAE} aller Daten bei den gesunden Personen bei 13,76\,\si{FE} im Vergleich zu 21,85\,\si{FE} bei tatsächlichen Patient*innen.
 
-Die Daten werden auf den trainierten Modellen ohne weitere Anpassungen getestet. Es zeigt sich, dass die Klassifikation auch auf unbekannten Daten mit anderen Aufnahmebedingungen funktioniert. Die Ergebnisse für die vier Modelle sind in Tabelle\,\ref{fig:res-healthy-data} abgebildet. Es zeigt sich erneut, dass die Regressionsmodelle eine höhere Coverage bei einem ebenfalls höheren \ac{MAE} erreichen. Während die Performance der Klassifikationsmodelle auch bei den unbekannten Daten sehr ähnlich ist, zeigt sich bei den Regressionsmodellen, dass das \ac{RF}-Modell bei der \ac{AUC}, dem F1-Score und der Accuracy etwas besser abschneidet. Allerdings ist auch der \ac{MAE} leicht höher - bei einer ebenfalls leicht höheren Coverage.
+Die Daten werden auf den trainierten Modellen ohne weitere Anpassungen getestet. Es zeigt sich, dass die Klassifikation auch auf unbekannten Daten mit anderen Aufnahmebedingungen funktioniert. Die Ergebnisse für die vier Modelle sind in Tabelle~\ref{fig:res-healthy-data} abgebildet. Es zeigt sich erneut, dass die Regressionsmodelle eine höhere Coverage bei einem ebenfalls höheren \ac{MAE} erreichen. Während die Performance der Klassifikationsmodelle auch bei den unbekannten Daten sehr ähnlich ist, zeigt sich bei den Regressionsmodellen, dass das \ac{RF}-Modell bei der \ac{AUC}, dem F1-Score und der Accuracy etwas besser abschneidet. Allerdings ist auch der \ac{MAE} leicht höher - bei einer ebenfalls leicht höheren Coverage.
 
 \begin{table}[H]
 	\centering

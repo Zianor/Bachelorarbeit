@@ -1,14 +1,14 @@
 \chapter{Synthese}\label{synthese}
 
-Die Untersuchungen in Kapitel\,\ref{analyse} haben gezeigt, dass die existierenden untersuchten Verfahren sich nur bedingt eignen, die Qualität von \ac{BKG}-Signal aus Langzeitaufnahmen von Patient*innen zu beurteilen. Deshalb werden weitere Möglichkeiten zu diesem Zweck untersucht und der Fokus dabei vor allem auf die Konstruktion und Analyse der Eingabemerkmale gelegt. Es wird eine Auswahl von Modellen zum Testen getroffen und ein Basisklassifikator zum Vergleich dieser Modelle entwickelt.
+Die Untersuchungen in Kapitel~\ref{analyse} haben gezeigt, dass die existierenden untersuchten Verfahren sich nur bedingt eignen, die Qualität von \ac{BKG}-Signal aus Langzeitaufnahmen von Patient*innen zu beurteilen. Deshalb werden weitere Möglichkeiten zu diesem Zweck untersucht und der Fokus dabei vor allem auf die Konstruktion und Analyse der Eingabemerkmale gelegt. Es wird eine Auswahl von Modellen zum Testen getroffen und ein Basisklassifikator zum Vergleich dieser Modelle entwickelt.
 
 \section{Merkmalskonstruktion}
 
 Grundsätzlich muss zwischen zwei Eingabeformen unterschieden werden: Der bisher betrachteten Eingabe von Merkmalen und der Eingabe des Signals selbst. Letzteres hat den Vorteil, dass keine Informationen verloren gehen können. Allerdings ist das Training so sehr rechen- und damit auch zeitaufwändig und die Merkmale, die zur Beurteilung der Signalqualität genutzt werden, sind nur schwer nachvollziehbar. Aus diesen Gründen wird in dieser Arbeit die Eingabe von Merkmalen untersucht.
 
-Neben der Konstruktion von neuen Merkmalen können ebenfalls die Ergebnisse aus Kapitel\,\ref{analyse} verwendet werden, das bedeutet das reduzierte Set statistischer Merkmale und der \ac{SQI} des \ac{CLIE}-Algorithmus, bzw. die Coverage durch Intervalle, deren \ac{SQI} über einem Schwellwert $q\textsubscript{th}$ liegt. Das Vorgehen bei der Konstruktion neuer Merkmale besteht darin, diese zunächst zu sammeln und anschließend zu untersuchen, Zusammenhänge zu ermitteln und mit den gewonnenen Erkenntnissen die Merkmale zu reduzieren und in Relation zueinander zu setzen.
+Neben der Konstruktion von neuen Merkmalen können ebenfalls die Ergebnisse aus Kapitel~\ref{analyse} verwendet werden, das bedeutet das reduzierte Set statistischer Merkmale und der \ac{SQI} des \ac{CLIE}-Algorithmus, bzw. die Coverage durch Intervalle, deren \ac{SQI} über einem Schwellwert $q\textsubscript{th}$ liegt. Das Vorgehen bei der Konstruktion neuer Merkmale besteht darin, diese zunächst zu sammeln und anschließend zu untersuchen, Zusammenhänge zu ermitteln und mit den gewonnenen Erkenntnissen die Merkmale zu reduzieren und in Relation zueinander zu setzen.
 
-Da die Untersuchung in Kapitel\,\ref{eval-brueser} gezeigt hat, dass die Ergebnisse stark abhängig von der Auswahl des Schwellwerts $q\textsubscript{th}$ für den \ac{SQI} sind, wurde die Coverage für die Schwellwerte $q\textsubscript{th} = 0.3$, $q\textsubscript{th} = 0.4$ und $q\textsubscript{th} = 0.5$ als Merkmal ausgewählt. Da die Verteilung des \ac{SQI} auf dem Segment womöglich weitere Erkenntnisse ermöglicht, wurden außerdem Merkmale zu der Verteilung der \ac{SQI} aller ermittelten Intervalle berechnet:
+Da die Untersuchung in Kapitel~\ref{eval-brueser} gezeigt hat, dass die Ergebnisse stark abhängig von der Auswahl des Schwellwerts $q\textsubscript{th}$ für den \ac{SQI} sind, wurde die Coverage für die Schwellwerte $q\textsubscript{th} = 0.3$, $q\textsubscript{th} = 0.4$ und $q\textsubscript{th} = 0.5$ als Merkmal ausgewählt. Da die Verteilung des \ac{SQI} auf dem Segment womöglich weitere Erkenntnisse ermöglicht, wurden außerdem Merkmale zu der Verteilung der \ac{SQI} aller ermittelten Intervalle berechnet:
 \begin{itemize}
 	\item Minimum $\text{SQI}\textsubscript{min}$
 	\item Maximum $\text{SQI}\textsubscript{max}$
@@ -67,7 +67,7 @@ Da die Berechnung aller Merkmale für die Menge der Daten zeit- und rechenaufwä
 
 \section{Explorative Datenanalyse und Merkmalsreduktion}\label{reduction}
 
-Durch die Extraktion mehrerer Merkmale pro betrachteter Eigenschaft entstehen korrelierte Merkmale, bei denen eine Reduktion der Merkmale zu einer verbesserten Performance führen kann. Außerdem werden durch korrelierte Merkmale Analysen der Wichtigkeit der Merkmale verzerrt. Eine Reduktion wird im Rahmen einer explorativen Datenanalyse durchgeführt. Die Korrelationen sind in dem erzeugten Korrelationsdiagramm, das in Abbildung\,\ref{fig:corr-heatmap-own} gezeigt ist, deutlich sichtbar.
+Durch die Extraktion mehrerer Merkmale pro betrachteter Eigenschaft entstehen korrelierte Merkmale, bei denen eine Reduktion der Merkmale zu einer verbesserten Performance führen kann. Außerdem werden durch korrelierte Merkmale Analysen der Wichtigkeit der Merkmale verzerrt. Eine Reduktion wird im Rahmen einer explorativen Datenanalyse durchgeführt. Die Korrelationen sind in dem erzeugten Korrelationsdiagramm, das in Abbildung~\ref{fig:corr-heatmap-own} gezeigt ist, deutlich sichtbar.
 
 \begin{figure}[H]
 	\centering
@@ -76,7 +76,7 @@ Durch die Extraktion mehrerer Merkmale pro betrachteter Eigenschaft entstehen ko
 	\label{fig:corr-heatmap-own}
 \end{figure}
  
-Auch bei diesen Merkmalen wird mit dem Python-Paket \texttt{rfimp} ermittelt, welche Merkmale durch andere vorhergesagt werden können. Im Zuge der Merkmalskonstruktion werden Merkmale verworfen, die sich durch ein einzelnes anderes Merkmal vorhersagen lassen. Um jeweils das Merkmal zu verwerfen, dass weniger Informationen beiträgt, wird außerdem mit der Bibliothek \texttt{sklearn} die Mutual Information zwischen den Merkmalen und der binären Annotation berechnet. Visualisiert ist sie in Abbildung\,\ref{fig:mutual-inf-own-all}.
+Auch bei diesen Merkmalen wird mit dem Python-Paket \texttt{rfimp} ermittelt, welche Merkmale durch andere vorhergesagt werden können. Im Zuge der Merkmalskonstruktion werden Merkmale verworfen, die sich durch ein einzelnes anderes Merkmal vorhersagen lassen. Um jeweils das Merkmal zu verwerfen, dass weniger Informationen beiträgt, wird außerdem mit der Bibliothek \texttt{sklearn} die Mutual Information zwischen den Merkmalen und der binären Annotation berechnet. Visualisiert ist sie in Abbildung~\ref{fig:mutual-inf-own-all}.
 
 \begin{figure}[H]
 	\centering
@@ -91,7 +91,7 @@ Nach Reduktion um diese Merkmale wird die Berechnung der Abhängigkeiten wiederh
 
 Damit verbleiben insgesamt 20 Merkmale. Die Reduktion der Merkmale ermöglicht schnelleres Training und durch die weniger stark korrelierten Merkmale stabilere Modelle. Dennoch muss bei der Evaluation der Modelle untersucht werden, wie sich die Reduktion der Merkmale auswirkt.
 
-Eine andere Möglichkeit der Merkmalsreduktion ist die Transformation in einen neuen Merkmalsraum, beispielsweise durch eine \ac{PCA}. Die graphische Darstellung einer Reduktion in einen zweidimensionalen Merkmalsraum, siehe Abbildung\,\ref{fig:pca-own-reduced}, zeigt, dass die Daten so nicht vollständig linear separierbar sind.
+Eine andere Möglichkeit der Merkmalsreduktion ist die Transformation in einen neuen Merkmalsraum, beispielsweise durch eine \ac{PCA}. Die graphische Darstellung einer Reduktion in einen zweidimensionalen Merkmalsraum, siehe Abbildung~\ref{fig:pca-own-reduced}, zeigt, dass die Daten so nicht vollständig linear separierbar sind.
 
 \begin{figure}[H]
 	\centering
@@ -100,7 +100,7 @@ Eine andere Möglichkeit der Merkmalsreduktion ist die Transformation in einen n
 	\label{fig:pca-own-reduced}
 \end{figure}
 
-Eine Untersuchung der Mutual Information der verbleibenden Merkmale (Abbildung\,\ref{fig:mutual-inf-own}) zeigt, dass $\text{SQI}\textsubscript{min}$ mit Abstand am meisten davon besitzt. Auch die anderen Merkmale, die Informationen über den \ac{SQI} beinhalten, zählen zu den Merkmalen mit mehr Mutual Information mit der Annotation der Daten. Zu diesen zählen auch die beiden herzratenbezogenen Merkmale $\text{diff}\textsubscript{data}$ und $\text{diff}\textsubscript{acf}$. Die übernommenen noch verbleibenden vier statistischen Merkmale sind die, die am wenigsten Mutual Information mit dem Ziel teilen.
+Eine Untersuchung der Mutual Information der verbleibenden Merkmale (Abbildung~\ref{fig:mutual-inf-own}) zeigt, dass $\text{SQI}\textsubscript{min}$ mit Abstand am meisten davon besitzt. Auch die anderen Merkmale, die Informationen über den \ac{SQI} beinhalten, zählen zu den Merkmalen mit mehr Mutual Information mit der Annotation der Daten. Zu diesen zählen auch die beiden herzratenbezogenen Merkmale $\text{diff}\textsubscript{data}$ und $\text{diff}\textsubscript{acf}$. Die übernommenen noch verbleibenden vier statistischen Merkmale sind die, die am wenigsten Mutual Information mit dem Ziel teilen.
 
 \begin{figure}[H]
 	\centering

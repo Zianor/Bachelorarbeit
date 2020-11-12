@@ -20,7 +20,7 @@ class OwnClassifier(BaseEstimator, ClassifierMixin):
         """Fits the underlying model to a binary label
 
         :param X: input samples {array-like, sparse matrix} of shape (n_samples, n_features}
-        param y: target label
+        :param y: target label
         """
         if type(X) is not pd.DataFrame:
             X = pd.DataFrame(X)
@@ -32,7 +32,7 @@ class OwnClassifier(BaseEstimator, ClassifierMixin):
             scale_pos_weight = len(y[~y].index) / len(y[y].index)
             self.model.set_params(scale_pos_weight=scale_pos_weight)
         self.model.fit(X.loc[~mask_nan], y_true)
-        self.classes_ = [False, True]  # order important for AUC
+        self.classes_ = [False, True]  # order is important for AUC
         return self
 
     def predict(self, X):
@@ -96,7 +96,7 @@ class RegressionClassifier(BaseEstimator, ClassifierMixin):
         """
         y = np.power(y, 1/self.scale_sqrt)
         self.model.fit(X, y)
-        self.classes_ = [False, True]  # order important for AUC?
+        self.classes_ = [False, True]  # order is important for AUC
         return self
 
     def predict(self, X):
