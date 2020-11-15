@@ -121,7 +121,7 @@ class RegressionClassifier(BaseEstimator, ClassifierMixin):
         proba_true = np.array([np.math.exp(np.log(0.5)/self.threshold * y) for y in y_continuous])
         proba_false = 1 - proba_true
         ret = np.ones(shape=(len(y_continuous), 2))
-        ret[:, 0] = proba_false  # TODO: clean up
+        ret[:, 0] = proba_false
         ret[:, 1] = proba_true
         return ret
 

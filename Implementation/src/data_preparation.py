@@ -125,6 +125,8 @@ class ECGSeries:
 
 
 class DataSeries:
+    """Represents the data from one patient, containing ecg, bcg and the drift compensation
+    """
     bcg_sample_rate = 100
     reference_threshold = 90
 
@@ -203,6 +205,8 @@ class DataSeries:
             return abs_err / 0.5
 
     def get_best_est_int(self, bcg_start, bcg_end):
+        """Returns the filtered signal from the interval with the highest sqi in given window
+        """
         idx = self.bcg.get_unique_peak_locations(bcg_start, bcg_end)
         if len(idx) == 0:
             return None
@@ -214,6 +218,8 @@ class DataSeries:
         return None
 
     def get_median_est_int(self, bcg_start, bcg_end):
+        """Returns the filtered signal from the interval with the median interval length in given window
+        """
         idx = self.bcg.get_unique_peak_locations(bcg_start, bcg_end)
         if len(idx) == 0:
             return None
