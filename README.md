@@ -19,3 +19,7 @@ In `data_preparation.py` werden die Daten eingelesen, in einer Datenstruktur ges
  #### Implementierung und Training der Modelle
  Die Modelle selbst sind in `estimators.py` implementiert. Die selbst entwickelten Modelle finden sich zusätzlich noch 
  in `own_models.py`.
+ 
+ 
+ #### Reproduktion der Ergebnisse
+ Eine einfache Reproduktion der Ergebnisse kann durch das Ausführen des Skriptes `reproduce_results.py` erreicht werden.
